@@ -2,6 +2,7 @@
     "name": "wangxian/ephp",
     "description": "The ephp Framework.",
     "keywords": ["framework", "ephp"],
+    "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/wangxian/ephp",
     "support": {
@@ -10,13 +11,14 @@
     },
     "authors": [
         {
-            "name": "WangXian"
+            "name": "wangxian",
+            "email": "xian366@126.com"
         }
     ],
     "require": {
         "php": ">=5.6.10",
         "ext-mbstring": "*",
-        "ext-openssl": "*",
+        "ext-openssl": "*"
     },
     "autoload": {
         "files": [
