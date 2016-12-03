@@ -15,6 +15,12 @@ use ePHP\Core\Config;
  */
 function dump()
 {
+    // 关闭dump
+    if (!Config::get('show_dump'))
+    {
+        return false;
+    }
+
     $args         = func_get_args();
     $console_func = func_get_arg(0);
 

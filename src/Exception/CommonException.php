@@ -2,6 +2,8 @@
 
 namespace ePHP\Exception;
 
+use ePHP\Core\Config;
+
 class CommonException extends \Exception
 {
     // 错误堆栈
@@ -38,10 +40,10 @@ class CommonException extends \Exception
         $str = "异常信息\n-----------------------------------\n" . $this->getMessage() . "\n"
         . "-----------------------------------\n" . $this->ephpTraceString . "\n-----------------------------------\n";
 
-        // if (C('exception_log'))
-        // {
-        //     wlog('ExceptionLog', $str);
-        // }
+        if (Config::get('exception_log'))
+        {
+            wlog('ExceptionLog', $str);
+        }
 
         // //ob_start();
         // $tpl = C('tpl_exception');
@@ -55,7 +57,10 @@ class CommonException extends \Exception
         // }
 
         // //return ob_get_clean();
-        dump('error', $str);
+        if (Config::get('show_errors'))
+        {
+            dump('error', $str);
+        }
 
         return '';
     }
