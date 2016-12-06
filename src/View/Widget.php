@@ -7,7 +7,7 @@
  * @version 7.2
  * @author WangXian
  * @email wo#wangxian.me
- * @package  ePHP\View
+ * @package  \ePHP\View
  * @creation_date 2011-06-04
  * @last_modified 2016-12-03
 +------------------------------------------------------------------------------

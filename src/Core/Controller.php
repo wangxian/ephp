@@ -31,7 +31,7 @@ class Controller
                 }
                 else
                 {
-                    $model_name        = '\\App\\Models\\' . substr($key, 6) . 'Model';
+                    $model_name        = '\\App\\Models\\' . ucfirst(substr($key, 6)) . 'Model';
                     return $this->$key = new $model_name;
                 }
                 break;
