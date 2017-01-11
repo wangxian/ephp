@@ -16,23 +16,29 @@ use ePHP\Core\Config;
 
 class Cache
 {
+    /**
+     * @var \ePHP\Cache\Cache
+     */
     private static $instance;
 
     /**
      * cache handle
-     * @var object
+     *
+     * @var mixed
      */
     public $handle;
 
     /**
      * 0:长期有效, -1:不缓存，>0:缓存一定的秒数
-     * @var integer
+     *
+     * @var int
      */
     public $expire = 0;
 
     /**
      * 初始化, 获取缓存示例，$cache = Cache::init();
-     * @return object
+     *
+     * @return mixed
      */
     public static function init()
     {
