@@ -81,7 +81,7 @@ class Route
     /**
      * Find the matching route based on the current PATH_INFO
      *
-     * @return [type] [description]
+     * @return array
      */
     public function findRoute()
     {
