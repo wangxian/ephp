@@ -5,14 +5,18 @@
 <style type="text/css">
 body { font: 12px/18px Tahoma, Geneva, sans-serif; background-color: #f2f2f2;  }
 #wrapper { margin: 50px; padding: 100px 50px; box-sizing: border-box; }
-span {font-size: 6em; color: #262626; line-height:1em; text-align: right; display: inline-block; padding: 20px 40px 30px 50px; border-right: 5px solid #e9e9e9; font-weight: bold; }
-em { color: #262626; font-size: 2.8em; font-style: normal; padding-left: 30px; display: inline-block; vertical-align: super; }
+p { display: table; width: 100%; text-align: center; }
+span { font-size: 3em; }
+span:first-child { border-right: 1px solid #e9e9e9; padding-right: 5%; font-size: 5em; font-weight: bold; }
+span:last-child { overflow:hidden; white-space:nowrap }
 </style>
 </head>
 <body>
   <div id="wrapper">
-    <span>404</span>
-    <em>This page could not be found.</em>
+    <p>
+      <span>404</span>
+      <span>This page could not be found.</span>
+    </p>
     <!-- <p>This page could not be found.</p> -->
   </div>
 </body>
