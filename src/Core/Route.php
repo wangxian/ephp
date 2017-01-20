@@ -161,7 +161,7 @@ class Route
                 {
                     // has prefixUri
                     $items = $pathinfo ? explode('/', ltrim($pathinfo, '/' . implode($value['params'], '/'))) : [];
-                    return [$controller_name, $items[1], $value['controller']];
+                    return [$controller_name, empty($items[1])?'index':$items[1], $value['controller']];
                 }
             }
         }

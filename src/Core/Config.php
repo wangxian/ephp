@@ -38,14 +38,14 @@ class Config
         // 加载其他配制文件
         if ($config_name !== 'main' && !isset(self::$_config[$config_name]))
         {
-            $filename = APP_PATH . '/conf/' . $config_name . '.config.php';
+            $filename = APP_PATH . '/conf/' . $config_name . '.php';
             if (file_exists($filename))
             {
                 self::$_config[$config_name] = include $filename;
             }
             else
             {
-                show_error("配置文件：{$filename} 不存在！");
+                \show_error("Config file {$filename} is not exists.");
             }
 
         }
@@ -62,7 +62,18 @@ class Config
         else if (strpos($key, '.'))
         {
             $array = explode('.', $key);
-            return isset(self::$_config[$config_name][$array[0]][$array[1]]) ? self::$_config[$config_name][$array[0]][$array[1]] : false;
+            if(count($array) === 2)
+            {
+                return isset(self::$_config[$config_name][$array[0]][$array[1]]) ? self::$_config[$config_name][$array[0]][$array[1]] : false;
+            }
+            else if(count($array) === 3)
+            {
+                return isset(self::$_config[$config_name][$array[0]][$array[1]][$array[2]]) ? self::$_config[$config_name][$array[0]][$array[1]][$array[2]] : false;
+            }
+            else
+            {
+                show_error('Config::get("a.b.c") Only 3 levels are allowed.');
+            }
         }
         else
         {

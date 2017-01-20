@@ -112,10 +112,10 @@ class BaseModel
             $current_class = get_class($this);
             if ($current_class != 'model')
             {
-                $this->table_name = substr($current_class, 0, strlen($current_class) - 5);
+                $this->table_name = strtolower(substr($current_class, strrpos($current_class, '\\')+1, -5));
 
                 // 如果设置了表前缀
-                if (true == ($tb_prefix = Config::get($this->db_config_name . '.tb_prefix', 'db')))
+                if (true == ($tb_prefix = Config::get('dbconfig.'.$this->db_config_name . '.tb_prefix')))
                 {
                     $this->table_name = $tb_prefix . $this->table_name;
                 }
@@ -123,7 +123,7 @@ class BaseModel
             }
             else
             {
-                throw new CommonException('table_name无法确定！');
+                throw new CommonException('Tablename cannot automatically infer.');
             }
 
         }

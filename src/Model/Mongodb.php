@@ -1,4 +1,6 @@
 <?php
+namespace ePHP\Model;
+
 /**
  +------------------------------------------------------------------------------
  * mongodb model for ePHP
@@ -11,7 +13,7 @@
  +------------------------------------------------------------------------------
  */
 
-class modelMongodb
+class ModelMongodb
 {
 	protected $table_name	= '';
 	protected $sql			= array();
