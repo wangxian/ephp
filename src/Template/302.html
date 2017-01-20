@@ -2,19 +2,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta http-equiv="refresh" content="<?php echo $wait;?>;URL=<?php echo $url;?>" />
-<title>HTTP/1.1 302 Moved Permanently</title>
+<title>302</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
 <style type="text/css">
-body { background-color: #fff; margin: 40px; font-family: Consolas, Verdana, Arial, sans-serif; }
-#content { border: 1px solid #E1E1E1; background-color: #E8F3FF; padding: 20px 20px 12px 20px; }
-p { color: #000; font-size: 13px; }
-
-#redirect { color: #999; }
+body{ font: 12px/22px "Microsoft Yahei", "Consolas",Tahoma, Geneva, sans-serif; background-color: #f2f2f2; letter-spacing:1px; }
+#content{ margin: 80px auto; padding: 0 10px; text-align: center; }
+h2{ font-size: 24px; color: #262626; letter-spacing: 2px; }
+#message {}
+#redirect{ color:#aaa; }
+a { color: #000;  }
 </style>
 </head>
 <body>
 <div id="content">
+  <h2>提示信息</h2>
   <p><?php echo $message;?></p>
-  <?php echo '<p id="redirect">'. $wait .' seconds later will be redirect, if not automatically jump, Please <a href="'. $url .'">click here</a>.</p>';?>
+  <?php echo '<p id="redirect">'. $wait .'秒后自动跳转, 如果没有自动跳转请 <a href="'. $url .'">点击跳转</a>.</p>';?>
 
 </div>
 </body>
