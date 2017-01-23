@@ -157,11 +157,21 @@ class Route
                     // has not prefixUri
                     return [$controller_name, $items[1], $value['controller']];
                 }
-                else if ($value['count'] > 0 && $items[0] === $value['params'][0])
+                else if ($value['count'] > 0)
                 {
                     // has prefixUri
-                    $items = $pathinfo ? explode('/', ltrim($pathinfo, '/' . implode($value['params'], '/'))) : [];
-                    return [$controller_name, empty($items[1])?'index':$items[1], $value['controller']];
+                    $prefix = '/' . implode($value['params'], '/');
+                    // check has same prefix uri
+                    if ( substr($pathinfo, 0, strlen($prefix)) === $prefix)
+                    {
+                        $items = $pathinfo ? explode('/', ltrim($pathinfo, '/' . implode($value['params'], '/'))) : [];
+                        // not contains prefix uri, and it must match controller name
+                        if ($items[0] === $controller_name)
+                        {
+                            return [$controller_name, empty($items[1])?'index':$items[1], $value['controller']];
+                        }
+                    }
+
                 }
             }
         }
