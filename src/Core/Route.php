@@ -85,7 +85,7 @@ class Route
      */
     public function findRoute()
     {
-        $pathinfo = !empty($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/index/index';
+        $pathinfo = !empty($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] != '/' ? $_SERVER['PATH_INFO'] : '/index/index';
         $items    = $pathinfo ? explode('/', ltrim($pathinfo, '/')) : [];
         $count    = count($items);
 

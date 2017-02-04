@@ -123,7 +123,8 @@ function show_404()
     {
         include APP_PATH . '/views/' . $tpl;
     }
-    exit;
+
+    if (SERVER_MODE !== 'swoole') exit;
 }
 
 /**
@@ -154,7 +155,7 @@ function show_success($message, $url = '', $wait = 6)
         include APP_PATH . '/views/' . $tpl;
     }
 
-    exit;
+    if (SERVER_MODE !== 'swoole') exit;
 }
 
 /**
@@ -186,7 +187,7 @@ function show_error($message, $url = '', $wait = 6)
         include APP_PATH . '/views/' . $tpl;
     }
 
-    exit;
+    if (SERVER_MODE !== 'swoole') exit;
 }
 
 /**

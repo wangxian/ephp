@@ -20,6 +20,12 @@ class Application
         ini_set('display_errors', 'On');
         error_reporting(E_ALL | E_STRICT);
 
+        if ( !defined('SERVER_MODE') )
+        {
+            // Mark server mode
+            define('SERVER_MODE', 'fpm');
+        }
+
         try
         {
             $route = (\ePHP\Core\Route::init())->findRoute();
@@ -44,7 +50,7 @@ class Application
             }
             else
             {
-                show_error("method {$action_name}() is not defined in {$controller_name}");
+                \show_error("method {$action_name}() is not defined in {$controller_name}");
             }
 
         }
