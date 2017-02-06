@@ -8,6 +8,16 @@ namespace ePHP\Core;
 class Controller
 {
     /**
+     * \swoole_http_request $request
+     */
+    public $request;
+
+    /**
+     * @var \swoole_http_response $response
+     */
+    public $response;
+
+    /**
      * 自动实例化一些类，包括：view\request\model\cache
      *
      * @ignore
@@ -21,8 +31,8 @@ class Controller
             case 'view':
                 return $this->view = new \ePHP\View\BaseView();
                 break;
-            case 'request':
-                return $this->request = new \ePHP\Http\Request();
+            case 'cookie':
+                return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole($this->response);
                 break;
             case substr($key, 0, 5) === 'model':
                 if ($key === 'model')

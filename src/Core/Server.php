@@ -46,7 +46,7 @@ class Server
     private function printServerFinger(string $bind_http, bool $is_swoole)
     {
         $version       = $this->version;
-        $software      = $is_swoole ? 'PHP Development Server' : 'PHP Development Server';
+        $software      = $is_swoole ? 'Swoole Server' : 'PHP Development Server';
         $document_root = APP_PATH . '/public';
 
         echo <<<EOT
@@ -184,7 +184,7 @@ EOT;
         if (true || !is_file($filename))
         {
             ob_start();
-            (new \ePHP\Core\Application())->run();
+            (new \ePHP\Core\Application())->run($request, $response);
             $output = ob_get_clean();
 
             $response->end($output);

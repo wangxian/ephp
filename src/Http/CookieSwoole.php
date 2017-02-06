@@ -1,34 +1,17 @@
 <?php
 namespace ePHP\Http;
 
-class Cookie
+class CookieSwoole
 {
-    public function __construct()
+    /**
+     * @var \swoole_http_response $response
+     */
+    private $response;
+
+    public function __construct($response)
     {
-
+        $this->response = $response;
     }
-
-    // /**
-    //  * @var \ePHP\Http\Cookie
-    //  */
-    // private static $instance;
-
-    // /**
-    //  * Handle dynamic, static calls to the object.
-    //  *
-    //  * @param  string  $method
-    //  * @param  array   $args
-    //  * @return mixed
-    //  */
-    // public static function __callStatic($method, $args)
-    // {
-    //     if (!isset(self::$instance))
-    //     {
-    //         self::$instance = new self();
-    //     }
-    //     $method = '_'.$method;
-    //     return self::$instance->$method(...$args);
-    // }
 
     /**
      * Set Cookie
@@ -44,12 +27,12 @@ class Cookie
     {
         if (empty($domain))
         {
-            setcookie($name, $value, $expire + time(), $path);
+            $this->response->cookie($name, $value, $expire + time(), $path);
         }
         else
         {
             $domain = '.' . $_SERVER['HTTP_HOST'];
-            setcookie($name, $value, $expire + time(), $path, $domain);
+            $this->response->cookie($name, $value, $expire + time(), $path, $domain);
         }
 
         // Make it come into effect immediately.
@@ -114,12 +97,12 @@ class Cookie
     {
         if (empty($domain))
         {
-            setcookie($name, null, time() - 3600, '/');
+            $this->response->cookie($name, null, time() - 3600, '/');
         }
         else
         {
             $domain = '.' . $_SERVER['HTTP_HOST'];
-            setcookie($name, null, time() - 3600, '/', $domain);
+            $this->response->cookie($name, null, time() - 3600, '/', $domain);
         }
 
         unset($_COOKIE[$name]);
