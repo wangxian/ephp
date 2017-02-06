@@ -33,7 +33,7 @@ function dump()
         $console_func = 'info';
     }
 
-    echo '<script type="text/javascript">if(!!window.console) console.' . $console_func . '.apply(null, ' . json_encode($args) . ');</script>';
+    echo '<script type="text/javascript">if(!!window.console) console.' . $console_func . '.apply(null, ' . json_encode($args, JSON_UNESCAPED_UNICODE) . ');</script>';
 }
 
 /**
