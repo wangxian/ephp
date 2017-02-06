@@ -31,28 +31,34 @@ class Application
             $route = (\ePHP\Core\Route::init())->findRoute();
             // dumpdie($route);
 
-            $_GET['controller'] = $route[0];
-            $_GET['action']     = $route[1];
-
-            $controller_name = $route[2];
-            $action_name     = $_GET['action'];
-
-            $_REQUEST = array_merge($_GET, $_REQUEST);
-
-            if (method_exists($controller_name, $action_name))
+            if (!empty($route))
             {
-                $c_init = new $controller_name;
-                call_user_func(array($c_init, $action_name));
-            }
-            else if (!Config::get('show_errors'))
-            {
-                \show_404();
+                $_GET['controller'] = $route[0];
+                $_GET['action']     = $route[1];
+
+                $controller_name = $route[2];
+                $action_name     = $_GET['action'];
+
+                $_REQUEST = array_merge($_GET, $_REQUEST);
+
+                if (method_exists($controller_name, $action_name))
+                {
+                    $c_init = new $controller_name;
+                    call_user_func(array($c_init, $action_name));
+                }
+                else if (!Config::get('show_errors'))
+                {
+                    \show_404();
+                }
+                else
+                {
+                    \show_error("method {$action_name}() is not defined in {$controller_name}");
+                }
             }
             else
             {
-                \show_error("method {$action_name}() is not defined in {$controller_name}");
+                \show_404();
             }
-
         }
         catch (\ePHP\Exception\CommonException $e)
         {
