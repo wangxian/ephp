@@ -15,7 +15,7 @@ class Server
      *
      * @var swoole_http_server
      */
-    private $server;
+    public $server;
 
     /**
      * @var \ePHP\Core\Server
@@ -92,7 +92,7 @@ EOT;
      * create a swoole server
      *
      * @param  array $config server config
-     * @return null
+     * @return \swoole_http_server
      */
     function createServer(array $config)
     {
@@ -105,6 +105,19 @@ EOT;
         $this->server = new \swoole_http_server($host, $port);
         $this->server->set($config);
 
+        $this->server->on('task', [$this, 'onTask']);
+        $this->server->on('finish', [$this, 'onFinish']);
+
+        return $this;
+    }
+
+    /**
+     * Start swoole server
+     *
+     * @return null
+     */
+    function start()
+    {
         // Linsten http Event
         $this->server->on('request', [$this, 'onRequest']);
 
@@ -207,5 +220,15 @@ EOT;
     function onWorkerError(\swoole_http_server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
         echo "http worker error ..... \n";
+    }
+
+    function onTask(\swoole_server $serv, $task_id, $from_id, $data)
+    {
+
+    }
+
+    function onFinish(\swoole_http_server $serv, $task_id, $data)
+    {
+
     }
 }
