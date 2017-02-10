@@ -50,8 +50,9 @@ class Application
                         $c_init->response = $response;
                     }
 
-                    call_user_func(array($c_init, $action_name));
-                    // $c_init->{$action_name}();
+                    // Under swoole server, can't use call_user_func
+                    // call_user_func(array($c_init, $action_name));
+                    $c_init->{$action_name}();
                 }
                 else if (!Config::get('show_errors'))
                 {

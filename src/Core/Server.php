@@ -157,7 +157,7 @@ EOT;
         $_COOKIE = $request->cookie ?? [];
         $_FILES  = $request->files ?? [];
 
-        $_SERVER = [];
+        $_SERVER = ['run_dbquery_count' => 0];
         foreach ($request->server as $key => $value)
         {
             $key = strtoupper($key);
@@ -182,11 +182,9 @@ EOT;
         $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
         if (true || !is_file($filename))
         {
-            // ob_start();
+            ob_start();
             (new \ePHP\Core\Application())->run($request, $response);
-            // $output = ob_get_clean();
-
-            // $response->end($output);
+            $response->end(ob_get_clean());
         }
         else
         {
