@@ -34,6 +34,8 @@ class Controller
             case 'cookie':
                 return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole($this->response);
                 break;
+            case 'server':
+                return \ePHP\Core\Server::init()->server;
             case substr($key, 0, 5) === 'model':
                 if ($key === 'model')
                 {

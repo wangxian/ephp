@@ -29,7 +29,7 @@ class Server
      */
     public static function init()
     {
-        if (!self::$instance instanceof Server)
+        if (!self::$instance instanceof self)
         {
             return self::$instance = new self();
         }
@@ -180,14 +180,13 @@ EOT;
         $response->header('Server', 'ePHP/'. $this->version);
 
         $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
-
         if (true || !is_file($filename))
         {
-            ob_start();
+            // ob_start();
             (new \ePHP\Core\Application())->run($request, $response);
-            $output = ob_get_clean();
+            // $output = ob_get_clean();
 
-            $response->end($output);
+            // $response->end($output);
         }
         else
         {
@@ -209,17 +208,17 @@ EOT;
 
     function onWorkerStart(\swoole_http_server $server, int $worker_id)
     {
-        // echo "http worker start ..... \n";
+        // echo "http worker start ...... \n";
     }
 
     function onWorkerStop(\swoole_http_server $server, int $worker_id)
     {
-        echo "http worker stop ..... \n";
+        echo "http worker stop ...... \n";
     }
 
     function onWorkerError(\swoole_http_server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
-        echo "http worker error ..... \n";
+        echo "http worker error ...... \n";
     }
 
     function onTask(\swoole_server $serv, $task_id, $from_id, $data)
