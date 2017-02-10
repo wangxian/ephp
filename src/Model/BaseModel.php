@@ -50,7 +50,7 @@ class BaseModel
         if (!isset(self::$_db_handle[$this->db_config_name]))
         {
             $dbdriver = 'DB_' . Config::get('dbdriver');
-            include __DIR__ . '/' . $dbdriver . '.php';
+            include_once __DIR__ . '/' . $dbdriver . '.php';
 
             $dbdriver                                = '\\ePHP\\Model\\' . $dbdriver;
             self::$_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
