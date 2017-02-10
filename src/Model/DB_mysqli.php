@@ -89,6 +89,7 @@ class DB_mysqli
     {
         $rs   = $this->query($sql);
         $data = $rs->fetch_assoc();
+        if (empty($data)) $data = [];
 
         // 释放内存
         $rs->free();
@@ -104,7 +105,7 @@ class DB_mysqli
     function fetch_arrays($sql)
     {
         $rs   = $this->query($sql);
-        $data = null;
+        $data = [];
         while (true == ($row = $rs->fetch_assoc()))
         {
             $data[] = $row;

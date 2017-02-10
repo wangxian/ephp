@@ -114,6 +114,7 @@ class DB_mysql
     {
         $rs   = $this->query($sql);
         $data = mysql_fetch_assoc($rs);
+        if(empty($data)) $data = [];
 
         mysql_free_result($rs);
         return $data;
@@ -128,13 +129,14 @@ class DB_mysql
     public function fetch_arrays($sql)
     {
         $result = $this->query($sql);
-        $array  = null;
+
+        $data  = [];
         while (true == ($row = mysql_fetch_assoc($result)))
         {
-            $array[] = $row;
+            $data[] = $row;
         }
         mysql_free_result($result);
-        return $array;
+        return $data;
     }
 
     /**
