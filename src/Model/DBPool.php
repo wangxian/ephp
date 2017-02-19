@@ -81,22 +81,14 @@ class DBPool
     {
         // When pool size is big,
         // then wait for 5 minutes reduce pool
-        if (false && $this->queue->count() > $idle && (time() - $this->_capLastRiseTime > 300))
+        if ($this->queue->count() > $idle && (time() - $this->_capLastRiseTime > 300))
         {
-            var_dump('........................reduce connctions........................');
+            // var_dump('........................reduce connctions........................');
             while ($this->queue->count() > $idle)
             {
                 $this->queue->dequeue();
             }
             $this->cap = $idle;
-            $this->_capLastRiseTime = time();
-        }
-
-        if (time() - $this->_capLastRiseTime > 10)
-        {
-            var_dump('........................reduce connctions........................');
-            while($this->queue->count() > 1) $this->queue->dequeue();
-            $this->cap = 1;
             $this->_capLastRiseTime = time();
         }
 

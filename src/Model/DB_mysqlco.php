@@ -78,7 +78,7 @@ class DB_mysqlco
     private function prepareDB()
     {
         $dbpool = DBPool::init();
-        var_dump($dbpool->cap + $dbpool->acticeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
+        // var_dump($dbpool->cap + $dbpool->acticeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
 
         if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->iconfig['max_pool_size']))
         {
@@ -89,14 +89,14 @@ class DB_mysqlco
             || ($dbpool->queue->isEmpty() && $dbpool->cap < $this->iconfig['max_pool_size'])
         )
         {
-            var_dump('........................reconnect........................');
+            // var_dump('........................reconnect........................');
             $this->reconnect();
             $dbpool->acticeCount++;
             return false;
         }
         else
         {
-            var_dump('........................using pool........................');
+            // var_dump('........................using pool........................');
             $this->db = $dbpool->out($this->iconfig['idle_pool_size']);
             return true;
         }

@@ -186,7 +186,7 @@ EOT;
             (new \ePHP\Core\Application())->run($request, $response);
             $h = ob_get_clean();
 
-            echo "----------------------\n". $h ."\n---------------------\n";
+            // echo "----------------------\n". $h ."\n";
 
             // Fixed output o byte
             if (strlen($h) === 0) $h = ' ';
