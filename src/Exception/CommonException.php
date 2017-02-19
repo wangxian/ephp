@@ -16,8 +16,8 @@ class CommonException extends \Exception
      */
     public function __construct($message, $code = 0, $previous = null)
     {
-        //5.3.0  The previous parameter was added.
-        //5.3.0 以后previous才新增的
+        // 5.3.0  The previous parameter was added.
+        // 5.3.0 以后previous才新增的
         parent::__construct($message, $code);
 
         $this->ephpTraceString = $this->getTraceAsString();

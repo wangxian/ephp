@@ -11,7 +11,7 @@ class Server
     private $version = '7.0.2';
 
     /**
-     * handle of Swoole http server
+     * Handle of Swoole http server
      *
      * @var swoole_http_server
      */
@@ -184,7 +184,14 @@ EOT;
         {
             ob_start();
             (new \ePHP\Core\Application())->run($request, $response);
-            $response->end(ob_get_clean());
+            $h = ob_get_clean();
+
+            echo "----------------------\n". $h ."\n---------------------\n";
+
+            // Fixed output o byte
+            if (strlen($h) === 0) $h = ' ';
+
+            $response->end($h);
         }
         else
         {
