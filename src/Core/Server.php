@@ -89,7 +89,7 @@ EOT;
     }
 
     /**
-     * create a swoole server
+     * Create a swoole server
      *
      * @param  array $config server config
      * @return \swoole_http_server
@@ -128,7 +128,7 @@ EOT;
         $this->server->on('workerStop', [$this, 'onWorkerStop']);
         $this->server->on('workerError', [$this, 'onWorkerError']);
 
-        // start a new http server
+        // Start a new http server
         $this->server->start();
     }
 
@@ -218,12 +218,12 @@ EOT;
 
     function onWorkerStop(\swoole_http_server $server, int $worker_id)
     {
-        echo "http worker stop ...... \n";
+        echo "http worker stop[{$worker_id}] ...... \n";
     }
 
     function onWorkerError(\swoole_http_server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
-        echo "http worker error ...... \n";
+        echo "http worker error[{$worker_id}] ...... \n";
     }
 
     function onTask(\swoole_server $serv, $task_id, $from_id, $data)

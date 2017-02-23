@@ -1,17 +1,4 @@
 <?php
-/**
-+------------------------------------------------------------------------------
- * mysql类
- * 使用老的mysql链接，应用程序一般不会直接调用dbdrivers
-+------------------------------------------------------------------------------
- * @version 3.0
- * @author  WangXian
- * @package dbdrivers
- * @creation date 2010-8-12
- * @Modified date 2011-6-11
-+------------------------------------------------------------------------------
- */
-
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
@@ -20,17 +7,12 @@ class DB_mysql
 {
     public $db = false;
 
-    /**
-     * 使用配置中的那个数据库, 如: default, master, slave
-     *
-     * @param string $db_config
-     */
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
         if (false == ($iconfig = Config::get($db_config)))
         {
-            show_error('无效数据库配制！');
+            \show_error('Invalid database configuration！');
         }
 
         if (empty($iconfig['port']))
@@ -41,16 +23,15 @@ class DB_mysql
         $this->db = \mysql_connect($iconfig['host'] . ':' . $iconfig['port'], $iconfig['user'], $iconfig['password']);
         if (empty($this->db))
         {
-            show_error('Can not connect to your MySQL Server. Then exit');
+            show_error('Can not connect to your MySQL Server.');
         }
 
-        // 打开数据库
         if (!mysql_select_db($iconfig['dbname'], $this->db))
         {
             show_error(mysql_error($this->db));
         }
 
-        // 设置charset
+        // Set charset
         $this->query("set names " . (isset($iconfig['charset']) ? $iconfig['charset'] : 'utf8'));
     }
 
@@ -62,7 +43,6 @@ class DB_mysql
      */
     public function query($sql)
     {
-        // 是否记录 SQL log
         if (true == Config::get('sql_log'))
         {
             wlog('SQL-Log', $sql);
@@ -75,7 +55,7 @@ class DB_mysql
         }
         else if (Config::get('show_errors'))
         {
-            throw new CommonException('执行mysql::query()出现错误: ' . mysql_error($this->db) . '<br />原SQL: ' . $sql, 2045);
+            throw new CommonException('DBError: ' . mysql_error($this->db) . '<br />RawSQL: ' . $sql, 2045);
         }
         else
         {
@@ -95,7 +75,7 @@ class DB_mysql
     }
 
     /**
-     * 影响的数据总行数
+     * Affected rows
      *
      * @return int $affected_rows
      */
@@ -105,7 +85,7 @@ class DB_mysql
     }
 
     /**
-     * 查询一条数据，返回数据格式array
+     * fetch one row, return array
      *
      * @param string $sql
      * @return array
@@ -121,7 +101,7 @@ class DB_mysql
     }
 
     /**
-     * 查询多条数据，返回数据格式array
+     * fetch many rows, return array
      *
      * @param string $sql
      * @return array
@@ -140,7 +120,7 @@ class DB_mysql
     }
 
     /**
-     * 查询一条数据，返回数据格式Object
+     * fetch one row, return object
      *
      * @param string $sql
      * @return object
@@ -155,7 +135,7 @@ class DB_mysql
     }
 
     /**
-     * 查询多条数据，返回数据格式Object
+     * fetch many rows, return object
      *
      * @param string $sql
      * @return object
@@ -173,7 +153,7 @@ class DB_mysql
     }
 
     /**
-     * 转义SQL中不安全的字符
+     * Escape SQL
      *
      * @return string $str
      */
@@ -183,7 +163,7 @@ class DB_mysql
     }
 
     /*
-     * 设置事务是否自动提交
+     * Set auto commit
      *
      * @param bool $f
      * @return bool
@@ -196,14 +176,13 @@ class DB_mysql
         }
         else
         {
-            // 不自动提交事务
             $this->query('SET AUTOCOMMIT=0');
             return $this->query('START TRANSACTION');
         }
     }
 
     /*
-     * 提交事务
+     * Commit transaction
      *
      * @return bool
      */
@@ -213,7 +192,7 @@ class DB_mysql
     }
 
     /*
-     * 回滚事务
+     * Roolback transacton
      *
      * @return bool
      */

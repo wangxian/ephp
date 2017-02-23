@@ -1,17 +1,10 @@
 <?php
+/**
+ * This feature is temporarily unavailable
+ */
 namespace ePHP\Model;
 
-/**
- +------------------------------------------------------------------------------
- * mongodb model for ePHP
- +------------------------------------------------------------------------------
- * @version 4.2
- * @author  WangXian
- * @package core
- * @creation_date 2011-12-14
- * @last_modified 2011-12-14
- +------------------------------------------------------------------------------
- */
+use ePHP\Core\Config;
 
 class ModelMongodb
 {
@@ -31,7 +24,8 @@ class ModelMongodb
 	static protected $_db_handle;
 
 	/**
-	 * 清理使用过的变量
+	 * Clear unused variable
+     *
 	 * @access protected
 	 * @return void
 	 */
@@ -49,6 +43,7 @@ class ModelMongodb
 	{
 		if(! isset(self::$_db_handle[$this->db_config_name]) )
 		{
+            $db_config = 'dbconfig.' . $db_config;
 			if(false == ( $iconfig = C($this->db_config_name, 'db') ) ) show_error('数据库配制文件db.config.php中 '. $this->db_config_name .'  未设置。');
 
 			$DSN = 'mongodb://'; // exp: mongodb://192.168.1.222

@@ -1,5 +1,5 @@
 <?php
-// Coroutine MySQL
+// Swoole Coroutine MySQL
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
@@ -37,7 +37,7 @@ class DB_mysqlco
         $db_config = 'dbconfig.' . $db_config;
         if (false == ($iconfig = Config::get($db_config)))
         {
-            show_error('无效数据库配制！');
+            \show_error('Invalid database configuration！');
         }
 
         if (empty($iconfig['port']))
@@ -121,7 +121,7 @@ class DB_mysqlco
         // If disconnect, Must connection
         if (!$this->db->connected)
         {
-            var_dump('........................mysql disconnected........................');
+            // var_dump('........................mysql disconnected........................');
             $this->reconnect();
         }
 
@@ -152,7 +152,7 @@ class DB_mysqlco
         }
         else if (Config::get('show_errors'))
         {
-            throw new CommonException('执行出现错误: ' . $this->db->error . '<br />原SQL: ' . $sql, 2045);
+            throw new CommonException('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
         }
         else
         {
@@ -166,7 +166,7 @@ class DB_mysqlco
     }
 
     /**
-     * return last insert id
+     * Return last insert id
      *
      * @return int $insert_id
      */
@@ -176,7 +176,7 @@ class DB_mysqlco
     }
 
     /**
-     * affected_rows
+     * Affected_rows
      *
      * @return int $affected_rows
      */
@@ -186,7 +186,8 @@ class DB_mysqlco
     }
 
     /**
-     * fetch array
+     * fetch one row, return array
+     * if empty return []
      *
      * @param string $sql
      * @return array
@@ -199,7 +200,7 @@ class DB_mysqlco
     }
 
     /**
-     * 查询多条数据，返回数据格式array
+     * fetch many rows, return array
      *
      * @param string $sql
      * @return array
@@ -210,7 +211,7 @@ class DB_mysqlco
     }
 
     /**
-     * 查询一条数据，返回数据格式Object
+     * fetch one row, return object
      *
      * @param string $sql
      * @return object
@@ -221,7 +222,8 @@ class DB_mysqlco
     }
 
     /**
-     * 查询多条数据，返回数据格式Object
+     * fetch many rows, return object
+     * if empty return []
      *
      * @param string $sql
      * @return object
@@ -239,7 +241,7 @@ class DB_mysqlco
     }
 
     /**
-     * 转义SQL中不安全的字符
+     * Escape SQL string
      *
      * @return string $str
      */
@@ -249,42 +251,45 @@ class DB_mysqlco
     }
 
     /*
-     * 设置事务是否自动提交
+     * Set auto commit transaction
      *
      * @param bool $f
      * @return bool
      */
     public function autocommit($f)
     {
-        if ($f)
-        {
-            return $this->query('SET AUTOCOMMIT=1');
-        }
-        else
-        {
-            // 不自动提交事务
-            $this->query('SET AUTOCOMMIT=0');
-            return $this->query('START TRANSACTION');
-        }
+        return true;
+        // if ($f)
+        // {
+        //     return $this->query('SET AUTOCOMMIT=1');
+        // }
+        // else
+        // {
+        //     // Disable auto commit
+        //     $this->query('SET AUTOCOMMIT=0');
+        //     return $this->query('START TRANSACTION');
+        // }
     }
 
     /*
-     * 提交事务
+     * Commit transaction
      *
      * @return bool
      */
     public function commit()
     {
-        return $this->query('COMMIT');
+        return true;
+        // return $this->query('COMMIT');
     }
 
     /*
-     * 回滚事务
+     * Roollback transaction
      *
      * @return bool
      */
     public function rollback()
     {
-        return $this->query('ROLLBACK');
+        return true;
+        // return $this->query('ROLLBACK');
     }
 }

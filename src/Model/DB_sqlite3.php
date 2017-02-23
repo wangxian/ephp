@@ -1,16 +1,4 @@
 <?php
-/**
-+------------------------------------------------------------------------------
- * sqlite3 driver for ePHP
-+------------------------------------------------------------------------------
- * @version 3.0
- * @author  WangXian
- * @package  dbdrivers
- * @email    <wo#wangxian.me>
- * @creation date 2011-2-22 18:16:52
- * @last modified 2011.6.11
-+------------------------------------------------------------------------------
- */
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
@@ -19,17 +7,12 @@ class DB_sqlite3
 {
     public $db = false;
 
-    /**
-     * 使用配置中的那个数据库, 如: default, master, slave
-     *
-     * @param string $db_config
-     */
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
         if (false == ($iconfig = Config::get($db_config)))
         {
-            show_error('无效数据库配制！');
+            \show_error('Invalid database configuration！');
         }
 
         $this->db = new \SQLite3($iconfig['host'], SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE, $iconfig['password']);
@@ -48,7 +31,6 @@ class DB_sqlite3
      */
     public function query($sql)
     {
-        // 是否记录 SQL log
         if (true == Config::get('sql_log'))
         {
             wlog('SQL-Log', $sql);
@@ -71,7 +53,7 @@ class DB_sqlite3
         }
         else if (Config::get('show_errors'))
         {
-            show_error('执行sqlite_query()出现错误: ' . $this->db->lastErrorMsg() . '<br />原SQL: ' . $sql);
+            \show_error('DBError:' . $this->db->lastErrorMsg() . '<br />RawSQL: ' . $sql);
         }
         else
         {
@@ -91,7 +73,7 @@ class DB_sqlite3
     }
 
     /**
-     * affected_rows
+     * Affected rows
      *
      * @return integer $affected_rows
      */
@@ -101,7 +83,7 @@ class DB_sqlite3
     }
 
     /**
-     * 查询一条数据，返回数据格式array
+     * fetch one row, return array
      *
      * @param string $sql
      * @return array
@@ -117,7 +99,7 @@ class DB_sqlite3
     }
 
     /**
-     * 查询多条数据，返回数据格式array
+     * fetch many rows, return array
      *
      * @param string $sql
      * @return array
@@ -137,7 +119,7 @@ class DB_sqlite3
     }
 
     /**
-     * 查询一条数据，返回数据格式Object
+     * fetch one row, return object
      *
      * @param string $sql
      * @return object
@@ -149,7 +131,7 @@ class DB_sqlite3
     }
 
     /**
-     * 查询多条数据，返回数据格式Object
+     * fetch many rows, return object
      *
      * @param string $sql
      * @return object
@@ -170,7 +152,7 @@ class DB_sqlite3
     }
 
     /**
-     * 转义SQL中不安全的字符
+     * Escape SQL
      *
      * @return string $str
      */

@@ -1,17 +1,4 @@
 <?php
-/**
-+------------------------------------------------------------------------------
- * mysqli类
- * 使用mysqli驱动
-+------------------------------------------------------------------------------
- * @version 3.0
- * @author  WangXian
- * @package dbdrivers
- * @creation date 2010-8-12
- * @Modified date 2011-6-11
-+------------------------------------------------------------------------------
- */
-
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
@@ -21,17 +8,12 @@ class DB_mysqli
 {
     public $db = false;
 
-    /**
-     * 使用配置中的那个数据库, 如: default, master, slave
-     *
-     * @param string $db_config
-     */
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
         if (false == ($iconfig = Config::get($db_config)))
         {
-            show_error('无效数据库配制！');
+            \show_error('Invalid database configuration！');
         }
 
         if (empty($iconfig['port']))
@@ -42,10 +24,10 @@ class DB_mysqli
         $this->db = new \mysqli($iconfig['host'], $iconfig['user'], $iconfig['password'], $iconfig['dbname'], $iconfig['port']);
         if (mysqli_connect_errno())
         {
-            show_error('无法连接到数据库，错误信息: ' . mysqli_connect_error());
+            \show_error('Can not connect to MySQL, message: ' . mysqli_connect_error());
         }
 
-        // 设置charset
+        // Set charset
         $this->db->set_charset(isset($iconfig['charset']) ? $iconfig['charset'] : 'utf8');
     }
 
@@ -57,7 +39,6 @@ class DB_mysqli
      */
     function query($sql)
     {
-        // 是否记录 SQL log
         if (true == Config::get('sql_log'))
         {
             wlog('SQL-Log', $sql);
@@ -70,7 +51,7 @@ class DB_mysqli
         }
         else if (Config::get('show_errors'))
         {
-            throw new CommonException('执行mysqli::query()出现错误: ' . $this->db->error . '<br />原SQL: ' . $sql, 2045);
+            throw new CommonException('DBError: ' . $this->db->error . '<br />RawSQL: ' . $sql, 2045);
         }
         else
         {
@@ -80,7 +61,7 @@ class DB_mysqli
     }
 
     /**
-     * 获取单条记录,返回数据格式array
+     * fetch one row, return array
      *
      * @param string $sql
      * @return array
@@ -91,13 +72,12 @@ class DB_mysqli
         $data = $rs->fetch_assoc();
         if (empty($data)) $data = [];
 
-        // 释放内存
         $rs->free();
         return $data;
     }
 
     /**
-     * 获取多条记录，返回数据格式array
+     * fetch many rows, return array
      *
      * @param string $sql
      * @return array
@@ -115,7 +95,7 @@ class DB_mysqli
     }
 
     /**
-     * 获取一条记录,以object的方式返回数据
+     * fetch one row, return object
      *
      * @param string $sql
      * @return object
@@ -130,7 +110,7 @@ class DB_mysqli
     }
 
     /**
-     * 查询多条记录，以objects的方式返回数据
+     * fetch many rows, return object
      *
      * @param string $sql
      * @return object
@@ -148,7 +128,7 @@ class DB_mysqli
     }
 
     /**
-     * return last insert id
+     * Return last insert id
      *
      * @return int insert_id
      */
@@ -158,9 +138,9 @@ class DB_mysqli
     }
 
     /**
-     * 影响的行数
+     * Return last affected rows
      *
-     * @return int 操作影响的数据条数
+     * @return int
      */
     public function affected_rows()
     {
@@ -178,7 +158,7 @@ class DB_mysqli
     }
 
     /*
-     * 设置事务是否自动提交
+     * Set auto commit
      *
      * @param bool $f
      * @return bool
@@ -189,7 +169,7 @@ class DB_mysqli
     }
 
     /*
-     * 提交事务
+     * Commit transaction
      *
      * @return bool
      */
@@ -199,7 +179,7 @@ class DB_mysqli
     }
 
     /*
-     * 回滚事务
+     * Roollback transaction
      *
      * @return bool
      */

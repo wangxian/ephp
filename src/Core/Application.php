@@ -15,7 +15,7 @@ class Application
      */
     function run($request=null, $response=null)
     {
-        // 设置默认错误级别, 测试环境，尽量显示所有错误
+        // Set default error level, In dev env show all errors
         // ini_set('display_errors', Config::get('show_errors') ? 'Off' : 'Off');
         ini_set('display_errors', 'On');
         error_reporting(E_ALL | E_STRICT);

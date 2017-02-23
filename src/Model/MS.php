@@ -1,30 +1,20 @@
 <?php
-namespace ePHP\Model;
-
 /**
- +------------------------------------------------------------------------------
- * modelMS for ePHP
- +------------------------------------------------------------------------------
- * @version 4.1
- * @author  WangXian
- * @package core
- * @creation_date 2011-9-23
- * @last_modified 2011-9-25
- +------------------------------------------------------------------------------
+ * This feature is temporarily unavailable
  */
+
+namespace ePHP\Model;
 
 class modelMS extends model
 {
-    /**
-     * 默认的使用的数据库
-     * @var string
-     */
+
     public  $db_config_name = 'master';
 
     /**
-     * 连接数据库
+     * What de will be connect
+     *
      * @access protected
-     * @param string $db_config_name 使用那个数据库连接
+     * @param string $db_config_name
      */
     protected function conn($db_config_name='')
     {
