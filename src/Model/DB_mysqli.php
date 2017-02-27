@@ -49,7 +49,7 @@ class DB_mysqli
             $_SERVER['run_dbquery_count']++;
             return $rs;
         }
-        else if (Config::get('show_errors'))
+        else if (defined('RUN_ENV') && RUN_ENV == 'prod')
         {
             throw new CommonException('DBError: ' . $this->db->error . '<br />RawSQL: ' . $sql, 2045);
         }
