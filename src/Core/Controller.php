@@ -53,4 +53,14 @@ class Controller
                 show_error("Undefined property {$key}");
         }
     }
+
+    /**
+     * Stop run Application
+     *
+     * @return void
+     */
+    protected function stopRun()
+    {
+        throw new \ePHP\Exception\ExitException();
+    }
 }

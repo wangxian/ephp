@@ -6,11 +6,13 @@ use ePHP\Core\Config;
 
 class ExitException extends CommonException
 {
-    public function __construct($message, $file='', $line='')
+    public function __construct()
     {
-        parent::__construct($message);
+        parent::__construct('', -99);
+    }
 
-        if ($file) $this->file = $file;
-        if ($line) $this->line = $line;
+    public function __toString()
+    {
+
     }
 }

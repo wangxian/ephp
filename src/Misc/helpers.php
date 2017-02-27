@@ -43,7 +43,8 @@ function dump()
  */
 function dumpdie()
 {
-    dump(func_get_args());exit;
+    dump(func_get_args());
+    throw new \ePHP\Exception\ExitException();
 }
 
 /**
@@ -91,7 +92,7 @@ if (!function_exists('wlog'))
         $logdir = APP_PATH . '/' . Config::get('log_dir');
         if (!is_writeable($logdir))
         {
-            exit('ERROR: Log directory {' . $logdir . '} is not writeable, check the directory permissions!');
+            show_error('ERROR: Log directory {' . $logdir . '} is not writeable, check the directory permissions!');
         }
 
         // 修复：跑在toolbox docker-machine下，文件权限问题，
@@ -99,7 +100,7 @@ if (!function_exists('wlog'))
         $filename = $logdir . $name . date('Y-m-d') . '.log';
         if (file_exists($filename) && !is_writeable($filename))
         {
-            exit('ERROR: {' . $filename . '} is not writeable, check the file permissions!');
+            show_error('ERROR: {' . $filename . '} is not writeable, check the file permissions!');
         }
 
         error_log('[' . date('H:i:s') . ']' . $value . "\n", 3, $logdir . $name . date('Y-m-d') . '.log');
@@ -124,7 +125,7 @@ function show_404()
         include APP_PATH . '/views/' . $tpl;
     }
 
-    if (SERVER_MODE !== 'swoole') exit;
+    throw new \ePHP\Exception\ExitException();
 }
 
 /**
@@ -155,7 +156,7 @@ function show_success($message, $url = '', $wait = 6)
         include APP_PATH . '/views/' . $tpl;
     }
 
-    if (SERVER_MODE !== 'swoole') exit;
+    throw new \ePHP\Exception\ExitException();
 }
 
 /**
@@ -187,7 +188,7 @@ function show_error($message, $url = '', $wait = 6)
         include APP_PATH . '/views/' . $tpl;
     }
 
-    if (SERVER_MODE !== 'swoole') exit;
+    throw new \ePHP\Exception\ExitException();
 }
 
 /**
@@ -210,14 +211,14 @@ function R($url, $wait = 0, $message = '')
         // redirect
         header("Content-Type:text/html; charset=UTF-8");
         header("Location: {$url}");
-        exit;
+        throw new \ePHP\Exception\ExitException();
     }
     else
     {
         // html refresh
         // header("refresh:{$wait};url={$url}"); // 直接发送header头。
         include __DIR__ . '/../Template/302.html';
-        exit;
+        throw new \ePHP\Exception\ExitException();
     }
 }
 

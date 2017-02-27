@@ -54,7 +54,7 @@ class Application
                     // call_user_func(array($c_init, $action_name));
                     $c_init->{$action_name}();
                 }
-                else if (!Config::get('show_errors'))
+                else if (defined('RUN_ENV') && RUN_ENV == 'prod')
                 {
                     \show_404();
                 }
@@ -70,7 +70,11 @@ class Application
         }
         catch (\ePHP\Exception\CommonException $e)
         {
-            echo $e;
+            // ExitException don't show error message
+            if ($e->getCode() !== -99) 
+            {
+                echo $e;
+            }
         }
     }
 }

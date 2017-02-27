@@ -57,10 +57,10 @@ class CommonException extends \Exception
         // }
 
         // //return ob_get_clean();
-        if (Config::get('show_errors'))
-        {
-            dump('error', $str);
-        }
+        // if (defined('RUN_ENV') && RUN_ENV == 'prod')
+        // {
+        dump('error', $str);
+        // }
 
         return '';
     }
