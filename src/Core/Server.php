@@ -4,6 +4,21 @@ namespace ePHP\Core;
 class Server
 {
     /**
+     * Static file content type
+     *
+     * @var array
+     */
+    private $contentType = [
+        'html' => 'text/html',
+        'png'  => 'image/png',
+        'jpg'  => 'image/jpeg',
+        'gif'  => 'image/gif',
+        'ico'  => 'image/x-icon',
+        'css'  => 'text/css',
+        'js'   => 'text/js'
+    ];
+
+    /**
      * ePHP latest verson
      *
      * @var string
@@ -180,7 +195,16 @@ EOT;
         $response->header('Server', 'ePHP/'. $this->version);
 
         $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
-        if (true || !is_file($filename))
+        $extname = substr($filename, strrpos($filename, '.')+1);
+
+        if ( !( $extname === 'html' 
+                || $extname === 'css'
+                || $extname === 'js'
+                || $extname === 'png'
+                || $extname === 'jpg' 
+                || $extname === 'gif'
+                || $extname === 'ico')
+        )
         {
             ob_start();
             (new \ePHP\Core\Application())->run($request, $response);
@@ -195,8 +219,34 @@ EOT;
         }
         else
         {
-            $response->header('content-type', 'image/png');
-            $response->sendfile($filename);
+            if ( is_file($filename) )
+            {
+                $response->header('Content-Type', $this->contentType[$extname]);
+                if (PHP_OS !== 'Darwin') 
+                {
+                    $response->sendfile($filename);
+                } 
+                else 
+                {
+                    $response->end(file_get_contents($filename));
+                }
+            }
+            else
+            {
+                ob_start();
+                $tpl = Config::get('tpl_404');
+                if (!$tpl)
+                {
+                    include __DIR__ . '/../Template/404.html';
+                }
+                else
+                {
+                    include APP_PATH . '/views/' . $tpl;
+                }
+                $h = ob_get_clean();
+
+                $response->end($h);
+            }
         }
     }
 

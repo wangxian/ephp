@@ -13,6 +13,6 @@ class ExitException extends CommonException
 
     public function __toString()
     {
-
+        return '';
     }
 }
