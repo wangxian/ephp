@@ -50,7 +50,7 @@ class Controller
             case 'cache':
                 return $this->cache = \ePHP\Cache\Cache::init();
             default:
-                show_error("Undefined property {$key}");
+                throw new \ePHP\Exception\CommonException("Undefined property {$key}");
         }
     }
 
