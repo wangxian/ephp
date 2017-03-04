@@ -2,10 +2,10 @@
 namespace ePHP\Misc;
 
 /**
- +------------------------------------------------------------------------------
  * 日期时间操作相关
+ *
+ * 使用示例
  * <code>
- * //使用示例
  * echo Date::showtime(122121230); //返回 "22分钟前"
  * echo Date::getDate(); //返回当前的日期如 "2008-10-12"
  * echo Date::getDate(1229173896); //1229173896 是指定的时间戳
@@ -17,20 +17,13 @@ namespace ePHP\Misc;
  * echo Date::dateDiff('2005-10-20','2005-10-10');//"2005-10-20"-"2005-10-10"=10
  * echo Date::timeDiff('2005-10-20 10:00:00','2005-10-20  08:00:00'); //2小时
  * </code>
- +------------------------------------------------------------------------------
- * @version 3.2
- * @author WangXian
- * @email wo#wangxian.me
- * @package libraries
- * @creation_date 2010-10-17
- * @last_modified 2011-06-04
- +------------------------------------------------------------------------------
  */
 
 class Date
 {
 	/**
 	 * 人性化地显示时间，新浪微博的实现
+	 *
 	 * @param int|string $time 自动判断是Unix时间戳，还是一个格式化后的时间字符串
 	 * @return string
 	 */
@@ -65,6 +58,7 @@ class Date
 
 	/**
 	 * 得到当前日期
+	 *
 	 * @param string $fmt :日期格式
 	 * @param int $time :时间，默认为当前时间
 	 * @return string
@@ -77,6 +71,7 @@ class Date
 
 	/**
 	 * 得到当前日期时间
+	 *
 	 * @param string $fmt :日期格式
 	 * @param int $time :时间，默认为当前时间
 	 * @return string
@@ -88,6 +83,7 @@ class Date
 
 	/**
 	 * 计算日期天数差
+	 *
 	 * 例子:"2005-10-20"-"2005-10-10"=10
 	 * @param string $Date1 :如 "2005-10-20"
 	 * @param string $Date2 :如 "2005-10-10"
@@ -105,10 +101,10 @@ class Date
 
 	/**
 	 * 计算日期加天数后的日期
+	 *
 	 * @param string $date :如 "2005-10-20"
 	 * @param int $day  :如 6
 	 * @return string
-	 * 例子:2005-9-25"+6 = "2005-10-01"
 	 */
 	static public function dateAddDay($date,$day)
 	{
@@ -119,6 +115,7 @@ class Date
 
 	/**
 	 * 计算日期加天数后的日期
+	 *
 	 * @param string $date :如 "2005-10-20"
 	 * @param int $day  :如 10
 	 * @return string
@@ -133,6 +130,7 @@ class Date
 
 	/**
 	 * 比较两个时间
+	 *
 	 * @param string $timeA :格式如 "2006-10-12" 或 "2006-10-12 12:30" 或 "2006-10-12 12:30:50"
 	 * @param string $timeB :同上
 	 * @return int   0:$timeA = $timeB
@@ -150,6 +148,7 @@ class Date
 
 	/**
 	 * 计算时间a减去时间b的差值
+	 *
 	 * @param string $timeA :格式如 "2006-10-12" 或 "2006-10-12 12:30" 或 "2006-10-12 12:30:50"
 	 * @param string $timeB :同上
 	 * @return float 实数的小时,如"2.3333333333333"小时

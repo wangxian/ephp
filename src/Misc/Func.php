@@ -2,10 +2,9 @@
 namespace ePHP\Misc;
 
 /**
-+------------------------------------------------------------------------------
  * 常用函数类
+ *
  * <code>
- * //使用示例
  * echo Func::auto_charset('我是中国人','utf-8','gbk');//自动编码转换
  * echo Func::randNum();//返回一个随机的整数
  * echo Func::randNum(1,100);//返回1-100之间的整数
@@ -21,20 +20,12 @@ namespace ePHP\Misc;
  * echo Func::ubb();
  * echo Func::remove_xss() //过滤xss攻击
  * </code>
-+------------------------------------------------------------------------------
- * @version 3.2
- * @author WangXian
- * @email wo#wangxian.me
- * @package  libraries
- * @creation_date 2010-10-17
- * @last_modified 2011-02-04 22:39:17
-+------------------------------------------------------------------------------
  */
 
 class Func
 {
-    // 自动转换字符集 支持数组转换
     /**
+     * 自动转换字符集 支持数组转换
      *
      * @param string $fContents
      * @param string $from 编码
@@ -47,7 +38,7 @@ class Func
         $to   = strtoupper($to) == 'UTF8' ? 'utf-8' : $to;
         if (strtoupper($from) === strtoupper($to) || empty($fContents) || (is_scalar($fContents) && !is_string($fContents)))
         {
-            //如果编码相同或者非字符串标量则不转换
+            // 如果编码相同或者非字符串标量则不转换
             return $fContents;
         }
         if (is_string($fContents))
@@ -89,6 +80,7 @@ class Func
 
     /**
      * 产生一个随机数
+     *
      * @param int $min 最小
      * @param int $max 最大
      * @return integer
@@ -109,6 +101,7 @@ class Func
 
     /**
      * 产生随机字串，可用来自动生成密码 默认长度6位 字母和数字混合
+     *
      * @param string $len 长度
      * @param string $type 0大小写字母，1数字，2大写字母，3小写字母，4中文,5大小写数字
      * @param string $addChars 额外字符
@@ -137,15 +130,15 @@ class Func
             case 5:
                 $chars = 'ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789' . $addChars;
                 break;
-                //default :
-                //默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
+                // default :
+                // 默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
                 //                $chars='ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'.$addChars;
                 //                break;
         }
 
         if ($len > 10)
         {
-//位数过长重复字符串一定次数
+            // 位数过长重复字符串一定次数
             $chars = $type == 1 ? str_repeat($chars, $len) : str_repeat($chars, 5);
         }
 
@@ -167,6 +160,7 @@ class Func
 
     /**
      * 返回永远唯一32位md5的随机数
+     *
      * @return string
      */
     static public function md5Rand()
@@ -177,6 +171,7 @@ class Func
 
     /**
      * 字符串截取，支持中文和其他编码
+     *
      * @param string $str 需要转换的字符串
      * @param string $start 开始位置
      * @param string $length 截取长度
@@ -212,7 +207,8 @@ class Func
     }
 
     /**
-     * 字节格式化 把字节数格式为   描述的大小。
+     * 字节格式化 把字节数格式为   描述的大小
+     *
      * @param mixed $size
      * @param integer $dec 保留几位小数
      */
@@ -230,6 +226,7 @@ class Func
 
     /**
      * 检查字符串是否是UTF8编码
+     *
      * @param string $string
      */
     public static function is_utf8($string)
@@ -248,6 +245,7 @@ class Func
 
     /**
      * 代码加亮
+     *
      * @param string  $str 要高亮显示的字符串 或者 文件名
      * @param boolean $show 是否输出
      * @return string
@@ -305,6 +303,7 @@ class Func
 
     /**
      * 输出安全的html
+     *
      * @param string $text
      * @param string $tags,不允许的html标签。
      */
@@ -313,23 +312,23 @@ class Func
         $text = trim($text);
         $text = preg_replace('/<!--?.*-->/', '', $text); //完全过滤注释
 
-        //完全过滤动态代码
+        // 完全过滤动态代码
         $text = preg_replace('/<\?|\?' . '>/', '', $text);
 
-        //完全过滤js
+        // 完全过滤js
         $text = preg_replace('/<script?.*\/script>/', '', $text);
 
         $text = str_replace('[', '&#091;', $text);
         $text = str_replace(']', '&#093;', $text);
         $text = str_replace('|', '&#124;', $text);
 
-        //过滤换行符
+        // 过滤换行符
         $text = preg_replace('/\r?\n/', '', $text);
         //br
         $text = preg_replace('/<br(\s\/)?' . '>/i', '[br]', $text);
         $text = preg_replace('/(\[br\]\s*){10,}/i', '[br]', $text);
 
-        //过滤危险的属性，如：过滤on事件lang js
+        // 过滤危险的属性，如：过滤on事件lang js
         while (preg_match('/(<[^><]+)( lang|on|action|background|codebase|dynsrc|lowsrc)[^><]+/i', $text, $mat))
         {
             $text = str_replace($mat[0], $mat[1], $text);
@@ -345,49 +344,49 @@ class Func
             $tags = 'table|td|th|tr|i|b|u|strong|img|p|br|div|strong|em|ul|ol|li|dl|dd|dt|a';
         }
 
-        //允许的HTML标签
+        // 允许的HTML标签
         $text = preg_replace('/<(' . $tags . ')( [^><\[\]]*)>/i', '[\1\2]', $text);
         //过滤多余html
         $text = preg_replace('/<\/?(html|head|meta|link|base|basefont|body|bgsound|title|style|script|form|iframe|frame|frameset|applet|id|ilayer|layer|name|script|style|xml)[^><]*>/i', '', $text);
 
-        //过滤合法的html标签
+        // 过滤合法的html标签
         while (preg_match('/<([a-z]+)[^><\[\]]*>[^><]*<\/\1>/i', $text, $mat))
         {
             $text = str_replace($mat[0], str_replace('>', ']', str_replace('<', '[', $mat[0])), $text);
         }
 
-        //转换引号
+        // 转换引号
         while (preg_match('/(\[[^\[\]]*=\s*)(\"|\')([^\2=\[\]]+)\2([^\[\]]*\])/i', $text, $mat))
         {
             $text = str_replace($mat[0], $mat[1] . '|' . $mat[3] . '|' . $mat[4], $text);
         }
 
-        //过滤错误的单个引号
+        // 过滤错误的单个引号
         while (preg_match('/\[[^\[\]]*(\"|\')[^\[\]]*\]/i', $text, $mat))
         {
             $text = str_replace($mat[0], str_replace($mat[1], '', $mat[0]), $text);
         }
 
-        //转换其它所有不合法的 < >
+        // 转换其它所有不合法的 < >
         $text = str_replace('<', '&lt;', $text);
         $text = str_replace('>', '&gt;', $text);
         $text = str_replace('"', '&quot;', $text);
 
-        //反转换
+        // 反转换
         $text = str_replace('[', '<', $text);
         $text = str_replace(']', '>', $text);
         $text = str_replace('|', '"', $text);
 
-        //过滤多余空格
+        // 过滤多余空格
         $text = str_replace('  ', ' ', $text);
         return $text;
     }
 
-    /** ubb转换 */
+    // ubb转换
     public static function ubb($Text)
     {
         $Text = trim($Text);
-        //$Text=htmlspecialchars($Text);
+        // $Text=htmlspecialchars($Text);
         $Text = preg_replace('/\\t/is', '  ', $Text);
         $Text = preg_replace('/\[h1\](.+?)\[\/h1\]/is', "<h1>\\1</h1>", $Text);
         $Text = preg_replace('/\[h2\](.+?)\[\/h2\]/is', "<h2>\\1</h2>", $Text);
@@ -423,6 +422,7 @@ class Func
 
     /**
      * 过滤xss数据
+     *
      * @param string $val 要过滤的字符串
      * @return string
      */
@@ -479,9 +479,10 @@ class Func
 
     /**
      * 判断指定的字符串是否存在
+     * 例子: $str='34' $string='1234' 返回 TRUE
+     *
      * @param string $str :字符或字符串(子串)
      * @param string $string :字符串(母串)
-     * 例子: $str='34' $string='1234' 返回 TRUE
      */
     static public function strExists($str, $string)
     {
@@ -492,7 +493,9 @@ class Func
 
     /**
      * 转换 HTML 特殊字符以及空格和换行符
+     *
      * 一般将 <textarea> 标记中输入的内容从数据库中读出来后在网页中显示
+     *
      * @param string $text
      */
     static public function toHtml($text)
@@ -504,7 +507,9 @@ class Func
 
     /**
      * 安全base64_encode
+     *
      * 替换掉+ / = 字符，这样不用urldecode了
+     *
      * @param $string
      */
     public static function safe_b64encode($string)
@@ -516,6 +521,7 @@ class Func
 
     /**
      * 安全的base64_encode
+     *
      * @param $string
      */
     public static function safe_b64decode($string)
