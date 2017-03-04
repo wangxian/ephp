@@ -1,30 +1,4 @@
 <?php
-/**
-+------------------------------------------------------------------------------
- * memcached缓存
- * <code>
- * 如果选择了，memcache缓存驱动，则需要在 APP_PATH.'/conf/main.conf' 中配置memcache server信息。
- * 配置格式如：
- * ...
- * 'memcached' =>
- *   [
- *     ['host'=>'192.168.0.102', 'port'=>11211, 'weight'=>3],
- *     ['host'=>'192.168.0.103', 'port'=>11211, 'weight'=>3],
- *     ['host'=>'192.168.0.106', 'port'=>11211, 'weight'=>4]
- *   ]
- * ...
- * </code>
-+------------------------------------------------------------------------------
- * @version 4.0
- * @author WangXian
- * @package libraries
- * @email wo#wangxian.me
- * @creation_date 2011-8-3
- * @last_modified 2011-8-3
- * @ignore
-+------------------------------------------------------------------------------
- */
-
 namespace ePHP\Cache;
 use ePHP\Core\Config;
 

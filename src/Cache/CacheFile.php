@@ -1,18 +1,4 @@
 <?php
-/**
-+------------------------------------------------------------------------------
- * 文件缓存
-+------------------------------------------------------------------------------
- * @version 4.0
- * @author WangXian
- * @package libraries
- * @email wo#wangxian.me
- * @creation_date 2011-8-3
- * @last_modified 2011-8-3
- * @ignore
-+------------------------------------------------------------------------------
- */
-
 namespace ePHP\Cache;
 use ePHP\Core\Config;
 
@@ -76,7 +62,7 @@ class CacheFile
         $cachedir = APP_PATH . '/' . Config::get("cache_dir");
         if (!is_writeable($cachedir))
         {
-            show_error('ERROR: ' . $cachedir . ' is not writeable!');
+            \show_error('ERROR: ' . $cachedir . ' is not writeable!');
         }
 
         return file_put_contents($this->_filename($key), $value);
@@ -101,8 +87,8 @@ class CacheFile
      */
     public function flush($dir = '')
     {
-        $dir = Config::get("cache_dir");
-        Dir::deleteDir($dir);
+        $dir = $cache_dir = APP_PATH . '/' . Config::get('cache_dir');
+        \ePHP\Misc\Dir::deleteDir($dir);
         mkdir($dir, 0777);
     }
 
@@ -137,6 +123,6 @@ class CacheFile
         }
 
         // 缓存文件名
-        return $cache_dir . trim($cache_name) . '^' . md5($cache_name) . '.php';
+        return $cache_dir . trim($cache_name) . '^' . md5($cache_name) . '.cache';
     }
 }

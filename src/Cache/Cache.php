@@ -1,16 +1,4 @@
 <?php
-/**
-+------------------------------------------------------------------------------
- * 缓存类
-+------------------------------------------------------------------------------
- * @version 4.0
- * @author WangXian
- * @package libraries
- * @email wo#wangxian.me
- * @creation_date 2011-1-10
- * @last_modified 2011-8-3
-+------------------------------------------------------------------------------
- */
 namespace ePHP\Cache;
 use ePHP\Core\Config;
 
@@ -45,6 +33,7 @@ class Cache
         // !self::$_instance instanceof self
         if (!isset(self::$instance))
         {
+            echo time();
             self::$instance = new self();
 
             // 使用哪种方式的cache

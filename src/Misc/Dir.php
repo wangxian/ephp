@@ -1,24 +1,14 @@
 <?php
+// 目录操作类
 namespace ePHP\Misc;
-
- /**
- +------------------------------------------------------------------------------
- * 目录操作类
- +------------------------------------------------------------------------------
- * @version 3.0
- * @author WangXian
- * @package  libraries
- * @email wo#wangxian.me
- * @creation_date 2011-1-1 下午05:59:48
- * @last_modified 2011-06-04 22:21:03
- +------------------------------------------------------------------------------
- */
 
 class Dir
 {
 	/**
 	 * 遍历目录
+	 * 
 	 * 默认获取相对于index.php目录下的目录和文件
+	 *
 	 * @param string  $source_dir 相对于index.php的目录
 	 * @param boolean $subdir 递归子目录,true包含，false不包含
 	 * @return mixed
@@ -57,6 +47,7 @@ class Dir
 
 	/**
 	 * 判断目录是否为空
+	 *
 	 * @param string $dir
 	 * @return boolean true为空，false不为空
 	 */
@@ -73,6 +64,7 @@ class Dir
 
 	/**
 	 * 删除目录以及子目录的内容
+	 *
 	 * @param string $dir
 	 * @return boolean
 	 */
