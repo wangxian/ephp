@@ -164,7 +164,7 @@ class Route
                     // check has same prefix uri
                     if ( substr($pathinfo, 0, strlen($prefix)) === $prefix)
                     {
-                        $items = $pathinfo ? explode('/', ltrim($pathinfo, '/' . implode($value['params'], '/'))) : [];
+                        $items = $pathinfo ? explode('/', substr($pathinfo, strlen($prefix)+1)) : [];
                         // not contains prefix uri, and it must match controller name
                         if ($items[0] === $controller_name)
                         {
