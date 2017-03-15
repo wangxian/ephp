@@ -51,7 +51,7 @@ class DB_sqlite3
             $_SERVER['run_dbquery_count']++;
             return $rs;
         }
-        else if (defined('RUN_ENV') && RUN_ENV == 'prod')
+        else if (defined('RUN_ENV') && RUN_ENV != 'prod')
         {
             \show_error('DBError:' . $this->db->lastErrorMsg() . '<br />RawSQL: ' . $sql);
         }

@@ -33,7 +33,6 @@ class Cache
         // !self::$_instance instanceof self
         if (!isset(self::$instance))
         {
-            echo time();
             self::$instance = new self();
 
             // 使用哪种方式的cache

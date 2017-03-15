@@ -53,7 +53,7 @@ class DB_mysql
             $_SERVER['run_dbquery_count']++;
             return $rs;
         }
-        else if (defined('RUN_ENV') && RUN_ENV == 'prod')
+        else if (defined('RUN_ENV') && RUN_ENV != 'prod')
         {
             throw new CommonException('DBError: ' . mysql_error($this->db) . '<br />RawSQL: ' . $sql, 2045);
         }

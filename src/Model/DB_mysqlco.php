@@ -150,7 +150,7 @@ class DB_mysqlco
         {
             $_SERVER['run_dbquery_count']++;
         }
-        else if (defined('RUN_ENV') && RUN_ENV == 'prod')
+        else if (defined('RUN_ENV') && RUN_ENV != 'prod')
         {
             throw new CommonException('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
         }
