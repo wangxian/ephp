@@ -219,21 +219,21 @@ class BaseModel
     }
 
     /**
-     * SQL中limit，使用方法：model::limit('0,10') 或 model::limit(0,10)
+     * SQL中limit，使用方法：model->limit(0, 10) 或 model->limit(100)
      *
-     * @param mixed $limit limit部分或开始部分
-     * @param int $pagecount 每页数目
+     * @param int $offset 如果$limit=0则offset作为limit使用
+     * @param int $limit 每次查询的数据量
      * @return object $this
      */
-    public function limit($limit, $pagecount = 0)
+    public function limit($offset, $limit = 0)
     {
-        if (!$pagecount)
+        if ($limit > 0)
         {
-            $this->limit = $limit;
+            $this->limit = $offset .','. $limit;
         }
         else
         {
-            $this->limit = $limit . ',' . $pagecount;
+            $this->limit = $offset;
         }
 
         return $this;
@@ -242,7 +242,7 @@ class BaseModel
     /**
      * 写入数据库的内容(for insert|update)
      *
-     * @param string||array $data 要写入数据库的内容。
+     * @param mixed $data 要写入数据库的内容
      * @param array $replacement 当data是字符串时，按照位置替换问号“？”
      * @return object $this
      */
@@ -283,7 +283,7 @@ class BaseModel
     /**
      * set方法的别名
      *
-     * @param string||array $data 要写入数据库的内容。
+     * @param mixed $data 要写入数据库的内容。
      * @param array $replacement 当data是字符串时，按照位置替换问号“？”
      * @return object $this
      */
@@ -295,7 +295,7 @@ class BaseModel
     /**
      * SQL中的where条件
      *
-     * @param  string||array $where 可以是一个字符串或数组。
+     * @param  mixed $where 可以是一个字符串或数组。
      * @param  array $replacement 当where是字符串时，按照位置替换问号“？”
      * @return object $this
      */
