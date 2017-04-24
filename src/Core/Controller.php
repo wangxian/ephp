@@ -1,10 +1,6 @@
 <?php
-
 namespace ePHP\Core;
 
-/**
- * 父控制器
- */
 class Controller
 {
     /**
@@ -18,18 +14,24 @@ class Controller
     public $response;
 
     /**
-     * 自动实例化一些类，包括：view\request\model\cache
+     * Magic method, Automatic initialization of some commonly used classes
      *
-     * @ignore
      * @param string $key
+     * @return mixed
      */
     public function __get($key)
     {
-        // echo '__get ' . $key . '<hr />';
         switch ($key)
         {
             case 'view':
                 return $this->view = new \ePHP\View\BaseView();
+                break;
+            case 'session':
+                $session_name = Config::get('session_name');
+                if (!$session_name) {
+                    $session_name = 'pppid';
+                }
+                return $this->session = (new \ePHP\Http\Session())->start($session_name);
                 break;
             case 'cookie':
                 return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole($this->response);
@@ -58,6 +60,7 @@ class Controller
      * Stop run Application
      *
      * @return void
+     * @throws \ePHP\Exception\ExitException
      */
     protected function stopRun()
     {
