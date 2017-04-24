@@ -26,6 +26,9 @@ class Controller
             case 'view':
                 return $this->view = new \ePHP\View\BaseView();
                 break;
+            case 'httpclient':
+                return $this->view = new \ePHP\Http\Httpclient();
+                break;
             case 'session':
                 $session_name = Config::get('session_name');
                 if (!$session_name) {
