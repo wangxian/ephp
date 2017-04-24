@@ -45,22 +45,12 @@ class CommonException extends \Exception
             wlog('ExceptionLog', $str);
         }
 
-        // //ob_start();
-        // $tpl = C('tpl_exception');
-        // if (!$tpl)
-        // {
-        //     include FW_PATH . '/tpl/ephpException.tpl.php';
-        // }
-        // else
-        // {
-        //     include APP_PATH . '/views/public/' . $tpl;
-        // }
-
-        // //return ob_get_clean();
-        // if (defined('RUN_ENV') && RUN_ENV == 'prod')
-        // {
-        dump('error', $str);
-        // }
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+            && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest" ) {
+            echo $str;
+        } else {
+            dump('error', $str);
+        }
 
         return '';
     }
