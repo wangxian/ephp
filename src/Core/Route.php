@@ -155,7 +155,7 @@ class Route
                 if ($value['count'] === 0 && $items[0] === $controller_name)
                 {
                     // has not prefixUri
-                    return [$controller_name, $items[1], $value['controller']];
+                    return [$controller_name, isset($items[1])?$items[1]:'index', $value['controller']];
                 }
                 else if ($value['count'] > 0)
                 {
