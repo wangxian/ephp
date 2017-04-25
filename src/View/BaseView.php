@@ -55,7 +55,7 @@ class BaseView
         }
         else
         {
-            $cache = Cache::init();
+            $cache = \ePHP\Cache\Cache::init();
             if (false == ($content = $cache->get('html/' . $file)))
             {
                 $content = str_replace(array('<!--{', '}-->'), array('<?php ', '?>'), $this->_include($file, null, $layout_block, true));

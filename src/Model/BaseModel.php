@@ -287,9 +287,9 @@ class BaseModel
      * @param array $replacement 当data是字符串时，按照位置替换问号“？”
      * @return object $this
      */
-    public function data($data, $noquote = array())
+    public function data($data, $replacement = array())
     {
-        return $this->set($data, $noquote);
+        return $this->set($data, $replacement);
     }
 
     /**
@@ -526,34 +526,6 @@ class BaseModel
             }
             return $data;
         }
-    }
-
-    /**
-     * 根据条件查询数据
-     *
-     * @param string $condition 条件
-     * @return array
-     */
-    public function getBy($condition)
-    {
-        $data = $this->where($condition)->findAll();
-        if ($data)
-        {
-            if (count($data) == 1)
-            {
-                return $data[0];
-            }
-            else
-            {
-                return $data;
-            }
-
-        }
-        else
-        {
-            return false;
-        }
-
     }
 
     /**
