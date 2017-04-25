@@ -21,7 +21,9 @@ class Encrypt
         $iv_size   = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
         $iv        = mcrypt_create_iv($iv_size, MCRYPT_RAND);
         $crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $value, MCRYPT_MODE_ECB, $iv);
-        return trim(\ePHP\Misc\Func::safe_b64encode($crypttext)); //encode for cookie
+
+        // encode for cookie
+        return trim(\ePHP\Misc\Func::safe_b64encode($crypttext));
     }
 
     /**
