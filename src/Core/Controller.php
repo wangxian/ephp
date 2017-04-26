@@ -83,4 +83,22 @@ class Controller
         }
         return false;
     }
+
+    /**
+     * Set response header
+     *
+     * @param string $key
+     * @param string $value
+     * @return void
+     */
+    protected function setHeader($key, $value)
+    {
+        if (SERVER_MODE === 'swoole') {
+            $this->response->header($key, $value);
+        } else {
+            if (!headers_sent()) {
+                header($key . ': '. $value);
+            }
+        }
+    }
 }
