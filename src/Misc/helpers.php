@@ -77,33 +77,22 @@ function run_info($verbose = false)
     }
 }
 
-// 允许自定义写日志方法
-if (!function_exists('wlog'))
+
+/**
+ * 写文件日志
+ *
+ * @param string $key 日志名称，自动加上{2010-09-22.log}的作为文件名
+ * @param string $value
+ * @return void
+ */
+function wlog($key, $value)
 {
-    /**
-     * 写文件日志
-     *
-     * @param string $name 日志名称，自动加上{2010-09-22.log}的作为文件名
-     * @param string $value
-     * @return void
-     */
-    function wlog($name, $value)
-    {
-        $logdir = APP_PATH . '/' . Config::get('log_dir');
-        if (!is_writeable($logdir))
-        {
-            show_error('ERROR: Log directory {' . $logdir . '} is not writeable, check the directory permissions!');
-        }
+    $logger = Config::get('log_writer');
 
-        // 修复：跑在toolbox docker-machine下，文件权限问题，
-        // 文件创建后，以后不能再次写入，不然报错
-        $filename = $logdir . $name . date('Y-m-d') . '.log';
-        if (file_exists($filename) && !is_writeable($filename))
-        {
-            show_error('ERROR: {' . $filename . '} is not writeable, check the file permissions!');
-        }
-
-        error_log('[' . date('H:i:s') . ']' . $value . "\n", 3, $logdir . $name . date('Y-m-d') . '.log');
+    if ( !empty($logger) ) {
+        $logger->write($key, $value);
+    } else {
+        show_error('ERROR: please configure log_writer item in conf/main.php');
     }
 }
 
