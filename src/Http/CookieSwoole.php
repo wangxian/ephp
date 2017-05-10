@@ -27,11 +27,11 @@ class CookieSwoole
     {
         if (empty($domain))
         {
+            // $domain = '.' . $_SERVER['HTTP_HOST'];
             $this->response->cookie($name, $value, $expire + time(), $path);
         }
         else
         {
-            $domain = '.' . $_SERVER['HTTP_HOST'];
             $this->response->cookie($name, $value, $expire + time(), $path, $domain);
         }
 

@@ -44,11 +44,11 @@ class Cookie
     {
         if (empty($domain))
         {
+            // $domain = '.' . $_SERVER['HTTP_HOST'];
             setcookie($name, $value, $expire + time(), $path);
         }
         else
         {
-            $domain = '.' . $_SERVER['HTTP_HOST'];
             setcookie($name, $value, $expire + time(), $path, $domain);
         }
 
