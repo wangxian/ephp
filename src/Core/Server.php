@@ -23,7 +23,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.0.2';
+    private $version = '7.0.18';
 
     /**
      * Handle of Swoole http server
@@ -177,12 +177,18 @@ EOT;
         {
             $key = strtoupper($key);
             $_SERVER[$key] = $value;
+
+            // FIXED: swoole REQUEST_URI don't contains QUERY_STRING
+            if ($key === 'REQUEST_URI' && isset($_SERVER['QUERY_STRING']))
+            {
+                $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
+            }
         }
 
         foreach ($request->header as $key => $value)
         {
             $key = strtoupper(str_replace('-', '_', $key));
-            if (in_array($key, array('CONTENT_TYPE', 'CONTENT_LENGTH')))
+            if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH')
             {
                 $_SERVER[$key] = $value;
             }
@@ -197,11 +203,11 @@ EOT;
         $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
         $extname = substr($filename, strrpos($filename, '.')+1);
 
-        if ( !( $extname === 'html' 
+        if ( !( $extname === 'html'
                 || $extname === 'css'
                 || $extname === 'js'
                 || $extname === 'png'
-                || $extname === 'jpg' 
+                || $extname === 'jpg'
                 || $extname === 'gif'
                 || $extname === 'ico')
         )
@@ -222,11 +228,11 @@ EOT;
             if ( is_file($filename) )
             {
                 $response->header('Content-Type', $this->contentType[$extname]);
-                if (PHP_OS !== 'Darwin') 
+                if (PHP_OS !== 'Darwin')
                 {
                     $response->sendfile($filename);
-                } 
-                else 
+                }
+                else
                 {
                     $response->end(file_get_contents($filename));
                 }
