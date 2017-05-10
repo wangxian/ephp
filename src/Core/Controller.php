@@ -130,7 +130,7 @@ class Controller
             $this->setHeader("Location", $url);
             $this->stopRun();
         } else {
-            echo '<html><head><meta charset="UTF-8" /><title>302</title></head><body>';
+            echo '<html><head><meta charset="UTF-8" /><title></title></head><body>';
             echo '<script>window.location.href="'. $url .'";</script></body></html>';
             $this->stopRun();
         }
