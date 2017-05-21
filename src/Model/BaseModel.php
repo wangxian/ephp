@@ -3,6 +3,7 @@
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
+use \ePHP\Cache\Cache;
 use ePHP\Exception\CommonException;
 
 class BaseModel

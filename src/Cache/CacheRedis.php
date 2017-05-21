@@ -38,12 +38,14 @@ class CacheRedis
      */
     function set($key, $value, $expire = 0)
     {
-        if ($expire > 0)
-        {
-            return $this->connection->set($key, $value, $expire);
+        // 如果是对象，需要进行序列号存储
+        if (is_array($value) || is_object($value)) {
+            $value = serialize($value);
         }
-        else
-        {
+
+        if ($expire > 0) {
+            return $this->connection->set($key, $value, $expire);
+        } else {
             return $this->connection->set($key, $value);
         }
     }
@@ -56,7 +58,15 @@ class CacheRedis
      */
     function get($key)
     {
-        return $this->connection->get($key);
+        $data = $this->connection->get($key);
+        $dataType = substr($data, 0, 2);
+
+        // 如果是array或object需要反序列化
+        if ($dataType === 'a:' || $dataType === 'O:') {
+            $data = unserialize($data);
+        }
+
+        return $data;
     }
 
     /**
