@@ -150,13 +150,9 @@ class DB_mysqlco
         {
             $_SERVER['run_dbquery_count']++;
         }
-        else if (defined('RUN_ENV') && RUN_ENV != 'prod')
-        {
-            throw new CommonException('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
-        }
         else
         {
-            throw new ExitException('DB_mysqlco::query() error.');
+            throw new CommonException('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
         }
 
         $this->insert_id = $this->db->insert_id;
