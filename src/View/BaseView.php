@@ -24,7 +24,7 @@ class BaseView
     /**
      * 补全视图名
      *
-     * 默认使用 控制器/视图.tpl
+     * 默认使用 控制器/视图.ptpl
      * 如果指定，则使用指定好的视图，$this->view->render('user/info.php')
      *
      * @param string $file
@@ -34,7 +34,7 @@ class BaseView
     {
         if (empty($file))
         {
-            $file = $_GET['controller'] . '/' . $_GET['action'] . '.tpl';
+            $file = $_GET['controller'] . '/' . $_GET['action'] . '.ptpl';
         }
 
         return $file;
@@ -43,7 +43,7 @@ class BaseView
     /**
      * 视图渲染
      *
-     * @param string $file 视图名称，默认 `控制器/视图.tpl`
+     * @param string $file 视图名称，默认 `控制器/视图.ptpl`
      * @param int $expire 视图有效期(单位秒), 默认-1。当$expire>0缓存，=0长期缓存，<0不缓存
      * @package bool $layout_block 是否使用布局模版, 默认不使用
      */
