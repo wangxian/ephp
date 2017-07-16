@@ -16,20 +16,16 @@ use ePHP\Core\Config;
 function dump()
 {
     // 关闭dump
-    if (!Config::get('show_dump'))
-    {
+    if (!Config::get('show_dump')) {
         return false;
     }
 
     $args         = func_get_args();
     $console_func = func_get_arg(0);
 
-    if (count($args) > 1 && in_array($console_func, ['log', 'info', 'error']))
-    {
+    if (count($args) > 1 && in_array($console_func, ['log', 'info', 'error'])) {
         array_shift($args);
-    }
-    else
-    {
+    } else {
         $console_func = 'info';
     }
 
@@ -48,6 +44,21 @@ function dumpdie()
 }
 
 /**
+ * Throw a new Exception
+ *
+ * @param string $message
+ */
+function throw_error($message)
+{
+    $ex = Config::get('handler_exception');
+    if ( empty($ex) ) {
+        $ex = \ePHP\Exception\CommonException::class;
+    }
+
+    throw new $ex($message);
+}
+
+/**
  * 系统异常处理函数，将系统异常，重定向到CommonException去处理
  *
  * @ignore
@@ -57,7 +68,12 @@ function dumpdie()
  */
 function error_handler($errno, $errstr, $errfile, $errline)
 {
-    throw new \ePHP\Exception\CommonException($errstr, $errno, array('errfile' => $errfile, 'errline' => $errline));
+    $ex = Config::get('handler_exception');
+    if ( empty($ex) ) {
+        $ex = \ePHP\Exception\CommonException::class;
+    }
+
+    throw new $ex($errstr, $errno, array('errfile' => $errfile, 'errline' => $errline));
 }
 
 // 捕获系统所有的异常
@@ -71,8 +87,7 @@ $_SERVER['run_dbquery_count'] = 0;
 function run_info($verbose = false)
 {
     dump('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
-    if ($verbose)
-    {
+    if ($verbose) {
         dump('当前数据库查询次数:', $_SERVER['run_dbquery_count']);
     }
 }
@@ -89,7 +104,7 @@ function wlog($key, $value)
 {
     $logger = Config::get('log_writer');
 
-    if ( !empty($logger) ) {
+    if (!empty($logger)) {
         $logger->write($key, $value);
     } else {
         show_error('ERROR: please configure log_writer item in conf/main.php');
@@ -105,12 +120,9 @@ function show_404()
 {
     // header('HTTP/1.1 404 Not Found');
     $tpl = Config::get('tpl_404');
-    if (!$tpl)
-    {
+    if (!$tpl) {
         include __DIR__ . '/../Template/404.html';
-    }
-    else
-    {
+    } else {
         include APP_PATH . '/views/' . $tpl;
     }
 
@@ -130,18 +142,14 @@ function show_404()
  */
 function show_success($message, $url = '', $wait = 6)
 {
-    if ($url === '' && isset($_SERVER['HTTP_REFERER']))
-    {
+    if ($url === '' && isset($_SERVER['HTTP_REFERER'])) {
         $url = $_SERVER['HTTP_REFERER'];
     }
 
     $tpl = Config::get('tpl_success');
-    if (!$tpl)
-    {
+    if (!$tpl) {
         include __DIR__ . '/../Template/200.html';
-    }
-    else
-    {
+    } else {
         include APP_PATH . '/views/' . $tpl;
     }
 
@@ -162,18 +170,14 @@ function show_success($message, $url = '', $wait = 6)
 function show_error($message, $url = '', $wait = 6)
 {
     // header('HTTP/1.1 500 Internal Server Error');
-    if ($url === '' && isset($_SERVER['HTTP_REFERER']))
-    {
+    if ($url === '' && isset($_SERVER['HTTP_REFERER'])) {
         $url = $_SERVER['HTTP_REFERER'];
     }
 
     $tpl = Config::get('tpl_error');
-    if (!$tpl)
-    {
+    if (!$tpl) {
         include __DIR__ . '/../Template/500.html';
-    }
-    else
-    {
+    } else {
         include APP_PATH . '/views/' . $tpl;
     }
 
@@ -190,20 +194,16 @@ function show_error($message, $url = '', $wait = 6)
 function R($url, $wait = 0, $message = '')
 {
     // header("HTTP/1.1 301 Moved Permanently");
-    if (empty($message))
-    {
+    if (empty($message)) {
         $message = "系统将在{$wait}秒之后自动跳转到{$url}！";
     }
 
-    if (!headers_sent() && (0 === $wait))
-    {
+    if (!headers_sent() && (0 === $wait)) {
         // redirect
         header("Content-Type:text/html; charset=UTF-8");
         header("Location: {$url}");
         throw new \ePHP\Exception\ExitException();
-    }
-    else
-    {
+    } else {
         // html refresh
         // header("refresh:{$wait};url={$url}"); // 直接发送header头。
         include __DIR__ . '/../Template/302.html';
@@ -237,20 +237,15 @@ function getv($key, $default = '', $callback = '')
 function getp($pos, $default = '', $callback = '')
 {
     static $url_part = array();
-    if (empty($url_part))
-    {
+    if (empty($url_part)) {
         // only first time
         $posi = strpos($_SERVER['PATH_INFO'], '?');
         $url  = $posi ? substr($_SERVER['PATH_INFO'], 1, $posi) : substr($_SERVER['PATH_INFO'], 1);
-        if (!empty($url))
-        {
+        if (!empty($url)) {
             $url_part = explode('/', $url);
-        }
-        else
-        {
+        } else {
             $url_part = array('index', 'index');
         }
-
     }
     $pos = $pos - 1;
     return isset($url_part[$pos]) ? (empty($callback) ? trim($url_part[$pos]) : call_user_func($callback, trim($url_part[$pos]))) : $default;

@@ -22,13 +22,10 @@ class CommonException extends \Exception
 
         $this->ephpTraceString = $this->getTraceAsString();
 
-        if (is_array($previous))
-        {
+        if (is_array($previous)) {
             $this->file = $previous['errfile'];
             $this->line = $previous['errline'];
-        }
-        else if (is_object($previous))
-        {
+        } elseif (is_object($previous)) {
             $this->file            = $previous->getFile();
             $this->line            = $previous->getLine();
             $this->ephpTraceString = $previous->getTraceAsString();
@@ -40,10 +37,8 @@ class CommonException extends \Exception
         $str = "异常信息\n-----------------------------------\n" . $this->getMessage() . "\n"
         . "-----------------------------------\n" . $this->ephpTraceString . "\n-----------------------------------\n";
 
-        if (Config::get('exception_log'))
-        {
-            wlog('ExceptionLog', $str);
-        }
+        // 记录异常信息到文件中
+        wlog('ExceptionLog', $str);
 
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
             && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest" ) {

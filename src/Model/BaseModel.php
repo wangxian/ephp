@@ -4,7 +4,6 @@ namespace ePHP\Model;
 
 use ePHP\Core\Config;
 use \ePHP\Cache\Cache;
-use ePHP\Exception\CommonException;
 
 class BaseModel
 {
@@ -34,7 +33,7 @@ class BaseModel
 
 
     // db类的实例化。非db handle
-    private $db = NULL;
+    private $db = null;
 
     static private $_db_handle;
 
@@ -48,16 +47,13 @@ class BaseModel
      */
     private function conn()
     {
-        if (!isset(self::$_db_handle[$this->db_config_name]))
-        {
+        if (!isset(self::$_db_handle[$this->db_config_name])) {
             $dbdriver = 'DB_' . Config::get('dbdriver');
             include_once __DIR__ . '/' . $dbdriver . '.php';
 
             $dbdriver                                = '\\ePHP\\Model\\' . $dbdriver;
             self::$_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
-        }
-        else
-        {
+        } else {
             $this->db = self::$_db_handle[$this->db_config_name];
         }
 
@@ -75,8 +71,7 @@ class BaseModel
     private function _read_sql()
     {
         // 可能是model::query('select')，直接接受SQL的查询操作
-        if (!$this->query_sql)
-        {
+        if (!$this->query_sql) {
             $_table_name = $this->_get_table_name();
 
             $_join    = $this->join;
@@ -90,9 +85,7 @@ class BaseModel
 
             $this->_clear_var(); //清理使用过的变量
             return $this->sql;
-        }
-        else
-        {
+        } else {
             $this->sql       = $this->query_sql;
             $this->query_sql = '';
             return $this->sql;
@@ -107,26 +100,19 @@ class BaseModel
      */
     private function _get_table_name()
     {
-        if ($this->table_name == '')
-        {
+        if ($this->table_name == '') {
             // 如果是在实例化后使用，则使用当前模型名称
             $current_class = get_class($this);
-            if ($current_class != 'model')
-            {
+            if ($current_class != 'model') {
                 $this->table_name = strtolower(substr($current_class, strrpos($current_class, '\\')+1, -5));
 
                 // 如果设置了表前缀
-                if (true == ($tb_prefix = Config::get('dbconfig.'.$this->db_config_name . '.tb_prefix')))
-                {
+                if (true == ($tb_prefix = Config::get('dbconfig.'.$this->db_config_name . '.tb_prefix'))) {
                     $this->table_name = $tb_prefix . $this->table_name;
                 }
-
+            } else {
+                throw_error('Tablename cannot automatically infer.');
             }
-            else
-            {
-                throw new CommonException('Tablename cannot automatically infer.');
-            }
-
         }
 
         return $this->table_name;
@@ -228,12 +214,9 @@ class BaseModel
      */
     public function limit($offset, $limit = 0)
     {
-        if ($limit > 0)
-        {
+        if ($limit > 0) {
             $this->limit = $offset .','. $limit;
-        }
-        else
-        {
+        } else {
             $this->limit = $offset;
         }
 
@@ -249,33 +232,25 @@ class BaseModel
      */
     public function set($data, $replacement = array())
     {
-        if (is_array($data))
-        {
-            foreach ($data as $k => $v)
-            {
-                if (empty($noquote) || !in_array($k, $noquote))
-                {
+        if (is_array($data)) {
+            foreach ($data as $k => $v) {
+                if (empty($noquote) || !in_array($k, $noquote)) {
                     $data[$k] = "'" . $this->escape_string($v) . "'";
                 }
             }
 
             $this->data += $data;
-        }
-        else if (is_string($data) && !empty($replacement))
-        {
+        } elseif (is_string($data) && !empty($replacement)) {
             // 支持model->set("cid=? and name=?", [12, "name"])
             $i    = 0;
-            $data = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement)
-            {
+            $data = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement) {
                 $v = $replacement[$i++];
                 return !is_string($v) ? $v : "'" . $this->escape_string($v) . "'";
             }, $data);
 
             $this->data = $data;
-        }
-        else
-        {
-            throw new CommonException('model::set参数错误, 只接收string或array类型');
+        } else {
+            throw_error('model::set参数错误, 只接收string或array类型');
         }
 
         return $this;
@@ -302,32 +277,24 @@ class BaseModel
      */
     public function where($where, $replacement = array())
     {
-        if (is_array($where))
-        {
+        if (is_array($where)) {
             $tmp = array();
-            foreach ($where as $k => $v)
-            {
+            foreach ($where as $k => $v) {
                 $tmp[] = !is_string($v) ? $k . "=" . $v : $k . "='" . $v . "'";
             }
             $where = implode(' AND ', $tmp);
-        }
-        else if (is_string($where) && !empty($replacement))
-        {
+        } elseif (is_string($where) && !empty($replacement)) {
             // 支持model->where("id>? and name=?", [12, "name"])
             $i     = 0;
-            $where = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement)
-            {
+            $where = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement) {
                 $v = $replacement[$i++];
                 return !is_string($v) ? $v : "'" . $this->escape_string($v) . "'";
             }, $where);
         }
 
-        if (empty($this->where))
-        {
+        if (empty($this->where)) {
             $this->where = $where;
-        }
-        else
-        {
+        } else {
             $this->where .= " AND " . $where;
         }
 
@@ -436,12 +403,10 @@ class BaseModel
      */
     public function query($sql, $replacement = array())
     {
-        if (!empty($replacement))
-        {
+        if (!empty($replacement)) {
             // 支持model->query("cid=? and name=?", [12, "name"])
             $i   = 0;
-            $sql = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement)
-            {
+            $sql = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement) {
                 $v = $replacement[$i++];
                 return !is_string($v) ? $v : "'" . $this->escape_string($v) . "'";
             }, $sql);
@@ -449,16 +414,12 @@ class BaseModel
 
         // 鉴定是执行查询还是commit提交操作。如果是select、show，可以有后续操作。
         $_key = strtolower(substr($sql, 0, 4));
-        if ($_key == 'sele' || $_key == 'show')
-        {
+        if ($_key == 'sele' || $_key == 'show') {
             $this->query_sql = $sql;
             return $this;
-        }
-        else
-        {
+        } else {
             return $this->conn()->query($sql);
         }
-
     }
 
     // ------------------------------------------------------------------------------ 查询操作
@@ -511,16 +472,12 @@ class BaseModel
     protected function _find($type)
     {
         $sql = $this->_read_sql();
-        if ($this->expire < 0)
-        {
+        if ($this->expire < 0) {
             return $this->conn()->$type($sql);
-        }
-        else
-        {
+        } else {
             $cache     = Cache::init();
             $cachename = 'db/' . $type . '_' . md5($sql);
-            if (false == ($data = $cache->get($cachename)))
-            {
+            if (false == ($data = $cache->get($cachename))) {
                 $data = $this->conn()->$type($sql);
                 $cache->set($cachename, $data, $this->expire);
                 $this->expire = -1;
@@ -540,20 +497,16 @@ class BaseModel
     {
         $_where    = ($this->where != '') ? ' WHERE ' . $this->where : '';
         $this->sql = $this->_read_sql();
-        if ($this->expire < 0)
-        {
+        if ($this->expire < 0) {
             $_table_name = $this->_get_table_name();
             $sql_cout    = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
 
             $data['data']       = $this->conn()->fetch_arrays($this->sql);
             $data['data_count'] = $this->db->fetch_object($sql_cout)->countrows;
-        }
-        else
-        {
+        } else {
             $cache     = Cache::init();
             $cachename = 'db/findPage_' . md5($this->sql);
-            if (false == ($data = $cache->get($cachename)))
-            {
+            if (false == ($data = $cache->get($cachename))) {
                 $_table_name = $this->_get_table_name();
                 $sql_cout    = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
 
@@ -604,13 +557,10 @@ class BaseModel
         $_where      = '';
         $_table_name = $this->_get_table_name();
 
-        if ($this->where)
-        {
+        if ($this->where) {
             $_where = ' WHERE ' . $this->where;
-        }
-        else if ($this->where == '' && $f == false)
-        {
-            throw new CommonException('警告：您似乎漏掉了where条件。如果确认不使用where条件，请使用delete(true)');
+        } elseif ($this->where == '' && $f == false) {
+            throw_error('警告：您似乎漏掉了where条件。如果确认不使用where条件，请使用delete(true)');
         }
 
         // 清理使用过的变量
@@ -634,26 +584,19 @@ class BaseModel
         $_set_string = ' SET ';
         $tmp         = array();
 
-        if (is_array($this->data))
-        {
-            foreach ($this->data as $k => $v)
-            {
+        if (is_array($this->data)) {
+            foreach ($this->data as $k => $v) {
                 $tmp[] = $k . '=' . $v;
             }
             $_set_string .= implode(',', $tmp);
-        }
-        else if (is_string($this->data))
-        {
+        } elseif (is_string($this->data)) {
             $_set_string .= $this->data;
         }
 
-        if ($this->where)
-        {
+        if ($this->where) {
             $_where = ' WHERE ' . $this->where;
-        }
-        else if ($this->where == '' && $f == false)
-        {
-            throw new CommonException('警告：您似乎漏掉了where条件。如果确认不使用where条件，请使用update(true)');
+        } elseif ($this->where == '' && $f == false) {
+            throw_error('警告：您似乎漏掉了where条件。如果确认不使用where条件，请使用update(true)');
         }
 
         // 清理使用过的变量
@@ -683,15 +626,11 @@ class BaseModel
      */
     public function insert_update($update_string = '')
     {
-        if ($update_string)
-        {
+        if ($update_string) {
             return $this->_insert('UPDATE', $update_string);
-        }
-        else
-        {
+        } else {
             return $this->_insert('IGNORE');
         }
-
     }
 
     /**
@@ -712,9 +651,8 @@ class BaseModel
      */
     protected function _insert($type, $update_string = '')
     {
-        if (is_string($this->data))
-        {
-            throw new CommonException('错误：执行model::insert()时model::set/data()参数必须是array类型');
+        if (is_string($this->data)) {
+            throw_error('错误：执行model::insert()时model::set/data()参数必须是array类型');
             return false;
         }
         $_table_name = $this->_get_table_name();
@@ -726,20 +664,13 @@ class BaseModel
         $this->conn();
 
         // 插入类型
-        if ($type == 'IGNORE')
-        {
+        if ($type == 'IGNORE') {
             $this->sql = 'INSERT IGNORE INTO ' . $_table_name . " ({$_fields}) VALUES ({$_values})";
-        }
-        elseif ($type == 'REPLACE')
-        {
+        } elseif ($type == 'REPLACE') {
             $this->sql = 'REPLACE INTO ' . $_table_name . " ({$_fields}) VALUES ({$_values})";
-        }
-        elseif ($type == 'UPDATE')
-        {
+        } elseif ($type == 'UPDATE') {
             $this->sql = 'INSERT INTO ' . $_table_name . " ({$_fields}) VALUES ({$_values}) ON DUPLICATE KEY UPDATE " . $update_string;
-        }
-        else
-        {
+        } else {
             $this->sql = 'INSERT INTO ' . $_table_name . " ({$_fields}) VALUES ({$_values})";
         }
 
@@ -756,7 +687,7 @@ class BaseModel
      */
     public function trans_start()
     {
-        return $this->conn()->autocommit(FALSE);
+        return $this->conn()->autocommit(false);
     }
 
     /**
@@ -768,7 +699,7 @@ class BaseModel
     {
         $this->conn();
         $this->db->commit();
-        $this->db->autocommit(TRUE);
+        $this->db->autocommit(true);
     }
 
     /**
@@ -780,7 +711,7 @@ class BaseModel
     {
         $this->conn(); //connect server
         $this->db->rollback();
-        $this->db->autocommit(TRUE);
+        $this->db->autocommit(true);
     }
 
     /**
@@ -792,5 +723,4 @@ class BaseModel
     {
         return $this->conn()->escape_string($str);
     }
-
 }

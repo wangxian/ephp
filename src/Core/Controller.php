@@ -21,8 +21,7 @@ class Controller
      */
     public function __get($key)
     {
-        switch ($key)
-        {
+        switch ($key) {
             case 'view':
                 return $this->view = new \ePHP\View\BaseView();
                 break;
@@ -42,12 +41,9 @@ class Controller
             case 'server':
                 return \ePHP\Core\Server::init()->server;
             case substr($key, 0, 5) === 'model':
-                if ($key === 'model')
-                {
+                if ($key === 'model') {
                     return $this->model = new \ePHP\Model\BaseModel();
-                }
-                else
-                {
+                } else {
                     $model_name        = '\\App\\Models\\' . ucfirst(substr($key, 6)) . 'Model';
                     return $this->$key = new $model_name;
                 }
@@ -55,7 +51,7 @@ class Controller
             case 'cache':
                 return $this->cache = \ePHP\Cache\Cache::init();
             default:
-                throw new \ePHP\Exception\CommonException("Undefined property {$key}");
+                throw_error("Undefined property {$key}");
         }
     }
 

@@ -34,11 +34,10 @@ class Image
      * @param $imgfile 文件文件名
      * @return mixed
      */
-    static public function getInfo($imgfile)
+    public static function getInfo($imgfile)
     {
         $imageInfo = getimagesize($imgfile);
-        if ($imageInfo !== false)
-        {
+        if ($imageInfo !== false) {
             $imageType = strtolower(substr(image_type_to_extension($imageInfo[2]), 1));
             $imageSize = filesize($imgfile);
             $info      = array(
@@ -49,9 +48,7 @@ class Image
                 "mime"   => $imageInfo['mime'],
             );
             return $info;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -66,43 +63,32 @@ class Image
      * @param string $thumbWidth 缩略图最大宽度
      * @param string $thumbHeight 缩略图最大高度
      */
-    static public function thumbImg($srcfile, $dstfile, $thumbWidth, $thumbHeight)
+    public static function thumbImg($srcfile, $dstfile, $thumbWidth, $thumbHeight)
     {
         $imageinfo = getimagesize($srcfile);
-        if (empty($imageinfo))
-        {
-            throw new \ePHP\Exception\CommonException('只支持gif,jpg,png的图片');
+        if (empty($imageinfo)) {
+            throw_error('只支持gif,jpg,png的图片');
         }
 
         // dump($imageinfo);
 
-        if ($imageinfo[2] == 1)
-        {
+        if ($imageinfo[2] == 1) {
             $im = imagecreatefromgif($srcfile);
-        }
-        elseif ($imageinfo[2] == 2)
-        {
+        } elseif ($imageinfo[2] == 2) {
             $im = imagecreatefromjpeg($srcfile);
-        }
-        elseif ($imageinfo[2] == 3)
-        {
+        } elseif ($imageinfo[2] == 3) {
             $im = imagecreatefrompng($srcfile);
-        }
-        else
-        {
-            throw new \ePHP\Exception\CommonException('只支持gif,jpg,png的图片');
+        } else {
+            throw_error('只支持gif,jpg,png的图片');
         }
 
         $w = $imageinfo[0];
         $h = $imageinfo[1];
 
-        if ($thumbWidth / $thumbHeight > $w / $h)
-        {
+        if ($thumbWidth / $thumbHeight > $w / $h) {
             $nh = $thumbHeight;
             $nw = ($w * $thumbHeight) / $h;
-        }
-        else
-        {
+        } else {
             $nw = $thumbWidth;
             $nh = ($h * $thumbWidth) / $w;
         }
@@ -127,7 +113,7 @@ class Image
      * @param bool $hasborder 图片边框有否
      * @return null
      */
-    static public function captcha($length = 4, $mode = 3, $type = 'png', $hasborder = true)
+    public static function captcha($length = 4, $mode = 3, $type = 'png', $hasborder = true)
     {
         $randval                   = \ePHP\Misc\Func::randString($length, $mode);
         $_SESSION['imgVerifyCode'] = md5(strtolower($randval));
@@ -136,24 +122,18 @@ class Image
         $height = 25;
 
         $width = ($length * 9 + 10) > $width ? $length * 9 + 10 : $width;
-        if ($type != 'gif' && function_exists('imagecreatetruecolor'))
-        {
+        if ($type != 'gif' && function_exists('imagecreatetruecolor')) {
             $im = @imagecreatetruecolor($width, $height);
-        }
-        else
-        {
+        } else {
             $im = @imagecreate($width, $height);
         }
 
         // 背景色
         $backColor = imagecolorallocate($im, 252, 252, 252);
 
-        if ($hasborder)
-        {
+        if ($hasborder) {
             $border_color = 238;
-        }
-        else
-        {
+        } else {
             $border_color = 255;
         }
 
@@ -165,14 +145,12 @@ class Image
         $stringColor = imagecolorallocate($im, mt_rand(0, 200), mt_rand(0, 120), mt_rand(0, 120));
 
         // 干扰
-        for ($i = 0; $i < 10; $i++)
-        {
+        for ($i = 0; $i < 10; $i++) {
             $fontcolor = imagecolorallocate($im, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
             imagearc($im, mt_rand(-10, $width), mt_rand(-10, $height), mt_rand(30, 300), mt_rand(20, 200), 55, 44, $fontcolor);
         }
 
-        for ($i = 0; $i < 25; $i++)
-        {
+        for ($i = 0; $i < 25; $i++) {
             $fontcolor = imagecolorallocate($im, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
             imagesetpixel($im, mt_rand(0, $width), mt_rand(0, $height), $pointColor);
         }
@@ -191,10 +169,9 @@ class Image
      * @param $verifyCode 用户输入的验证码
      * @return bool
      */
-    static public function checkCaptcha($verifyCode)
+    public static function checkCaptcha($verifyCode)
     {
-        if (empty($_SESSION['imgVerifyCode']))
-        {
+        if (empty($_SESSION['imgVerifyCode'])) {
             return false;
         }
 

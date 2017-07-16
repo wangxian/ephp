@@ -1,5 +1,6 @@
 <?php
 namespace ePHP\Cache;
+
 use ePHP\Core\Config;
 
 /**
@@ -16,14 +17,12 @@ class CacheRedis
         $this->connection = new \Redis();
         $config           = Config::get('cache_redis');
 
-        if (empty($config))
-        {
-            throw new CommonException("please config cache_redis in conf/main.conf");
+        if (empty($config)) {
+            throw_error("please config cache_redis in conf/main.conf");
         }
 
         $this->connection->connect($config['host'], $config['port'], !empty($config['timeout']) ? $config['timeout'] : 2.5);
-        if (!empty($config['auth']))
-        {
+        if (!empty($config['auth'])) {
             $this->connection->auth($config['auth']);
         }
     }

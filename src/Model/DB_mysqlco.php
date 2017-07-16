@@ -4,7 +4,6 @@ namespace ePHP\Model;
 
 use ePHP\Core\Config;
 use ePHP\Model\DBPool;
-use ePHP\Exception\CommonException;
 use ePHP\Exception\ExitException;
 
 class DB_mysqlco
@@ -35,13 +34,11 @@ class DB_mysqlco
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
-        if (false == ($iconfig = Config::get($db_config)))
-        {
+        if (false == ($iconfig = Config::get($db_config))) {
             \show_error('Invalid database configuration！');
         }
 
-        if (empty($iconfig['port']))
-        {
+        if (empty($iconfig['port'])) {
             $iconfig['port'] = 3306;
         }
 
@@ -59,12 +56,9 @@ class DB_mysqlco
             'database' => $this->iconfig['dbname']
         ]);
 
-        if (!$this->db->connected)
-        {
+        if (!$this->db->connected) {
             throw new ExitException('Can not connect to your MySQL Server. Then exit');
-        }
-        else
-        {
+        } else {
             // Set default charset
             $this->db->query("set names " . (isset($this->iconfig['charset']) ? $this->iconfig['charset'] : 'utf8'));
         }
@@ -80,22 +74,18 @@ class DB_mysqlco
         $dbpool = DBPool::init();
         // var_dump($dbpool->cap + $dbpool->acticeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
 
-        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->iconfig['max_pool_size']))
-        {
+        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->iconfig['max_pool_size'])) {
             throw new ExitException('MySQL pool is empty...');
         }
 
-        if ( $dbpool->cap < $this->iconfig['idle_pool_size']
+        if ($dbpool->cap < $this->iconfig['idle_pool_size']
             || ($dbpool->queue->isEmpty() && $dbpool->cap < $this->iconfig['max_pool_size'])
-        )
-        {
+        ) {
             // var_dump('........................reconnect........................');
             $this->reconnect();
             $dbpool->acticeCount++;
             return false;
-        }
-        else
-        {
+        } else {
             // var_dump('........................using pool........................');
             $this->db = $dbpool->out($this->iconfig['idle_pool_size']);
             return true;
@@ -110,8 +100,7 @@ class DB_mysqlco
      */
     public function query($sql)
     {
-        if (true == Config::get('sql_log'))
-        {
+        if (true == Config::get('sql_log')) {
             wlog('SQL-Log', $sql);
         }
 
@@ -119,8 +108,7 @@ class DB_mysqlco
         $isFromPool = $this->prepareDB();
 
         // If disconnect, Must connection
-        if (!$this->db->connected)
-        {
+        if (!$this->db->connected) {
             // var_dump('........................mysql disconnected........................');
             $this->reconnect();
         }
@@ -143,16 +131,16 @@ class DB_mysqlco
 
         // Put db connction to pool
         // If it is new client, queue in, else put pool client back
-        if($isFromPool) DBPool::init()->back($this->db);
-        else DBPool::init()->in($this->db);
-
-        if ($this->db->errno == 0)
-        {
-            $_SERVER['run_dbquery_count']++;
+        if ($isFromPool) {
+            DBPool::init()->back($this->db);
+        } else {
+            DBPool::init()->in($this->db);
         }
-        else
-        {
-            throw new CommonException('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
+
+        if ($this->db->errno == 0) {
+            $_SERVER['run_dbquery_count']++;
+        } else {
+            throw_error('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
         }
 
         $this->insert_id = $this->db->insert_id;
@@ -191,8 +179,11 @@ class DB_mysqlco
     public function fetch_array($sql)
     {
         $result = $this->query($sql);
-        if (!empty($result)) return $result[0];
-        else return [];
+        if (!empty($result)) {
+            return $result[0];
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -228,8 +219,7 @@ class DB_mysqlco
     {
         $data = [];
         $result = $this->fetch_arrays($sql);
-        foreach ($result as $v)
-        {
+        foreach ($result as $v) {
             $data[] = (object)$v;
         }
 

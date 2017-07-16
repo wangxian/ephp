@@ -10,24 +10,20 @@ class DB_mysql
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
-        if (false == ($iconfig = Config::get($db_config)))
-        {
+        if (false == ($iconfig = Config::get($db_config))) {
             \show_error('Invalid database configuration！');
         }
 
-        if (empty($iconfig['port']))
-        {
+        if (empty($iconfig['port'])) {
             $iconfig['port'] = 3306;
         }
 
         $this->db = \mysql_connect($iconfig['host'] . ':' . $iconfig['port'], $iconfig['user'], $iconfig['password']);
-        if (empty($this->db))
-        {
+        if (empty($this->db)) {
             show_error('Can not connect to your MySQL Server.');
         }
 
-        if (!mysql_select_db($iconfig['dbname'], $this->db))
-        {
+        if (!mysql_select_db($iconfig['dbname'], $this->db)) {
             show_error(mysql_error($this->db));
         }
 
@@ -43,19 +39,15 @@ class DB_mysql
      */
     public function query($sql)
     {
-        if (true == Config::get('sql_log'))
-        {
+        if (true == Config::get('sql_log')) {
             wlog('SQL-Log', $sql);
         }
 
-        if (true == ($rs = mysql_query($sql, $this->db)))
-        {
+        if (true == ($rs = mysql_query($sql, $this->db))) {
             $_SERVER['run_dbquery_count']++;
             return $rs;
-        }
-        else
-        {
-            throw new CommonException('DBError: ' . mysql_error($this->db) . '<br />RawSQL: ' . $sql, 2045);
+        } else {
+            throw_error('DBError: ' . mysql_error($this->db) . '<br />RawSQL: ' . $sql, 2045);
         }
         //return false;
     }
@@ -90,7 +82,9 @@ class DB_mysql
     {
         $rs   = $this->query($sql);
         $data = mysql_fetch_assoc($rs);
-        if(empty($data)) $data = [];
+        if (empty($data)) {
+            $data = [];
+        }
 
         mysql_free_result($rs);
         return $data;
@@ -107,8 +101,7 @@ class DB_mysql
         $result = $this->query($sql);
 
         $data  = [];
-        while (true == ($row = mysql_fetch_assoc($result)))
-        {
+        while (true == ($row = mysql_fetch_assoc($result))) {
             $data[] = $row;
         }
         mysql_free_result($result);
@@ -140,8 +133,7 @@ class DB_mysql
     {
         $result = $this->query($sql);
         $array  = null;
-        while (true == ($row = mysql_fetch_object($result)))
-        {
+        while (true == ($row = mysql_fetch_object($result))) {
             $array[] = $row;
         }
         mysql_free_result($result);
@@ -166,12 +158,9 @@ class DB_mysql
      */
     public function autocommit($f)
     {
-        if ($f)
-        {
+        if ($f) {
             return $this->query('SET AUTOCOMMIT=1');
-        }
-        else
-        {
+        } else {
             $this->query('SET AUTOCOMMIT=0');
             return $this->query('START TRANSACTION');
         }

@@ -2,7 +2,6 @@
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
-use ePHP\Exception\CommonException;
 
 class DB_mysqli
 {
@@ -11,19 +10,16 @@ class DB_mysqli
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
-        if (false == ($iconfig = Config::get($db_config)))
-        {
+        if (false == ($iconfig = Config::get($db_config))) {
             \show_error('Invalid database configuration！');
         }
 
-        if (empty($iconfig['port']))
-        {
+        if (empty($iconfig['port'])) {
             $iconfig['port'] = 3306;
         }
 
         $this->db = new \mysqli($iconfig['host'], $iconfig['user'], $iconfig['password'], $iconfig['dbname'], $iconfig['port']);
-        if (mysqli_connect_errno())
-        {
+        if (mysqli_connect_errno()) {
             \show_error('Can not connect to MySQL, message: ' . mysqli_connect_error());
         }
 
@@ -39,21 +35,16 @@ class DB_mysqli
      */
     function query($sql)
     {
-        if (true == Config::get('sql_log'))
-        {
+        if (true == Config::get('sql_log')) {
             wlog('SQL-Log', $sql);
         }
 
-        if (true == ($rs = $this->db->query($sql)))
-        {
+        if (true == ($rs = $this->db->query($sql))) {
             $_SERVER['run_dbquery_count']++;
             return $rs;
+        } else {
+            throw_error('DBError: ' . $this->db->error . '<br />RawSQL: ' . $sql, 2045);
         }
-        else
-        {
-            throw new CommonException('DBError: ' . $this->db->error . '<br />RawSQL: ' . $sql, 2045);
-        }
-
     }
 
     /**
@@ -66,7 +57,9 @@ class DB_mysqli
     {
         $rs   = $this->query($sql);
         $data = $rs->fetch_assoc();
-        if (empty($data)) $data = [];
+        if (empty($data)) {
+            $data = [];
+        }
 
         $rs->free();
         return $data;
@@ -82,8 +75,7 @@ class DB_mysqli
     {
         $rs   = $this->query($sql);
         $data = [];
-        while (true == ($row = $rs->fetch_assoc()))
-        {
+        while (true == ($row = $rs->fetch_assoc())) {
             $data[] = $row;
         }
         $rs->free();
@@ -115,8 +107,7 @@ class DB_mysqli
     {
         $rs   = $this->query($sql);
         $data = null;
-        while (true == ($row = $rs->fetch_object()))
-        {
+        while (true == ($row = $rs->fetch_object())) {
             $data[] = $row;
         }
         $rs->free();

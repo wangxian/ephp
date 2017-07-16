@@ -13,26 +13,23 @@ class Application
      *
      * @return null
      */
-    function run($request=null, $response=null)
+    function run($request = null, $response = null)
     {
         // Set default error level, In dev env show all errors
         // ini_set('display_errors', Config::get('show_errors') ? 'Off' : 'Off');
         ini_set('display_errors', 'On');
         error_reporting(E_ALL | E_STRICT);
 
-        if ( !defined('SERVER_MODE') )
-        {
+        if (!defined('SERVER_MODE')) {
             // Mark server mode
             define('SERVER_MODE', 'fpm');
         }
 
-        try
-        {
+        try {
             $route = (\ePHP\Core\Route::init())->findRoute();
             // dumpdie($route);
 
-            if (!empty($route))
-            {
+            if (!empty($route)) {
                 $_GET['controller'] = $route[0];
                 $_GET['action']     = $route[1];
 
@@ -41,11 +38,9 @@ class Application
 
                 $_REQUEST = array_merge($_GET, $_REQUEST);
 
-                if (method_exists($controller_name, $action_name))
-                {
+                if (method_exists($controller_name, $action_name)) {
                     $c_init = new $controller_name;
-                    if (SERVER_MODE === 'swoole')
-                    {
+                    if (SERVER_MODE === 'swoole') {
                         $c_init->request = $request;
                         $c_init->response = $response;
                     }
@@ -53,26 +48,17 @@ class Application
                     // Under swoole server, can't use call_user_func
                     // call_user_func(array($c_init, $action_name));
                     $c_init->{$action_name}();
-                }
-                else if (defined('RUN_ENV') && RUN_ENV == 'prod')
-                {
+                } elseif (defined('RUN_ENV') && RUN_ENV == 'prod') {
                     \show_404();
-                }
-                else
-                {
+                } else {
                     \show_error("method {$action_name}() is not defined in {$controller_name}");
                 }
-            }
-            else
-            {
+            } else {
                 \show_404();
             }
-        }
-        catch (\ePHP\Exception\CommonException $e)
-        {
+        } catch (\ePHP\Exception\CommonException $e) {
             // ExitException don't show error message
-            if ($e->getCode() !== -99) 
-            {
+            if ($e->getCode() !== -99) {
                 echo $e;
             }
         }
