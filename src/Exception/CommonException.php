@@ -7,7 +7,7 @@ use ePHP\Core\Config;
 class CommonException extends \Exception
 {
     // 错误堆栈
-    private $ephpTraceString = '';
+    protected $ephpTraceString = '';
 
     /**
      * @param string $message 错误消息
