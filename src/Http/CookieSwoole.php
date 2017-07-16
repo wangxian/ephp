@@ -25,13 +25,10 @@ class CookieSwoole
      */
     public function set($name, $value, $expire = 604800, $path = '/', $domain = '')
     {
-        if (empty($domain))
-        {
+        if (empty($domain)) {
             // $domain = '.' . $_SERVER['HTTP_HOST'];
             $this->response->cookie($name, $value, $expire + time(), $path);
-        }
-        else
-        {
+        } else {
             $this->response->cookie($name, $value, $expire + time(), $path, $domain);
         }
 
@@ -75,12 +72,9 @@ class CookieSwoole
     public function getSecret($name)
     {
         $value = $this->get($name);
-        if (empty($value))
-        {
+        if (empty($value)) {
             return false;
-        }
-        else
-        {
+        } else {
             return \ePHP\Hash\Encrypt::decryptG($value, md5($_SERVER['HTTP_HOST'].APP_PATH.SERVER_MODE));
         }
     }
@@ -95,12 +89,9 @@ class CookieSwoole
      */
     public function delete($name, $path = '/', $domain = '')
     {
-        if (empty($domain))
-        {
+        if (empty($domain)) {
             $this->response->cookie($name, null, time() - 3600, '/');
-        }
-        else
-        {
+        } else {
             $domain = '.' . $_SERVER['HTTP_HOST'];
             $this->response->cookie($name, null, time() - 3600, '/', $domain);
         }
@@ -115,8 +106,7 @@ class CookieSwoole
      */
     public function deleteAll()
     {
-        foreach ($_COOKIE as $k => $v)
-        {
+        foreach ($_COOKIE as $k => $v) {
             $this->delete($k);
         }
     }

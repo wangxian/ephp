@@ -36,47 +36,30 @@ class Config
     {
         // 获取值
         // 加载其他配制文件
-        if ($config_name !== 'main' && !isset(self::$_config[$config_name]))
-        {
+        if ($config_name !== 'main' && !isset(self::$_config[$config_name])) {
             $filename = APP_PATH . '/conf/' . $config_name . '.php';
-            if (file_exists($filename))
-            {
+            if (file_exists($filename)) {
                 self::$_config[$config_name] = include $filename;
-            }
-            else
-            {
+            } else {
                 \show_error("Config file {$filename} is not exists.");
             }
-
         }
 
         // 返回需要value
-        if ($key === '')
-        {
+        if ($key === '') {
             return self::$_config[$config_name];
-        }
-        else if (array_key_exists($key, self::$_config[$config_name]))
-        {
+        } elseif (array_key_exists($key, self::$_config[$config_name])) {
             return self::$_config[$config_name][$key];
-        }
-        else if (strpos($key, '.'))
-        {
+        } elseif (strpos($key, '.')) {
             $array = explode('.', $key);
-            if(count($array) === 2)
-            {
+            if (count($array) === 2) {
                 return isset(self::$_config[$config_name][$array[0]][$array[1]]) ? self::$_config[$config_name][$array[0]][$array[1]] : false;
-            }
-            else if(count($array) === 3)
-            {
+            } elseif (count($array) === 3) {
                 return isset(self::$_config[$config_name][$array[0]][$array[1]][$array[2]]) ? self::$_config[$config_name][$array[0]][$array[1]][$array[2]] : false;
-            }
-            else
-            {
+            } else {
                 show_error('Config::get("a.b.c") Only 3 levels are allowed.');
             }
-        }
-        else
-        {
+        } else {
             return false;
         }
     }

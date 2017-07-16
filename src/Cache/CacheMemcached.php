@@ -1,5 +1,6 @@
 <?php
 namespace ePHP\Cache;
+
 use ePHP\Core\Config;
 
 class CacheMemcached
@@ -12,8 +13,7 @@ class CacheMemcached
         $this->connection = new MemCache;
         $config = Config::get('cache_memcached');
 
-        foreach ($config as $v)
-        {
+        foreach ($config as $v) {
             $this->addServer($v['host'], $v['port'], $v['weight']);
         }
     }
@@ -81,4 +81,3 @@ class CacheMemcached
         $this->connection->close();
     }
 }
-

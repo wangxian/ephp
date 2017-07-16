@@ -15,35 +15,27 @@ class Dir
      */
     public static function map($source_dir, $subdir = true)
     {
-        if (true == ($fp = opendir($source_dir)))
-        {
+        if (true == ($fp = opendir($source_dir))) {
             $source_dir = rtrim($source_dir, '/') . '/';
             $filedata   = array();
 
-            while (false !== ($file = readdir($fp)))
-            {
-                if ($file == '.' OR $file == '..')
-                {
+            while (false !== ($file = readdir($fp))) {
+                if ($file == '.' or $file == '..') {
                     continue;
                 }
 
-                if ($subdir && is_dir($source_dir . $file))
-                {
+                if ($subdir && is_dir($source_dir . $file)) {
                     $temp_array      = array();
                     $temp_array      = self::map($source_dir . $file . '/', $subdir);
                     $filedata[$file] = $temp_array;
-                }
-                else
-                {
+                } else {
                     $filedata[] = $file;
                 }
             }
 
             closedir($fp);
             return $filedata;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -58,22 +50,17 @@ class Dir
     {
         $handle = opendir($dir);
         $i      = 0;
-        while (false !== ($file = readdir($handle)))
-        {
+        while (false !== ($file = readdir($handle))) {
             $i++;
         }
 
         closedir($handle);
 
-        if ($i >= 2)
-        {
+        if ($i >= 2) {
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
-
     }
 
     /**
@@ -85,31 +72,21 @@ class Dir
     public static function deleteDir($dir)
     {
         $d = dir($dir);
-        while (false !== ($entry = $d->read()))
-        {
-            if ($entry == '.' || $entry == '..')
-            {
+        while (false !== ($entry = $d->read())) {
+            if ($entry == '.' || $entry == '..') {
                 continue;
             }
 
             $currele = $d->path . '/' . $entry;
-            if (is_dir($currele))
-            {
-                if (self::isEmpty($currele))
-                {
+            if (is_dir($currele)) {
+                if (self::isEmpty($currele)) {
                     rmdir($currele);
-                }
-                else
-                {
+                } else {
                     self::deleteDir($currele);
                 }
-
-            }
-            else
-            {
+            } else {
                 unlink($currele);
             }
-
         }
         $d->close();
 

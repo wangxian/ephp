@@ -44,8 +44,7 @@ class Server
      */
     public static function init()
     {
-        if (!self::$instance instanceof self)
-        {
+        if (!self::$instance instanceof self) {
             return self::$instance = new self();
         }
         return self::$instance;
@@ -81,7 +80,6 @@ Press Ctrl-C to quit.
 -----------------------------------
 
 EOT;
-
     }
 
     /**
@@ -149,12 +147,10 @@ EOT;
 
     function stop()
     {
-
     }
 
     function reload()
     {
-
     }
 
     /**
@@ -173,27 +169,21 @@ EOT;
         $_FILES  = $request->files ?? [];
 
         $_SERVER = ['run_dbquery_count' => 0];
-        foreach ($request->server as $key => $value)
-        {
+        foreach ($request->server as $key => $value) {
             $key = strtoupper($key);
             $_SERVER[$key] = $value;
 
             // FIXED: swoole REQUEST_URI don't contains QUERY_STRING
-            if ($key === 'REQUEST_URI' && isset($_SERVER['QUERY_STRING']))
-            {
+            if ($key === 'REQUEST_URI' && isset($_SERVER['QUERY_STRING'])) {
                 $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
             }
         }
 
-        foreach ($request->header as $key => $value)
-        {
+        foreach ($request->header as $key => $value) {
             $key = strtoupper(str_replace('-', '_', $key));
-            if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH')
-            {
+            if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH') {
                 $_SERVER[$key] = $value;
-            }
-            else
-            {
+            } else {
                 $_SERVER['HTTP_' . $key] = $value;
             }
         }
@@ -203,15 +193,14 @@ EOT;
         $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
         $extname = substr($filename, strrpos($filename, '.')+1);
 
-        if ( !( $extname === 'html'
+        if (!( $extname === 'html'
                 || $extname === 'css'
                 || $extname === 'js'
                 || $extname === 'png'
                 || $extname === 'jpg'
                 || $extname === 'gif'
                 || $extname === 'ico')
-        )
-        {
+        ) {
             ob_start();
             (new \ePHP\Core\Application())->run($request, $response);
             $h = ob_get_clean();
@@ -219,34 +208,25 @@ EOT;
             // echo "----------------------\n". $h ."\n";
 
             // Fixed output o byte
-            if (strlen($h) === 0) $h = ' ';
+            if (strlen($h) === 0) {
+                $h = ' ';
+            }
 
             $response->end($h);
-        }
-        else
-        {
-            if ( is_file($filename) )
-            {
+        } else {
+            if (is_file($filename)) {
                 $response->header('Content-Type', $this->contentType[$extname]);
-                if (PHP_OS !== 'Darwin')
-                {
+                if (PHP_OS !== 'Darwin') {
                     $response->sendfile($filename);
-                }
-                else
-                {
+                } else {
                     $response->end(file_get_contents($filename));
                 }
-            }
-            else
-            {
+            } else {
                 ob_start();
                 $tpl = Config::get('tpl_404');
-                if (!$tpl)
-                {
+                if (!$tpl) {
                     include __DIR__ . '/../Template/404.html';
-                }
-                else
-                {
+                } else {
                     include APP_PATH . '/views/' . $tpl;
                 }
                 $h = ob_get_clean();
@@ -284,11 +264,9 @@ EOT;
 
     function onTask(\swoole_server $serv, $task_id, $from_id, $data)
     {
-
     }
 
     function onFinish(\swoole_http_server $serv, $task_id, $data)
     {
-
     }
 }

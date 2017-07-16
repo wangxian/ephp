@@ -32,8 +32,7 @@ class BaseView
      */
     protected function __filename($file)
     {
-        if (empty($file))
-        {
+        if (empty($file)) {
             $file = $_GET['controller'] . '/' . $_GET['action'] . '.ptpl';
         }
 
@@ -49,15 +48,11 @@ class BaseView
      */
     public function render($file = '', $expire = -1, $layout_block = false)
     {
-        if ($expire < 0)
-        {
+        if ($expire < 0) {
             $this->_include($file, null, $layout_block, false);
-        }
-        else
-        {
+        } else {
             $cache = \ePHP\Cache\Cache::init();
-            if (false == ($content = $cache->get('html/' . $file)))
-            {
+            if (false == ($content = $cache->get('html/' . $file))) {
                 $content = str_replace(array('<!--{', '}-->'), array('<?php ', '?>'), $this->_include($file, null, $layout_block, true));
                 $cache->set('html/' . $file, $content, $expire);
             }
@@ -73,12 +68,9 @@ class BaseView
      */
     public function is_cached($file = '')
     {
-        if (Cache::init()->get('html/' . $file))
-        {
+        if (Cache::init()->get('html/' . $file)) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -145,17 +137,14 @@ class BaseView
         $content  = ob_get_clean();
         $_current = array_pop($this->_current);
 
-        if (!isset($this->_layout[$_current]))
-        {
+        if (!isset($this->_layout[$_current])) {
             echo "<!--{layout_block_{$_current}}-->";
         }
 
         $this->_instack[$_current] = $content;
-        if (empty($this->_current))
-        {
+        if (empty($this->_current)) {
             // 延时反转得到正序的栈结构
-            if (count($this->_instack) > 1)
-            {
+            if (count($this->_instack) > 1) {
                 $this->_instack = array_reverse($this->_instack);
             }
 
@@ -174,53 +163,38 @@ class BaseView
      */
     public function _include($file, $__vars = null, $layout_block = false, $return = false)
     {
-        if (is_array($this->vars))
-        {
+        if (is_array($this->vars)) {
             extract($this->vars);
         }
 
-        if (is_array($__vars))
-        {
+        if (is_array($__vars)) {
             extract($__vars);
         }
 
-        if ($layout_block)
-        {
+        if ($layout_block) {
             ob_start();
             include APP_PATH . '/views/' . $this->__filename($file);
             $content = ob_get_clean();
             //echo $content;print_r($this->_layout);exit;
 
-            if ($this->_layout)
-            {
-                foreach ($this->_layout as $k => $v)
-                {
+            if ($this->_layout) {
+                foreach ($this->_layout as $k => $v) {
                     $content = str_replace("<!--{layout_block_{$k}}-->", $v, $content);
                 }
-
             }
 
             // 是否返回
-            if ($return)
-            {
+            if ($return) {
                 return $content;
-            }
-            else
-            {
+            } else {
                 echo $content;
             }
-
-        }
-        else if ($return)
-        {
+        } elseif ($return) {
             ob_start();
             include APP_PATH . '/views/' . $this->__filename($file);
             return ob_get_clean();
-        }
-        else
-        {
+        } else {
             include APP_PATH . '/views/' . $this->__filename($file);
         }
-
     }
 }

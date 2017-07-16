@@ -15,8 +15,7 @@ trait Single
      */
     public static function init()
     {
-        if (!self::$instance instanceof self)
-        {
+        if (!self::$instance instanceof self) {
             return self::$instance = new self();
         }
         return self::$instance;

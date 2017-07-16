@@ -5,7 +5,6 @@ class Cookie
 {
     public function __construct()
     {
-
     }
 
     // /**
@@ -42,13 +41,10 @@ class Cookie
      */
     public function set($name, $value, $expire = 604800, $path = '/', $domain = '')
     {
-        if (empty($domain))
-        {
+        if (empty($domain)) {
             // $domain = '.' . $_SERVER['HTTP_HOST'];
             setcookie($name, $value, $expire + time(), $path);
-        }
-        else
-        {
+        } else {
             setcookie($name, $value, $expire + time(), $path, $domain);
         }
 
@@ -92,12 +88,9 @@ class Cookie
     public function getSecret($name)
     {
         $value = $this->get($name);
-        if (empty($value))
-        {
+        if (empty($value)) {
             return false;
-        }
-        else
-        {
+        } else {
             return \ePHP\Hash\Encrypt::decryptG($value, md5($_SERVER['HTTP_HOST'].APP_PATH.SERVER_MODE));
         }
     }
@@ -112,12 +105,9 @@ class Cookie
      */
     public function delete($name, $path = '/', $domain = '')
     {
-        if (empty($domain))
-        {
+        if (empty($domain)) {
             setcookie($name, null, time() - 3600, '/');
-        }
-        else
-        {
+        } else {
             $domain = '.' . $_SERVER['HTTP_HOST'];
             setcookie($name, null, time() - 3600, '/', $domain);
         }
@@ -132,8 +122,7 @@ class Cookie
      */
     public function deleteAll()
     {
-        foreach ($_COOKIE as $k => $v)
-        {
+        foreach ($_COOKIE as $k => $v) {
             $this->delete($k);
         }
     }

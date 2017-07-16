@@ -27,32 +27,25 @@ class Xml
      */
     private static function _to_xml_body($data, $child_label = '')
     {
-        if (is_object($data))
-        {
+        if (is_object($data)) {
             $data = get_object_vars($data);
         }
 
         $xml = '';
-        foreach ($data as $key => $val)
-        {
-            if ($child_label && is_numeric($key))
-            {
+        foreach ($data as $key => $val) {
+            if ($child_label && is_numeric($key)) {
                 $key = $child_label;
             }
 
             $xml .= "<{$key}>";
-            if (is_object($val))
-            {
+            if (is_object($val)) {
                 $val = (array) $val;
             }
 
-            if (is_array($val))
-            {
+            if (is_array($val)) {
                 $child_label_next = substr($key, 0, -1);
                 $xml .= "\n" . self::_to_xml_body($val, $child_label_next);
-            }
-            else
-            {
+            } else {
                 $xml .= $val;
             }
 
@@ -84,18 +77,13 @@ class Xml
     {
         $tmp  = array();
         $data = (array) $data;
-        foreach ($data as $k => $v)
-        {
+        foreach ($data as $k => $v) {
             $v = (array) $v;
-            if (isset($v[0]) && is_string($v[0]))
-            {
+            if (isset($v[0]) && is_string($v[0])) {
                 $tmp[$k] = $v[0];
-            }
-            else
-            {
+            } else {
                 $tmp[$k] = self::_toArray($v, true);
             }
-
         }
         return $tmp;
     }

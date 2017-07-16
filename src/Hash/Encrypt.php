@@ -13,8 +13,7 @@ class Encrypt
     public static function encryptG($value, $key = 'ePHP')
     {
         $key = pack('H*', md5($key . "30f7384ac1"));
-        if (!$value)
-        {
+        if (!$value) {
             return false;
         }
 
@@ -36,8 +35,7 @@ class Encrypt
     public static function decryptG($value, $key = 'ePHP')
     {
         $key = pack('H*', md5($key . "30f7384ac1"));
-        if (!$value)
-        {
+        if (!$value) {
             return false;
         }
 
@@ -68,20 +66,17 @@ class Encrypt
         $string_length = strlen($string);
         $rndkey        = $box        = array();
         $result        = '';
-        for ($i = 0; $i <= 255; $i++)
-        {
+        for ($i = 0; $i <= 255; $i++) {
             $rndkey[$i] = ord($key[$i % $key_length]);
             $box[$i]    = $i;
         }
-        for ($j = $i = 0; $i < 256; $i++)
-        {
+        for ($j = $i = 0; $i < 256; $i++) {
             $j       = ($j + $box[$i] + $rndkey[$i]) % 256;
             $tmp     = $box[$i];
             $box[$i] = $box[$j];
             $box[$j] = $tmp;
         }
-        for ($a = $j = $i = 0; $i < $string_length; $i++)
-        {
+        for ($a = $j = $i = 0; $i < $string_length; $i++) {
             $a       = ($a + 1) % 256;
             $j       = ($j + $box[$a]) % 256;
             $tmp     = $box[$a];
@@ -91,23 +86,15 @@ class Encrypt
         }
 
         // DECODE
-        if ($operation == 'DECODE')
-        {
-            if (substr($result, 0, 8) == substr(md5(substr($result, 8) . $key), 0, 8))
-            {
+        if ($operation == 'DECODE') {
+            if (substr($result, 0, 8) == substr(md5(substr($result, 8) . $key), 0, 8)) {
                 return substr($result, 8);
-            }
-            else
-            {
+            } else {
                 return '';
             }
-
-        }
-        else
-        {
+        } else {
             return str_replace('=', '', Func::safe_b64encode($result));
         }
-
     }
 
     /**

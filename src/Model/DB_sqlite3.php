@@ -10,17 +10,14 @@ class DB_sqlite3
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
-        if (false == ($iconfig = Config::get($db_config)))
-        {
+        if (false == ($iconfig = Config::get($db_config))) {
             \show_error('Invalid database configuration！');
         }
 
         $this->db = new \SQLite3($iconfig['host'], SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE, $iconfig['password']);
-        if (empty($this->db))
-        {
+        if (empty($this->db)) {
             show_error($this->db->lastErrorMsg());
         }
-
     }
 
     /**
@@ -31,28 +28,21 @@ class DB_sqlite3
      */
     public function query($sql)
     {
-        if (true == Config::get('sql_log'))
-        {
+        if (true == Config::get('sql_log')) {
             wlog('SQL-Log', $sql);
         }
 
         $_key = strtolower(substr($sql, 0, 6));
-        if ($_key == 'select')
-        {
+        if ($_key == 'select') {
             $qt = 'query';
-        }
-        else
-        {
+        } else {
             $qt = 'exec';
         }
 
-        if (true == ($rs = $this->db->$qt($sql)))
-        {
+        if (true == ($rs = $this->db->$qt($sql))) {
             $_SERVER['run_dbquery_count']++;
             return $rs;
-        }
-        else
-        {
+        } else {
             \show_error('DBError:' . $this->db->lastErrorMsg() . '<br />RawSQL: ' . $sql);
         }
         //return false;
@@ -104,8 +94,7 @@ class DB_sqlite3
     {
         $result = $this->db->query($sql);
         $array  = null;
-        while (true == ($row = $result->fetchArray(SQLITE3_ASSOC)))
-        {
+        while (true == ($row = $result->fetchArray(SQLITE3_ASSOC))) {
             $array[] = $row;
         }
         $_SERVER['run_dbquery_count']++;
@@ -135,10 +124,8 @@ class DB_sqlite3
     public function fetch_objects($sql)
     {
         $arr = $this->fetch_arrays($sql);
-        if (!empty($arr))
-        {
-            foreach ($arr as $k => $v)
-            {
+        if (!empty($arr)) {
+            foreach ($arr as $k => $v) {
                 $arr[$k] = (object) $v;
             }
         }

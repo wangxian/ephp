@@ -36,46 +36,32 @@ class Func
     {
         $from = strtoupper($from) == 'UTF8' ? 'utf-8' : $from;
         $to   = strtoupper($to) == 'UTF8' ? 'utf-8' : $to;
-        if (strtoupper($from) === strtoupper($to) || empty($fContents) || (is_scalar($fContents) && !is_string($fContents)))
-        {
+        if (strtoupper($from) === strtoupper($to) || empty($fContents) || (is_scalar($fContents) && !is_string($fContents))) {
             // 如果编码相同或者非字符串标量则不转换
             return $fContents;
         }
-        if (is_string($fContents))
-        {
-            if (function_exists('mb_convert_encoding'))
-            {
+
+        if (is_string($fContents)) {
+            if (function_exists('mb_convert_encoding')) {
                 return mb_convert_encoding($fContents, $to, $from);
-            }
-            elseif (function_exists('iconv'))
-            {
+            } elseif (function_exists('iconv')) {
                 return iconv($from, $to, $fContents);
-            }
-            else
-            {
+            } else {
                 return $fContents;
             }
 
-        }
-        elseif (is_array($fContents))
-        {
-            foreach ($fContents as $key => $val)
-            {
+        } elseif (is_array($fContents)) {
+            foreach ($fContents as $key => $val) {
                 $_key             = self::auto_charset($key, $from, $to);
                 $fContents[$_key] = self::auto_charset($val, $from, $to);
-                if ($key != $_key)
-                {
+                if ($key != $_key) {
                     unset($fContents[$key]);
                 }
-
             }
             return $fContents;
-        }
-        else
-        {
+        } else {
             return $fContents;
         }
-
     }
 
     /**
@@ -85,18 +71,14 @@ class Func
      * @param int $max 最大
      * @return integer
      */
-    static public function randNum($min = null, $max = null)
+    public static function randNum($min = null, $max = null)
     {
         mt_srand((double) microtime() * 1000000);
-        if ($min === null || $max === null)
-        {
+        if ($min === null || $max === null) {
             return mt_rand();
-        }
-        else
-        {
+        } else {
             return mt_rand($min, $max);
         }
-
     }
 
     /**
@@ -110,8 +92,7 @@ class Func
     public static function randString($len = 6, $type = 3, $addChars = '')
     {
         $str = '';
-        switch ($type)
-        {
+        switch ($type) {
             case 0:
                 $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' . $addChars;
                 break;
@@ -136,22 +117,17 @@ class Func
                 //                break;
         }
 
-        if ($len > 10)
-        {
+        if ($len > 10) {
             // 位数过长重复字符串一定次数
             $chars = $type == 1 ? str_repeat($chars, $len) : str_repeat($chars, 5);
         }
 
-        if ($type != 4)
-        {
+        if ($type != 4) {
             $chars = str_shuffle($chars);
             $str   = substr($chars, 0, $len);
-        }
-        else
-        {
+        } else {
             // 中文随机字
-            for ($i = 0; $i < $len; $i++)
-            {
+            for ($i = 0; $i < $len; $i++) {
                 $str .= self::msubstr($chars, floor(mt_rand(0, mb_strlen($chars, 'utf-8') - 1)), 1, 'utf-8', false);
             }
         }
@@ -163,7 +139,7 @@ class Func
      *
      * @return string
      */
-    static public function md5Rand()
+    public static function md5Rand()
     {
         srand((double) microtime() * 1000000);
         return md5(uniqid(time() . rand()));
@@ -179,18 +155,13 @@ class Func
      * @param string $suffix 截断显示字符,是否显示 '...'
      * @return string
      */
-    static public function msubstr($str, $start, $length, $charset = "UTF-8", $suffix = false)
+    public static function msubstr($str, $start, $length, $charset = "UTF-8", $suffix = false)
     {
-        if (function_exists("mb_substr"))
-        {
+        if (function_exists("mb_substr")) {
             $slice = mb_substr($str, $start, $length, $charset);
-        }
-        elseif (function_exists('iconv_substr'))
-        {
+        } elseif (function_exists('iconv_substr')) {
             $slice = iconv_substr($str, $start, $length, $charset);
-        }
-        else
-        {
+        } else {
             $re['utf-8']  = "/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xff][\x80-\xbf]{3}/";
             $re['gb2312'] = "/[\x01-\x7f]|[\xb0-\xf7][\xa0-\xfe]/";
             $re['gbk']    = "/[\x01-\x7f]|[\x81-\xfe][\x40-\xfe]/";
@@ -198,8 +169,7 @@ class Func
             preg_match_all($re[$charset], $str, $match);
             $slice = join("", array_slice($match[0], $start, $length));
         }
-        if ($suffix)
-        {
+        if ($suffix) {
             return $slice . "…";
         }
 
@@ -216,8 +186,7 @@ class Func
     {
         $a   = array("B", "KB", "MB", "GB", "TB", "PB");
         $pos = 0;
-        while ($size >= 1024)
-        {
+        while ($size >= 1024) {
             $size /= 1024;
             $pos++;
         }
@@ -252,8 +221,7 @@ class Func
      */
     public static function highlight_code($str, $show = false)
     {
-        if (file_exists($str))
-        {
+        if (file_exists($str)) {
             $str = file_get_contents($str);
         }
 
@@ -265,10 +233,9 @@ class Func
         $str = '<?php //tempstart' . "\n" . $str . '//tempend ?>'; // <?
 
         // All the magic happens here, baby!
-        $str = highlight_string($str, TRUE);
+        $str = highlight_string($str, true);
 
-        if (abs(phpversion()) < 5)
-        {
+        if (abs(phpversion()) < 5) {
             $str = str_replace(array('<font ', '</font>'), array('<span ', '</span>'), $str);
             $str = preg_replace('#color="(.*?)"#', 'style="color: \\1"', $str);
         }
@@ -282,23 +249,18 @@ class Func
         $str    = str_replace(array('phptagopen', 'phptagclose', 'backslashtmp'), array('&lt;?php', '?&gt;', '\\'), $str); //<?
         $line   = explode("<br />", rtrim(ltrim($str, '<code>'), '</code>'));
         $result = '<div class="code"><ol>';
-        foreach ($line as $key => $val)
-        {
+        foreach ($line as $key => $val) {
             $result .= '<li>' . $val . '</li>';
         }
 
         $result .= '</ol></div>';
         $result = str_replace("\n", "", $result);
 
-        if ($show !== false)
-        {
+        if ($show !== false) {
             echo $result;
-        }
-        else
-        {
+        } else {
             return $result;
         }
-
     }
 
     /**
@@ -329,18 +291,15 @@ class Func
         $text = preg_replace('/(\[br\]\s*){10,}/i', '[br]', $text);
 
         // 过滤危险的属性，如：过滤on事件lang js
-        while (preg_match('/(<[^><]+)( lang|on|action|background|codebase|dynsrc|lowsrc)[^><]+/i', $text, $mat))
-        {
+        while (preg_match('/(<[^><]+)( lang|on|action|background|codebase|dynsrc|lowsrc)[^><]+/i', $text, $mat)) {
             $text = str_replace($mat[0], $mat[1], $text);
         }
 
-        while (preg_match('/(<[^><]+)(window\.|javascript:|js:|about:|file:|document\.|vbs:|cookie)([^><]*)/i', $text, $mat))
-        {
+        while (preg_match('/(<[^><]+)(window\.|javascript:|js:|about:|file:|document\.|vbs:|cookie)([^><]*)/i', $text, $mat)) {
             $text = str_replace($mat[0], $mat[1] . $mat[3], $text);
         }
 
-        if (empty($tags))
-        {
+        if (empty($tags)) {
             $tags = 'table|td|th|tr|i|b|u|strong|img|p|br|div|strong|em|ul|ol|li|dl|dd|dt|a';
         }
 
@@ -350,20 +309,17 @@ class Func
         $text = preg_replace('/<\/?(html|head|meta|link|base|basefont|body|bgsound|title|style|script|form|iframe|frame|frameset|applet|id|ilayer|layer|name|script|style|xml)[^><]*>/i', '', $text);
 
         // 过滤合法的html标签
-        while (preg_match('/<([a-z]+)[^><\[\]]*>[^><]*<\/\1>/i', $text, $mat))
-        {
+        while (preg_match('/<([a-z]+)[^><\[\]]*>[^><]*<\/\1>/i', $text, $mat)) {
             $text = str_replace($mat[0], str_replace('>', ']', str_replace('<', '[', $mat[0])), $text);
         }
 
         // 转换引号
-        while (preg_match('/(\[[^\[\]]*=\s*)(\"|\')([^\2=\[\]]+)\2([^\[\]]*\])/i', $text, $mat))
-        {
+        while (preg_match('/(\[[^\[\]]*=\s*)(\"|\')([^\2=\[\]]+)\2([^\[\]]*\])/i', $text, $mat)) {
             $text = str_replace($mat[0], $mat[1] . '|' . $mat[3] . '|' . $mat[4], $text);
         }
 
         // 过滤错误的单个引号
-        while (preg_match('/\[[^\[\]]*(\"|\')[^\[\]]*\]/i', $text, $mat))
-        {
+        while (preg_match('/\[[^\[\]]*(\"|\')[^\[\]]*\]/i', $text, $mat)) {
             $text = str_replace($mat[0], str_replace($mat[1], '', $mat[0]), $text);
         }
 
@@ -434,8 +390,7 @@ class Func
         $search .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $search .= '1234567890!@#$%^&*()';
         $search .= '~`";:?+/={}[]-_|\'\\';
-        for ($i = 0; $i < strlen($search); $i++)
-        {
+        for ($i = 0; $i < strlen($search); $i++) {
             $val = preg_replace('/(&#[xX]0{0,8}' . dechex(ord($search[$i])) . ';?)/i', $search[$i], $val); // with a ;
             $val = preg_replace('/(&#0{0,8}' . ord($search[$i]) . ';?)/', $search[$i], $val); // with a ;
         }
@@ -446,16 +401,12 @@ class Func
         $ra  = array_merge($ra1, $ra2);
 
         $found = true; // keep replacing as long as the previous round replaced something
-        while ($found == true)
-        {
+        while ($found == true) {
             $val_before = $val;
-            for ($i = 0; $i < sizeof($ra); $i++)
-            {
+            for ($i = 0; $i < sizeof($ra); $i++) {
                 $pattern = '/';
-                for ($j = 0; $j < strlen($ra[$i]); $j++)
-                {
-                    if ($j > 0)
-                    {
+                for ($j = 0; $j < strlen($ra[$i]); $j++) {
+                    if ($j > 0) {
                         $pattern .= '(';
                         $pattern .= '(&#[xX]0{0,8}([9ab]);)';
                         $pattern .= '|';
@@ -467,8 +418,7 @@ class Func
                 $pattern .= '/i';
                 $replacement = substr($ra[$i], 0, 2) . '<x>' . substr($ra[$i], 2); // add in <> to nerf the tag
                 $val         = preg_replace($pattern, $replacement, $val); // filter out the hex tags
-                if ($val_before == $val)
-                {
+                if ($val_before == $val) {
                     // no replacements were made, so exit the loop
                     $found = false;
                 }
@@ -484,7 +434,7 @@ class Func
      * @param string $str :字符或字符串(子串)
      * @param string $string :字符串(母串)
      */
-    static public function strExists($str, $string)
+    public static function strExists($str, $string)
     {
         $string = (string) $string;
         $str    = (string) $str;
@@ -498,7 +448,7 @@ class Func
      *
      * @param string $text
      */
-    static public function toHtml($text)
+    public static function toHtml($text)
     {
         $text = htmlspecialchars($text);
         $text = nl2br(str_replace(' ', '&nbsp;', $text));
@@ -528,8 +478,7 @@ class Func
     {
         $data = str_replace(array('-', '_'), array('+', '/'), $string);
         $mod4 = strlen($data) % 4;
-        if ($mod4)
-        {
+        if ($mod4) {
             $data .= substr('====', $mod4);
         }
         return base64_decode($data);

@@ -25,13 +25,11 @@ class MultiView extends BaseView
      */
     public function _include($file, $__vars = null, $layout_block = false, $return = false)
     {
-        if (is_array($this->vars))
-        {
+        if (is_array($this->vars)) {
             extract($this->vars);
         }
 
-        if (is_array($__vars))
-        {
+        if (is_array($__vars)) {
             extract($__vars);
         }
 
@@ -39,32 +37,22 @@ class MultiView extends BaseView
         $file = $this->__filename($file);
         $tpl  = Config::get('tpl_switch');
 
-        if (!file_exists(APP_PATH . '/views/' . $tpl . '/' . $file))
-        {
-            if ($tpl !== 'default')
-            {
-                if (file_exists(APP_PATH . '/views/default/' . $file))
-                {
+        if (!file_exists(APP_PATH . '/views/' . $tpl . '/' . $file)) {
+            if ($tpl !== 'default') {
+                if (file_exists(APP_PATH . '/views/default/' . $file)) {
                     $tpl = 'default';
-                }
-                else
-                {
+                } else {
                     throw new ephpException("视图{$tpl}/{$file}不存在，公共视图default/{$file}也不存在,请保证其一存在!");
                 }
-
-            }
-            else
-            {
+            } else {
                 throw new ephpException("主题视图{$tpl}/{$file}不存在。");
             }
-
         }
 
         $file = $tpl . '/' . $file;
         /* support MultiView */
 
-        if ($layout_block)
-        {
+        if ($layout_block) {
             $tpl = Config::get('tpl_switch');
 
             ob_start();
@@ -72,35 +60,24 @@ class MultiView extends BaseView
             $content = ob_get_clean();
             //echo $content;print_r($this->_layout);exit;
 
-            if ($this->_layout)
-            {
-                foreach ($this->_layout as $k => $v)
-                {
+            if ($this->_layout) {
+                foreach ($this->_layout as $k => $v) {
                     $content = str_replace("<!--{layout_block_{$k}}-->", $v, $content);
                 }
-
             }
 
             //是否返回
-            if ($return)
-            {
+            if ($return) {
                 return $content;
-            }
-            else
-            {
+            } else {
                 echo $content;
             }
-
-        }
-        else if ($return)
-        {
-            ob_start();include APP_PATH . '/views/' . $file;
+        } elseif ($return) {
+            ob_start();
+            include APP_PATH . '/views/' . $file;
             return ob_get_clean();
-        }
-        else
-        {
+        } else {
             include APP_PATH . '/views/' . $file;
         }
-
     }
 }

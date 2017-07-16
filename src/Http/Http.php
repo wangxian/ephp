@@ -47,16 +47,14 @@ class Http
      *
      * @param $seconds 防刷新的时间
      */
-    static public function limitRefresh($seconds = 5)
+    public static function limitRefresh($seconds = 5)
     {
         $cookie_name   = 'limitRefresh_' . md5($_SERVER['PHP_SELF']);
         $cache_control = isset($_SERVER['HTTP_CACHE_CONTROL']) ? $_SERVER['HTTP_CACHE_CONTROL'] : '';
-        if (isset($_COOKIE[$cookie_name]) && ($_COOKIE[$cookie_name] + $seconds > time()) && $cache_control != 'no-cache')
-        {
-            header('HTTP/1.1 304 Not Modified');exit;
-        }
-        else
-        {
+        if (isset($_COOKIE[$cookie_name]) && ($_COOKIE[$cookie_name] + $seconds > time()) && $cache_control != 'no-cache') {
+            header('HTTP/1.1 304 Not Modified');
+            exit;
+        } else {
             $expire = $_SERVER['REQUEST_TIME'] + $seconds;
             setcookie($cookie_name, $_SERVER['REQUEST_TIME'], $expire + 3600, '/', $_SERVER['SERVER_NAME']);
             header('Last-Modified: ' . date('D,d M Y H:i:s', $expire) . ' GMT');
@@ -85,25 +83,19 @@ class Http
      * @param string $content  下载的内容
      * @return void
      */
-    static public function download($filename = '', $showname = '', $content = '')
+    public static function download($filename = '', $showname = '', $content = '')
     {
         // 得到下载长度
-        if (file_exists($filename))
-        {
+        if (file_exists($filename)) {
             $length = filesize($filename);
-        }
-        elseif ($content != '')
-        {
+        } elseif ($content != '') {
             $length = strlen($content);
-        }
-        else
-        {
+        } else {
             throw new ephpException('Not DownLoad Load File !');
         }
 
         // 最到显示的下载文件名
-        if ($showname == '')
-        {
+        if ($showname == '') {
             $showname = $filename;
         }
 
@@ -116,26 +108,20 @@ class Http
         header("Content-Disposition: attachment; filename=" . $showname);
 
         // 优先下载指定的内容再下载文件
-        if ($content == '')
-        {
+        if ($content == '') {
             $file = @fopen($filename, "r");
-            if (!$file)
-            {
+            if (!$file) {
                 throw new ephpException('Not DownLoad Load File !');
             }
             // 一次读一K内容
-            while (!@feof($file))
-            {
+            while (!@feof($file)) {
                 echo @fread($file, 1024 * 1000);
             }
 
             @fclose($file);
-        }
-        else
-        {
+        } else {
             exit($content);
         }
-
     }
 
     /**
@@ -143,7 +129,7 @@ class Http
      *
      * @param $code
      */
-    static public function sendStatus($code)
+    public static function sendStatus($code)
     {
         static $_status = array(
             // Informational 1xx
@@ -198,8 +184,7 @@ class Http
             505 => 'HTTP Version Not Supported',
             509 => 'Bandwidth Limit Exceeded',
         );
-        if (array_key_exists($code, $_status))
-        {
+        if (array_key_exists($code, $_status)) {
             header('HTTP/1.1 ' . $code . ' ' . $_status[$code]);
         }
     }
@@ -213,7 +198,7 @@ class Http
      * @param string $hintMsg 认证弹出框提示语
      * @param string $errorMsg 认证失败提示语
      */
-    static public function sendAuthUser($hintMsg, $errorMsg = '')
+    public static function sendAuthUser($hintMsg, $errorMsg = '')
     {
         header("WWW-Authenticate: Basic realm=\"{$hintMsg}\"");
         header('HTTP/1.0 401 Unauthorized');
@@ -229,41 +214,28 @@ class Http
      *
      * @return array
      */
-    static public function getAuthUser()
+    public static function getAuthUser()
     {
-        if (isset($_SERVER['PHP_AUTH_USER']))
-        {
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
             return array('user' => $_SERVER['PHP_AUTH_USER'],
                 'pwd'               => $_SERVER['PHP_AUTH_PW']);
-        }
-        else
-        {
+        } else {
             return false;
         }
-
     }
 
     // 获取客户端IP地址
-    static public function clientIp()
+    public static function clientIp()
     {
-        if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown"))
-        {
+        if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown")) {
             $ip = getenv("HTTP_CLIENT_IP");
-        }
-        else if (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown"))
-        {
+        } elseif (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown")) {
             $ip = getenv("HTTP_X_FORWARDED_FOR");
-        }
-        else if (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown"))
-        {
+        } elseif (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown")) {
             $ip = getenv("REMOTE_ADDR");
-        }
-        else if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown"))
-        {
+        } elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown")) {
             $ip = $_SERVER['REMOTE_ADDR'];
-        }
-        else
-        {
+        } else {
             $ip = "unknown";
         }
 
@@ -275,10 +247,9 @@ class Http
      *
      * @param string $ip 要转换ip的地址
      */
-    static public function clientArea($ip = '')
+    public static function clientArea($ip = '')
     {
-        if (!$ip)
-        {
+        if (!$ip) {
             $ip = self::clientIp();
         }
 
@@ -286,7 +257,7 @@ class Http
     }
 
     // 设置页面缓存,使表单在返回时不清空
-    static public function setFormCache()
+    public static function setFormCache()
     {
         session_cache_limiter('private,must-revalide');
     }
@@ -302,27 +273,20 @@ class Http
      * @param integer $timeout 超时秒数
      * @return string
      */
-    static public function sendRequest($url, $params = array(), $method = 'GET', $header = array(), $timeout = 0)
+    public static function sendRequest($url, $params = array(), $method = 'GET', $header = array(), $timeout = 0)
     {
         // 如果安装了 curl 库则优先使用它
-        if (function_exists('curl_init'))
-        {
+        if (function_exists('curl_init')) {
             $ch = curl_init();
-            if ($method == 'GET')
-            {
-                if (strpos($url, '?'))
-                {
+            if ($method == 'GET') {
+                if (strpos($url, '?')) {
                     $url .= '&' . http_build_query($params);
-                }
-                else
-                {
+                } else {
                     $url .= '?' . http_build_query($params);
                 }
 
                 curl_setopt($ch, CURLOPT_URL, $url);
-            }
-            else if ($method == 'POST')
-            {
+            } elseif ($method == 'POST') {
                 curl_setopt($ch, CURLOPT_POST, true);
                 $post_data = is_array($params) ? http_build_query($params) : $params;
                 // $post_data = $params; // 如果用来发送文件，文件名前加@，CURLOPT_POSTFIELDS必须为数组。
@@ -335,11 +299,10 @@ class Http
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
             #send header
-            if (!empty($header))
-            {
+            if (!empty($header)) {
                 //curl_setopt($ch, CURLOPT_NOBODY,FALSE);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-                curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+                curl_setopt($ch, CURLINFO_HEADER_OUT, true);
             }
 
             // case 'DELETE':
@@ -350,15 +313,12 @@ class Http
             // 在启用CURLOPT_RETURNTRANSFER的时候，返回原生的（Raw）输出。
             // curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 
-            if ($timeout)
-            {
+            if ($timeout) {
                 curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
             }
             // 超时时间
             return curl_exec($ch);
-        }
-        else
-        {
+        } else {
             $data_string = http_build_query($params);
             $context     = array(
                 'http' => array('method' => $method,
@@ -369,11 +329,9 @@ class Http
 
             $contextid = stream_context_create($context);
             $sock      = fopen($url, 'r', false, $contextid);
-            if ($sock)
-            {
+            if ($sock) {
                 $result = '';
-                while (!feof($sock))
-                {
+                while (!feof($sock)) {
                     $result .= fgets($sock, 4096);
                 }
 
@@ -382,5 +340,4 @@ class Http
             return $result;
         }
     }
-
 }

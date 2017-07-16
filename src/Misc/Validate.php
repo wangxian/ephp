@@ -66,8 +66,7 @@ class Validate
      */
     private function max($value, $max)
     {
-        if (is_string($value))
-        {
+        if (is_string($value)) {
             $value = strlen($value);
         }
 
@@ -83,8 +82,7 @@ class Validate
      */
     private function min($value, $min)
     {
-        if (is_string($value))
-        {
+        if (is_string($value)) {
             $value = strlen($value);
         }
 
@@ -100,8 +98,7 @@ class Validate
      */
     private function range($value, $range)
     {
-        if (is_string($value))
-        {
+        if (is_string($value)) {
             $value = strlen($value);
         }
 
@@ -230,8 +227,7 @@ class Validate
      */
     public function check($data, $rules, $ignorNotExists = false)
     {
-        foreach ($rules as $key => $rule)
-        {
+        foreach ($rules as $key => $rule) {
             // 设置规则默认值
             $rule += array('required' => false, 'message' => $this->_message);
 
@@ -239,10 +235,8 @@ class Validate
             unset($rule['message']);
 
             // 未设置时忽略验证
-            if (!isset($data[$key]) || empty($data[$key]))
-            {
-                if (!$ignorNotExists && $rule['required'])
-                {
+            if (!isset($data[$key]) || empty($data[$key])) {
+                if (!$ignorNotExists && $rule['required']) {
                     $this->_error[$key] = $this->_msg($message, 'required');
                 }
 
@@ -250,21 +244,17 @@ class Validate
             }
 
             #循环验证
-            foreach ($rule as $rule_type => $rule_value)
-            {
+            foreach ($rule as $rule_type => $rule_value) {
                 //密码验证
-                if ($rule_type == 'password_confirm')
-                {
-                    if ($data[$key] != $data[$rule_value])
-                    {
+                if ($rule_type == 'password_confirm') {
+                    if ($data[$key] != $data[$rule_value]) {
                         $this->_error[$key] = $this->_msg($message, $rule_type);
                     }
 
                     break;
                 }
 
-                if (!$this->_check($data[$key], $rule_type, $rule_value))
-                {
+                if (!$this->_check($data[$key], $rule_type, $rule_value)) {
                     $this->_error[$key] = $this->_msg($message, $rule_type);
                     break; //一个key只要有一个失败则停止。
                 }
@@ -272,15 +262,11 @@ class Validate
         }
 
         #验证成功or失败
-        if (empty($this->_error))
-        {
+        if (empty($this->_error)) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
-
     }
 
     /**
@@ -293,8 +279,7 @@ class Validate
      */
     private function _check($value, $rule_type, $rule_value)
     {
-        switch ($rule_type)
-        {
+        switch ($rule_type) {
             case 'required':
                 return !empty($value);
                 break;
@@ -327,19 +312,13 @@ class Validate
      */
     private function _msg($message, $rule_type)
     {
-        if (is_string($message))
-        {
+        if (is_string($message)) {
             return $message;
-        }
-        else if (isset($message[$rule_type]))
-        {
+        } elseif (isset($message[$rule_type])) {
             return $message[$rule_type];
-        }
-        else
-        {
+        } else {
             return 'INVALID';
         }
-
     }
 
     /**

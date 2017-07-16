@@ -137,7 +137,7 @@ class Httpclient
         if ($method === self::GET || $method === self::DELETE) {
             $url .= (stripos($url, '?') ? '&' : '?').http_build_query($params);
             $params = array();
-        } else if ( ($method === self::POST || $method === self::PUT || $method === self::PATCH) && (empty($options['files']) && empty($options['json']) )) {
+        } elseif (($method === self::POST || $method === self::PUT || $method === self::PATCH) && (empty($options['files']) && empty($options['json']) )) {
             $params = http_build_query($params);
         }
 
@@ -157,7 +157,7 @@ class Httpclient
             // 使用证书：cert 与 key 分别属于两个.pem文件
             curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, true);
 
-			// 严格校验
+            // 严格校验
             curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 2);
             curl_setopt($this->curl, CURLOPT_SSLCERTTYPE, 'PEM');
             curl_setopt($this->curl, CURLOPT_SSLCERT, $options['sslcert_path']);
@@ -210,12 +210,12 @@ class Httpclient
         $body = substr($response['response'], $headerSize);
 
         return (object)array(
-			'curl_info'    => $response['curl_info'],
-			'content_type' => $response['curl_info']['content_type'],
-			'status_code'  => $response['curl_info']['http_code'],
-			'headers'      => $this->splitHeaders($header),
-			'body'         => $body,
-		);
+            'curl_info'    => $response['curl_info'],
+            'content_type' => $response['curl_info']['content_type'],
+            'status_code'  => $response['curl_info']['http_code'],
+            'headers'      => $this->splitHeaders($header),
+            'body'         => $body,
+        );
     }
 
     /**
@@ -275,9 +275,9 @@ class Httpclient
         $curlInfo = curl_getinfo($this->curl);
 
         $results = array(
-			'curl_info' => $curlInfo,
-			'response' => $response,
-		);
+            'curl_info' => $curlInfo,
+            'response' => $response,
+        );
 
         return $results;
     }

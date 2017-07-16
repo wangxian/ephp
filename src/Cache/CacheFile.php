@@ -1,5 +1,6 @@
 <?php
 namespace ePHP\Cache;
+
 use ePHP\Core\Config;
 
 class CacheFile
@@ -13,8 +14,7 @@ class CacheFile
     public function get($key)
     {
         $filename = $this->_filename($key);
-        if (!file_exists($filename))
-        {
+        if (!file_exists($filename)) {
             return false;
         }
 
@@ -25,15 +25,11 @@ class CacheFile
         // echo $expire."<br />\n";
         // echo substr($tmp_value,23);exit;
 
-        if ($expire != 0 && time() < $expire)
-        {
+        if ($expire != 0 && time() < $expire) {
             return unserialize(substr($tmp_value, 23));
-        }
-        else
-        {
+        } else {
             return false;
         }
-
     }
 
     /**
@@ -47,12 +43,9 @@ class CacheFile
     public function set($key, $value, $expire = 0)
     {
         // 如果expire为0时，设为长期有效。
-        if ($expire != 0)
-        {
+        if ($expire != 0) {
             $expire = time() + $expire;
-        }
-        else
-        {
+        } else {
             $expire = time() * 2;
         }
 
@@ -60,8 +53,7 @@ class CacheFile
 
         // 检查目录可写否
         $cachedir = APP_PATH . '/' . Config::get("cache_dir");
-        if (!is_writeable($cachedir))
-        {
+        if (!is_writeable($cachedir)) {
             \show_error('ERROR: ' . $cachedir . ' is not writeable!');
         }
 
@@ -101,8 +93,7 @@ class CacheFile
      */
     private function _filename($key)
     {
-        if (true == ($dir_pos = strrpos($key, '/')))
-        {
+        if (true == ($dir_pos = strrpos($key, '/'))) {
             // 有子目录，也可能有多层子目录。
             $cache_name = substr($key, $dir_pos + 1);
 
@@ -110,13 +101,10 @@ class CacheFile
             $cache_dir = APP_PATH . '/' . Config::get('cache_dir') . substr($key, 0, $dir_pos) . '/';
 
             // 递归创建文件夹
-            if (!is_dir($cache_dir))
-            {
-                mkdir($cache_dir, 0777, TRUE);
+            if (!is_dir($cache_dir)) {
+                mkdir($cache_dir, 0777, true);
             }
-        }
-        else
-        {
+        } else {
             // 无子目录
             $cache_name = $key;
             $cache_dir  = APP_PATH . '/' . Config::get('cache_dir');

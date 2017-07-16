@@ -29,7 +29,7 @@ class FileLogger
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
         }
 
-        if ( !is_writeable($this->logdir) ) {
+        if (!is_writeable($this->logdir)) {
             show_error('Failed to write log, directory is not writable of ' . $this->logdir);
         }
 

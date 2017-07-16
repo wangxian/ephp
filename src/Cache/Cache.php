@@ -1,5 +1,6 @@
 <?php
 namespace ePHP\Cache;
+
 use ePHP\Core\Config;
 
 class Cache
@@ -31,8 +32,7 @@ class Cache
     public static function init()
     {
         // !self::$_instance instanceof self
-        if (!isset(self::$instance))
-        {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
 
             // 使用哪种方式的cache
@@ -75,8 +75,7 @@ class Cache
     public function set($key, $value, $expire = 0)
     {
         // 为了兼容$cache->name = $value的方式，接收$Cache::init()->expire = 900设置有效期。
-        if ($this->expire)
-        {
+        if ($this->expire) {
             $expire = $this->expire;
         }
 
@@ -104,5 +103,3 @@ class Cache
         return $this->handle->flush();
     }
 }
-
-

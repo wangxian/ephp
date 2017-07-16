@@ -27,8 +27,7 @@ class Pinyin
     public function output($str, $utf8 = true)
     {
         // 参数分析
-        if (!$str)
-        {
+        if (!$str) {
             return false;
         }
 
@@ -37,11 +36,9 @@ class Pinyin
         $num = strlen($str);
 
         $pinyin = '';
-        for ($i = 0; $i < $num; $i++)
-        {
+        for ($i = 0; $i < $num; $i++) {
             $temp = ord(substr($str, $i, 1));
-            if ($temp > 160)
-            {
+            if ($temp > 160) {
                 $temp2 = ord(substr($str, ++$i, 1));
                 $temp  = $temp * 256 + $temp2 - 65536;
             }
@@ -60,26 +57,18 @@ class Pinyin
      */
     private function num2str($num)
     {
-        if (!$this->lib)
-        {
+        if (!$this->lib) {
             $this->parse_lib();
         }
 
-        if ($num > 0 && $num < 160)
-        {
+        if ($num > 0 && $num < 160) {
             return chr($num);
-        }
-        elseif ($num < -20319 || $num > -10247)
-        {
+        } elseif ($num < -20319 || $num > -10247) {
             return '';
-        }
-        else
-        {
+        } else {
             $total = sizeof($this->lib) - 1;
-            for ($i = $total; $i >= 0; $i--)
-            {
-                if ($this->lib[$i][1] <= $num)
-                {
+            for ($i = $total; $i >= 0; $i--) {
+                if ($this->lib[$i][1] <= $num) {
                     break;
                 }
             }
@@ -499,21 +488,14 @@ class Pinyin
     // 编码转换
     private function iconvStr($from, $to, $fContents)
     {
-        if (is_string($fContents))
-        {
-            if (function_exists('mb_convert_encoding'))
-            {
+        if (is_string($fContents)) {
+            if (function_exists('mb_convert_encoding')) {
                 return mb_convert_encoding($fContents, $to, $from);
-            }
-            else if (function_exists('iconv'))
-            {
+            } elseif (function_exists('iconv')) {
                 return iconv($from, $to, $fContents);
-            }
-            else
-            {
+            } else {
                 return $fContents;
             }
-
         }
     }
 

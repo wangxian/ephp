@@ -49,7 +49,6 @@ class DB_mysql
         } else {
             throw_error('DBError: ' . mysql_error($this->db) . '<br />RawSQL: ' . $sql, 2045);
         }
-        //return false;
     }
 
     /**

@@ -10,31 +10,25 @@ class Debug
         $debug = debug_backtrace();
         $lines = '';
         $index = 0;
-        for ($i = 0; $i < count($debug); $i++)
-        {
-            if ($i == 0)
-            {
+
+        for ($i = 0; $i < count($debug); $i++) {
+            if ($i == 0) {
                 continue;
             }
             $file = $debug[$i];
-            if (!isset($file['file']))
-            {
+            if (!isset($file['file'])) {
                 $file['file'] = 'eval';
             }
-            if (!isset($file['line']))
-            {
+            if (!isset($file['line'])) {
                 $file['line'] = null;
             }
             $line = "#{$index} {$file['file']}({$file['line']}): ";
-            if (isset($file['class']))
-            {
+            if (isset($file['class'])) {
                 $line .= "{$file['class']}{$file['type']}";
             }
             $line .= "{$file['function']}(";
-            if (isset($file['args']) && count($file['args']))
-            {
-                foreach ($file['args'] as $arg)
-                {
+            if (isset($file['args']) && count($file['args'])) {
+                foreach ($file['args'] as $arg) {
                     $line .= gettype($arg) . ', ';
                 }
                 $line = substr($line, 0, -2);
@@ -46,12 +40,9 @@ class Debug
 
         $lines .= "#{$index} {main}\n";
 
-        if (ini_get('html_errors'))
-        {
+        if (ini_get('html_errors')) {
             echo nl2br(str_replace(' ', '&nbsp;', $lines));
-        }
-        else
-        {
+        } else {
             echo $lines;
         }
     }

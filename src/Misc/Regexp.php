@@ -31,7 +31,7 @@ class Regexp
      * @param string $string :要检查的字符串
      * @return boolean
      */
-    static public function check($regExp, $string)
+    public static function check($regExp, $string)
     {
         $regExpType = array(
             'email'       => '/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([_a-z0-9]+\.)+[a-z]{2,5}$/',
@@ -46,8 +46,7 @@ class Regexp
         );
         $regExpValue = array_key_exists($regExp, $regExpType) ? $regExpType[$regExp] : $regExp;
 
-        if (substr($regExpValue, 0, 1) != '/')
-        {
+        if (substr($regExpValue, 0, 1) != '/') {
             throw new ephpException('<font color="red">在默认库中 ' . $regExp . ' 的规则匹配失败，系统使用你的输入作为正则规则，但你输入的正则语法错误。</font> 合法的规则如： /^[0-9]+$/ 请检查后重试！', 1554);
         }
         //dump($regExpValue);
