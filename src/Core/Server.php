@@ -167,6 +167,7 @@ EOT;
         $_POST   = $request->post ?? [];
         $_COOKIE = $request->cookie ?? [];
         $_FILES  = $request->files ?? [];
+        $_REQUEST  = array_merge($_GET, $_POST, $_COOKIE);
 
         $_SERVER = ['run_dbquery_count' => 0];
         foreach ($request->server as $key => $value) {

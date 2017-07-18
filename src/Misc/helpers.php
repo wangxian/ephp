@@ -236,17 +236,14 @@ function getv($key, $default = '', $callback = '')
  */
 function getp($pos, $default = '', $callback = '')
 {
-    static $url_part = array();
-    if (empty($url_part)) {
-        // only first time
-        $posi = strpos($_SERVER['PATH_INFO'], '?');
-        $url  = $posi ? substr($_SERVER['PATH_INFO'], 1, $posi) : substr($_SERVER['PATH_INFO'], 1);
-        if (!empty($url)) {
-            $url_part = explode('/', $url);
-        } else {
-            $url_part = array('index', 'index');
-        }
+    $posi = strpos($_SERVER['PATH_INFO'], '?');
+    $url  = $posi ? substr($_SERVER['PATH_INFO'], 1, $posi) : substr($_SERVER['PATH_INFO'], 1);
+    if (!empty($url)) {
+        $url_part = explode('/', $url);
+    } else {
+        $url_part = array('index', 'index');
     }
+
     $pos = $pos - 1;
     return isset($url_part[$pos]) ? (empty($callback) ? trim($url_part[$pos]) : call_user_func($callback, trim($url_part[$pos]))) : $default;
 }
