@@ -6,24 +6,44 @@ use ePHP\Core\Config;
 /**
  * Redis 驱动缓存
  * 需安装: https://github.com/phpredis/phpredis 扩展
+ * 或predis: https://github.com/nrk/predis
  */
 class CacheRedis
 {
-    // 原始链接驱动链接
+    /**
+     * Redis connection
+     *
+     * @var object
+     */
     public $connection;
 
-    function __construct()
+    function __construct($type='redis')
     {
-        $this->connection = new \Redis();
-        $config           = Config::get('cache_redis');
+        $config = Config::get('cache_redis');
 
         if (empty($config)) {
             throw_error("please config cache_redis in conf/main.conf");
         }
 
-        $this->connection->connect($config['host'], $config['port'], !empty($config['timeout']) ? $config['timeout'] : 2.5);
-        if (!empty($config['auth'])) {
-            $this->connection->auth($config['auth']);
+        if ($type === 'redis') {
+            // C extension - phpredis
+            $this->connection = new \Redis();
+            $this->connection->connect($config['host'], $config['port'], !empty($config['timeout']) ? $config['timeout'] : 2.5);
+
+            if (!empty($config['auth'])) {
+                $this->connection->auth($config['auth']);
+            }
+        } else {
+            // PHP extension - predis
+            if (!empty($config['auth'])) {
+                $config['password'] = $config['auth'];
+            }
+
+            if (empty($config['scheme'])) {
+                $config['scheme'] = 'tcp';
+            }
+
+            $this->connection = new \Predis\Client($config);
         }
     }
 
@@ -43,7 +63,7 @@ class CacheRedis
         }
 
         if ($expire > 0) {
-            return $this->connection->set($key, $value, $expire);
+            return $this->connection->setex($key, $expire, $value);
         } else {
             return $this->connection->set($key, $value);
         }
@@ -90,8 +110,8 @@ class CacheRedis
         return $this->connection->flushDb();
     }
 
-    function __destruct()
-    {
-        $this->connection->close();
-    }
+    // function __destruct()
+    // {
+    //     $this->connection->close();
+    // }
 }

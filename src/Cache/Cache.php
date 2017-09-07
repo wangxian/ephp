@@ -36,9 +36,16 @@ class Cache
             self::$instance = new self();
 
             // 使用哪种方式的cache
-            $cache_driver          = Config::get('cache_driver');
-            $cache_driver          = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
-            self::$instance->handle = new $cache_driver;
+            $cache_driver = Config::get('cache_driver');
+
+            // 兼容predis(PHP扩展), phpredis(C扩展)
+            $type = $cache_driver;
+            if ($cache_driver === 'predis') {
+                $cache_driver = 'redis';
+            }
+
+            $cache_driver = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
+            self::$instance->handle = new $cache_driver($type);
         }
         return self::$instance;
     }
@@ -74,7 +81,6 @@ class Cache
      */
     public function set($key, $value, $expire = 0)
     {
-        // 为了兼容$cache->name = $value的方式，接收$Cache::init()->expire = 900设置有效期。
         if ($this->expire) {
             $expire = $this->expire;
         }
