@@ -7,13 +7,13 @@ use \ePHP\Cache\Cache;
 
 class BaseModel
 {
-    // 当前model的表明
+    // Current table name
     protected $table_name = '';
 
-    // 当前执行的SQL
+    // Raw SQL
     public $sql = '';
 
-    // 默认的数据库，比如default, master, slave
+    // Default dbconfig name, AS default, master, slave
     protected $db_config_name = 'default';
 
     private $field   = '*';
@@ -25,23 +25,22 @@ class BaseModel
     private $join    = '';
     private $data    = array();
 
-    // 缓存时间，单位秒
+    // Expire seconds
     private $expire = -1;
 
-    // 用query($sql)方法，直接用SQL进行查询。
+    // Raw query SQL
     private $query_sql = '';
 
 
-    // db类的实例化。非db handle
+    // Model Db handle
     private $db = null;
 
     static private $_db_handle;
 
     /**
-     * 连接数据库
+     * Connect to the database
      *
-     * 一般情况下，不需要直接调用。conn初级化的时候，会使用单例形式
-     * 不会出现多个实例。
+     * 该方法不需要直接调用, 在使用时每个数据库只创建一个链接，以后直接复用
      *
      * @access private
      */
@@ -234,15 +233,14 @@ class BaseModel
     {
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                if (empty($noquote) || !in_array($k, $noquote)) {
-                    $data[$k] = "'" . $this->escape_string($v) . "'";
-                }
+                $data[$k] = "'" . $this->escape_string($v) . "'";
             }
 
             $this->data += $data;
-        } elseif (is_string($data) && !empty($replacement)) {
+        } else if (is_string($data) && !empty($replacement)) {
             // 支持model->set("cid=? and name=?", [12, "name"])
-            $i    = 0;
+            $i = 0;
+
             $data = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement) {
                 $v = $replacement[$i++];
                 return !is_string($v) ? $v : "'" . $this->escape_string($v) . "'";
@@ -329,6 +327,7 @@ class BaseModel
 
     /**
      * SQL order by
+     *
      * @param  string $orderby
      * @return object $this
      */
