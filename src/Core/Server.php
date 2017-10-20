@@ -217,11 +217,12 @@ EOT;
         } else {
             if (is_file($filename)) {
                 $response->header('Content-Type', $this->contentType[$extname]);
-                if (PHP_OS !== 'Darwin') {
-                    $response->sendfile($filename);
-                } else {
-                    $response->end(file_get_contents($filename));
-                }
+                $response->sendfile($filename);
+                // if (PHP_OS !== 'Darwin') {
+                //     $response->sendfile($filename);
+                // } else {
+                //     $response->end(file_get_contents($filename));
+                // }
             } else {
                 ob_start();
                 $tpl = Config::get('tpl_404');
