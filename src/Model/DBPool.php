@@ -32,22 +32,22 @@ class DBPool
     private $_capLastRiseTime = 0;
 
     /**
-     * @var \ePHP\Core\Server
+     * @var \ePHP\Model\DBPool
      */
-    private static $instance;
+    private static $instance = [];
 
     /**
      * Dynamically handle calls to the class.
      *
      * @return \ePHP\Model\Pool
      */
-    public static function init()
+    public static function init($name)
     {
-        if (!self::$instance instanceof self) {
-            self::$instance        = new self();
-            self::$instance->queue = new \SplQueue();
+        if (empty(self::$instance[$name]) || !self::$instance[$name] instanceof self) {
+            self::$instance[$name]        = new self();
+            self::$instance[$name]->queue = new \SplQueue();
         }
-        return self::$instance;
+        return self::$instance[$name];
     }
 
 

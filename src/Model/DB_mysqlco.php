@@ -11,6 +11,13 @@ class DB_mysqlco
     public $db = false;
 
     /**
+     * Default db config
+     *
+     * @var string
+     */
+    public $db_config = 'default';
+
+    /**
      * Current db config
      *
      * @var array
@@ -42,6 +49,15 @@ class DB_mysqlco
             $iconfig['port'] = 3306;
         }
 
+        if (empty($iconfig['idle_pool_size'])) {
+            $iconfig['idle_pool_size'] = 5;
+        }
+
+        if (empty($iconfig['max_pool_size'])) {
+            $iconfig['max_pool_size'] = 10;
+        }
+
+        $this->db_config = $db_config;
         $this->iconfig = $iconfig;
     }
 
@@ -71,7 +87,7 @@ class DB_mysqlco
      */
     private function prepareDB()
     {
-        $dbpool = DBPool::init();
+        $dbpool = DBPool::init($this->db_config);
         // var_dump($dbpool->cap + $dbpool->acticeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
 
         if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->iconfig['max_pool_size'])) {
@@ -132,9 +148,9 @@ class DB_mysqlco
         // Put db connction to pool
         // If it is new client, queue in, else put pool client back
         if ($isFromPool) {
-            DBPool::init()->back($this->db);
+            DBPool::init($this->db_config)->back($this->db);
         } else {
-            DBPool::init()->in($this->db);
+            DBPool::init($this->db_config)->in($this->db);
         }
 
         if ($this->db->errno == 0) {
