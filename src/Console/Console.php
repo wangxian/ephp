@@ -67,7 +67,7 @@ class Console
     private function _log($level, $message)
     {
         $level_config = Config::get("log_level");
-        if ($level_config) {
+        if (!$level_config) {
             $level_config = "DEBUG";
         }
 
