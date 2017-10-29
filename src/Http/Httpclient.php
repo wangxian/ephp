@@ -56,7 +56,7 @@ class Httpclient
      * Make a HTTP GET request.
      *
      * @param string $url
-     * @param array  $params
+     * @param mixed  $params
      * @param array  $options
      *
      * @return array
@@ -70,7 +70,7 @@ class Httpclient
      * Make a HTTP POST request.
      *
      * @param string $url
-     * @param array  $params
+     * @param mixed  $params
      * @param array  $options
      *
      * @return array
@@ -84,7 +84,7 @@ class Httpclient
      * Make a HTTP PUT request.
      *
      * @param string $url
-     * @param array  $params
+     * @param mixed  $params
      * @param array  $options
      *
      * @return array
@@ -98,7 +98,7 @@ class Httpclient
      * Make a HTTP PATCH request.
      *
      * @param string $url
-     * @param array  $params
+     * @param mixed  $params
      * @param array  $options
      *
      * @return array
@@ -112,7 +112,7 @@ class Httpclient
      * Make a HTTP DELETE request.
      *
      * @param string $url
-     * @param array  $params
+     * @param mixed  $params
      * @param array  $options
      *
      * @return array
@@ -127,18 +127,22 @@ class Httpclient
      *
      * @param string $url
      * @param string $method
-     * @param array  $params
+     * @param mixed  $params
      * @param array  $options
      *
      * @return array
      */
     protected function request($url, $method = self::GET, $params = array(), $options = array())
     {
-        if ($method === self::GET || $method === self::DELETE) {
-            $url .= (stripos($url, '?') ? '&' : '?').http_build_query($params);
-            $params = array();
-        } elseif (($method === self::POST || $method === self::PUT || $method === self::PATCH) && (empty($options['files']) && empty($options['json']) )) {
-            $params = http_build_query($params);
+        if (is_array($params)) {
+            if ($method === self::GET || $method === self::DELETE) {
+                $url .= (stripos($url, '?') ? '&' : '?').http_build_query($params);
+                $params = '';
+            } elseif (($method === self::POST || $method === self::PUT || $method === self::PATCH)
+                && (empty($options['files']) && empty($options['json']) )
+            ) {
+                $params = http_build_query($params);
+            }
         }
 
         curl_setopt($this->curl, CURLOPT_HEADER, 1);
@@ -184,7 +188,9 @@ class Httpclient
                 $options['headers'][] = 'content-type:application/json';
             }
 
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $params);
+            if (!empty($params)) {
+                curl_setopt($this->curl, CURLOPT_POSTFIELDS, $params);
+            }
         }
 
         // Check for custom headers
