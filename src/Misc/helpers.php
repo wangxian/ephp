@@ -39,7 +39,7 @@ function dump()
  */
 function dumpdie()
 {
-    dump(func_get_args());
+    call_user_func_array('dump', func_get_args());
     throw new \ePHP\Exception\ExitException();
 }
 
