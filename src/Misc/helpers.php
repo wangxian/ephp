@@ -221,7 +221,7 @@ function R($url, $wait = 0, $message = '')
  */
 function getv($key, $default = '', $callback = '')
 {
-    return isset($_GET[$key]) ? (empty($callback) ? trim($_GET[$key]) : call_user_func($callback, trim($_GET[$key]))) : $default;
+    return !empty($_GET[$key]) ? (empty($callback) ? trim($_GET[$key]) : call_user_func($callback, trim($_GET[$key]))) : $default;
 }
 
 /**
@@ -248,7 +248,7 @@ function getp($pos, $default = '', $callback = '')
         }
     }
     $pos = $pos - 1;
-    return isset($url_part[$pos]) ? (empty($callback) ? trim($url_part[$pos]) : call_user_func($callback, trim($url_part[$pos]))) : $default;
+    return !empty($url_part[$pos]) ? (empty($callback) ? trim($url_part[$pos]) : call_user_func($callback, trim($url_part[$pos]))) : $default;
 }
 
 /**
@@ -261,7 +261,7 @@ function getp($pos, $default = '', $callback = '')
  */
 function postv($key, $default = '', $callback = '')
 {
-    return isset($_POST[$key]) ? (empty($callback) ? trim($_POST[$key]) : call_user_func($callback, trim($_POST[$key]))) : $default;
+    return !empty($_POST[$key]) ? (empty($callback) ? trim($_POST[$key]) : call_user_func($callback, trim($_POST[$key]))) : $default;
 }
 
 /**
@@ -274,7 +274,7 @@ function postv($key, $default = '', $callback = '')
  */
 function requestv($key, $default = '', $callback = '')
 {
-    return isset($_REQUEST[$key]) ? (empty($callback) ? trim($_REQUEST[$key]) : call_user_func($callback, trim($_REQUEST[$key]))) : $default;
+    return !empty($_REQUEST[$key]) ? (empty($callback) ? trim($_REQUEST[$key]) : call_user_func($callback, trim($_REQUEST[$key]))) : $default;
 }
 
 /**
