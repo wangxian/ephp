@@ -112,18 +112,18 @@ class Controller
     protected function redirect($url, $code = 302)
     {
         if (!headers_sent()) {
-            if ($code == 301) {
-                if (SERVER_MODE === 'swoole') {
-                    $this->response->status(301);
+            if (SERVER_MODE === 'swoole' ) {
+                if ($this->response) {
+                    $this->response->status($code);
                 } else {
-                    header('HTTP/1.1 301 Moved Permanently');
+                    echo '<html><head><meta charset="UTF-8" /><title></title></head><body>';
+                    echo '<script>window.location.href="'. $url .'";</script></body></html>';
+                    $this->stopRun();
                 }
+            } else if ($code == 301) {
+                header('HTTP/1.1 301 Moved Permanently');
             } else {
-                if (SERVER_MODE === 'swoole') {
-                    $this->response->status(302);
-                } else {
-                    header('HTTP/1.1 302 Found');
-                }
+                header('HTTP/1.1 302 Found');
             }
 
             $this->setHeader("Location", $url);

@@ -39,7 +39,7 @@ class Application
                 $_REQUEST = array_merge($_GET, $_REQUEST);
 
                 if (method_exists($controller_name, $action_name)) {
-                    $c_init = new $controller_name;
+                    $c_init = new $controller_name($request, $response);
                     if (SERVER_MODE === 'swoole') {
                         $c_init->request = $request;
                         $c_init->response = $response;
