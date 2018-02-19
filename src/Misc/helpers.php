@@ -47,15 +47,16 @@ function dumpdie()
  * Throw a new Exception
  *
  * @param string $message
+ * @param int $code
  */
-function throw_error($message)
+function throw_error($message, $code = 0)
 {
     $ex = Config::get('handler_exception');
     if ( empty($ex) ) {
         $ex = \ePHP\Exception\CommonException::class;
     }
 
-    throw new $ex($message);
+    throw new $ex($message, $code);
 }
 
 /**
