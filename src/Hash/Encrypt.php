@@ -6,51 +6,47 @@ class Encrypt
     /**
      * encrypt
      *
-     * @param string $key
-     * @param string $value default 'ePHP'
+     * @param string $str
+     * @param string $secret default 'ePHP'
      * @return string
      */
-    public static function encryptG($value, $key = 'ePHP')
+    public static function encryptG($str, $secret = 'ePHP')
     {
-        $key = pack('H*', md5($key . "30f7384ac1"));
-        if (!$value) {
+        if (!$str) {
             return false;
         }
 
-        $iv_size   = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
-        $iv        = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $crypttext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $value, MCRYPT_MODE_ECB, $iv);
+        $key = md5($secret . "30f7384ac1");
 
-        // encode for cookie
-        return trim(\ePHP\Misc\Func::safe_b64encode($crypttext));
+        $ciphertext_raw = openssl_encrypt($str, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+        return \ePHP\Misc\Func::safe_b64encode($ciphertext_raw);
     }
 
     /**
      * decrypt
      *
-     * @param string $value
-     * @param string $key default 'ePHP'
+     * @param string $str
+     * @param string $secret default 'ePHP'
      * @return string
      */
-    public static function decryptG($value, $key = 'ePHP')
+    public static function decryptG($str, $secret = 'ePHP')
     {
-        $key = pack('H*', md5($key . "30f7384ac1"));
-        if (!$value) {
+        if (!$str) {
             return false;
         }
 
-        $crypttext   = \ePHP\Misc\Func::safe_b64decode($value);
-        $iv_size     = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
-        $iv          = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $decrypttext = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $crypttext, MCRYPT_MODE_ECB, $iv);
-        return trim($decrypttext);
+        $key = md5($secret . "30f7384ac1");
+
+        $ciphertext_raw = \ePHP\Misc\Func::safe_b64decode($str);
+        return openssl_decrypt($ciphertext_raw, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
     }
 
     /**
-     * encode or decode
+     * Others encode or decode
+     *
      * <code>
-     * echo $str = edcode('1371817454','ENCODE','1');
-     * echo edcode('XbfSC2GOpSTtwHwOIDW7Fg','DECODE','2000558');
+     * echo $str = edcode('1371817454', 'ENCODE','1');
+     * echo edcode('XbfSC2GOpSTtwHwOIDW7Fg', 'DECODE','2000558');
      * </code>
      *
      * @param string $string 密文
