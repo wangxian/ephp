@@ -156,7 +156,7 @@ class DB_mysqlco
         if ($this->db->errno == 0) {
             $_SERVER['run_dbquery_count']++;
         } else {
-            throw_error('DBError:' . $this->db->error . '<br />RawSQL:' . $sql, 2045);
+            throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 2045);
         }
 
         $this->insert_id = $this->db->insert_id;

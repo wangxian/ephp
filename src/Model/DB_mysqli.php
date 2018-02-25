@@ -43,7 +43,7 @@ class DB_mysqli
             $_SERVER['run_dbquery_count']++;
             return $rs;
         } else {
-            throw_error('DBError: ' . $this->db->error . '<br />RawSQL: ' . $sql, 2045);
+            throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 2045);
         }
     }
 

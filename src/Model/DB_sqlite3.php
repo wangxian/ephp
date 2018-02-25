@@ -43,7 +43,7 @@ class DB_sqlite3
             $_SERVER['run_dbquery_count']++;
             return $rs;
         } else {
-            \show_error('DBError:' . $this->db->lastErrorMsg() . '<br />RawSQL: ' . $sql);
+            \show_error('DB_ERROR: ' . $this->db->lastErrorMsg() . "\nRAW_SQL: " . $sql);
         }
         //return false;
     }
