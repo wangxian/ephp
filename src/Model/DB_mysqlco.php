@@ -136,9 +136,9 @@ class DB_mysqlco
             $this->reconnect();
         }
 
-        $this->db->setDefer();
+        // $this->db->setDefer();
         $this->db->query($sql);
-        $result = $this->db->recv();
+        // $result = $this->db->recv();
 
         // Fix Lost connection to MySQL server during query
         // MySQL server has gone away
