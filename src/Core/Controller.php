@@ -134,4 +134,18 @@ class Controller
             $this->stopRun();
         }
     }
+
+    /**
+     * Get raw post content
+     *
+     * @return string
+     */
+    protected function rawContent()
+    {
+        if (SERVER_MODE !== 'swoole') {
+            return file_get_contents('php://input');
+        } else {
+            return $GLOBALS['__$request']->rawContent();
+        }
+    }
 }
