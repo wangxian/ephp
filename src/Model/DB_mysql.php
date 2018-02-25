@@ -44,7 +44,7 @@ class DB_mysql
         }
 
         if (true == ($rs = mysql_query($sql, $this->db))) {
-            $_SERVER['__DB_QUERY_COUNT']++;
+            $GLOBALS['__$DB_QUERY_COUNT']++;
             return $rs;
         } else {
             throw_error('DB_ERROR: ' . mysql_error($this->db) . "\nRAW_SQL: " . $sql, 2045);

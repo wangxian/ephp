@@ -169,7 +169,12 @@ EOT;
         $_FILES  = $request->files ?? [];
         $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
 
-        $_SERVER = ['__DB_QUERY_COUNT' => 0];
+        // 注入全局变量
+        $GLOBALS['__$request']  = $request;
+        $GLOBALS['__$response'] = $response;
+        $GLOBALS['__$DB_QUERY_COUNT'] = 0;
+
+        $_SERVER = [];
         foreach ($request->server as $key => $value) {
             $key = strtoupper($key);
             $_SERVER[$key] = $value;

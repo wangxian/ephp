@@ -83,13 +83,13 @@ set_error_handler("error_handler");
 // db query cout
 // 记录数据库查询执行次数，这也是一个优化的手段
 // 用在run_info方法中
-$_SERVER['__DB_QUERY_COUNT'] = 0;
+$GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
 function run_info($verbose = false)
 {
     dump('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
-        dump('当前数据库查询次数:', $_SERVER['__DB_QUERY_COUNT']);
+        dump('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
     }
 }
 
