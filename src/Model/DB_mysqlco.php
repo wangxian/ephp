@@ -57,6 +57,14 @@ class DB_mysqlco
             $iconfig['max_pool_size'] = 10;
         }
 
+        if (empty($iconfig['timeout'])) {
+            $iconfig['timeout'] = 10;
+        }
+
+        if (empty($iconfig['charset'])) {
+            $iconfig['charset'] = 'utf8';
+        }
+
         $this->db_config = $db_config;
         $this->iconfig = $iconfig;
     }
@@ -69,14 +77,13 @@ class DB_mysqlco
             'port' => $this->iconfig['port'],
             'user' => $this->iconfig['user'],
             'password' => $this->iconfig['password'],
-            'database' => $this->iconfig['dbname']
+            'database' => $this->iconfig['dbname'],
+            'timeout' => $this->iconfig['timeout'],
+            'charset' => $this->iconfig['charset']
         ]);
 
         if (!$this->db->connected) {
             throw new ExitException('Can not connect to your MySQL Server. Then exit');
-        } else {
-            // Set default charset
-            $this->db->query("set names " . (isset($this->iconfig['charset']) ? $this->iconfig['charset'] : 'utf8'));
         }
     }
 
