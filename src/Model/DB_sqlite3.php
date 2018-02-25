@@ -40,7 +40,7 @@ class DB_sqlite3
         }
 
         if (true == ($rs = $this->db->$qt($sql))) {
-            $_SERVER['run_dbquery_count']++;
+            $_SERVER['__DB_QUERY_COUNT']++;
             return $rs;
         } else {
             \show_error('DB_ERROR: ' . $this->db->lastErrorMsg() . "\nRAW_SQL: " . $sql);
@@ -78,7 +78,7 @@ class DB_sqlite3
     {
         $rs   = $this->query($sql);
         $data = $rs->fetchArray(SQLITE3_ASSOC);
-        $_SERVER['run_dbquery_count']++;
+        $_SERVER['__DB_QUERY_COUNT']++;
 
         $rs->finalize();
         return $data;
@@ -97,7 +97,7 @@ class DB_sqlite3
         while (true == ($row = $result->fetchArray(SQLITE3_ASSOC))) {
             $array[] = $row;
         }
-        $_SERVER['run_dbquery_count']++;
+        $_SERVER['__DB_QUERY_COUNT']++;
 
         $result->finalize();
         return $array;
@@ -111,7 +111,7 @@ class DB_sqlite3
      */
     public function fetch_object($sql)
     {
-        $_SERVER['run_dbquery_count']++;
+        $_SERVER['__DB_QUERY_COUNT']++;
         return (object) $this->fetch_array($sql);
     }
 
@@ -130,7 +130,7 @@ class DB_sqlite3
             }
         }
 
-        $_SERVER['run_dbquery_count']++;
+        $_SERVER['__DB_QUERY_COUNT']++;
         return $arr;
     }
 

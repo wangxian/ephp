@@ -40,7 +40,7 @@ class DB_mysqli
         }
 
         if (true == ($rs = $this->db->query($sql))) {
-            $_SERVER['run_dbquery_count']++;
+            $_SERVER['__DB_QUERY_COUNT']++;
             return $rs;
         } else {
             throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 2045);

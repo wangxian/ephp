@@ -169,7 +169,7 @@ EOT;
         $_FILES  = $request->files ?? [];
         $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
 
-        $_SERVER = ['run_dbquery_count' => 0];
+        $_SERVER = ['__DB_QUERY_COUNT' => 0];
         foreach ($request->server as $key => $value) {
             $key = strtoupper($key);
             $_SERVER[$key] = $value;
