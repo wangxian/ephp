@@ -208,7 +208,7 @@ EOT;
                 || $extname === 'ico')
         ) {
             ob_start();
-            (new \ePHP\Core\Application())->run($request, $response);
+            (new \ePHP\Core\Application())->run();
             $h = ob_get_clean();
 
             // echo "----------------------\n". $h ."\n";

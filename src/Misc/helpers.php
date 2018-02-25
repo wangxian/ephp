@@ -60,7 +60,7 @@ function throw_error($message, $code = 0)
 }
 
 /**
- * 系统异常处理函数，将系统异常，重定向到CommonException去处理
+ * 系统错误处理函数，将系统错误，重定向到CommonException去处理
  *
  * @ignore
  * @return void
@@ -77,8 +77,47 @@ function error_handler($errno, $errstr, $errfile, $errline)
     throw new $ex($errstr, $errno, array('errfile' => $errfile, 'errline' => $errline));
 }
 
+/**
+ * 捕获Swoole异常退出错误
+ *
+ * @ignore
+ * @return void
+ *
+ */
+function shutdown_handler()
+{
+    $error = error_get_last();
+    if (isset($error['type']))
+    {
+        switch ($error['type'])
+        {
+            case E_ERROR:
+            case E_PARSE:
+            case E_CORE_ERROR:
+            case E_COMPILE_ERROR:
+                $message = $error['message'];
+                $file = $error['file'];
+                $line = $error['line'];
+
+                $str = "Fatal error:\n-----------------------------------\n" . $message . ' in ' . $file . '('. $line . ")\n-----------------------------------\n";
+                wlog('ExceptionLog', $str);
+
+                $str = '<pre>'. $str .'</pre>';
+
+                if (SERVER_MODE !== 'swoole') {
+                    echo $str;
+                } else {
+                    $GLOBALS['__$response']->end($str);
+                }
+                break;
+        }
+    }
+}
+
+
 // 捕获系统所有的异常
 set_error_handler("error_handler");
+register_shutdown_function("shutdown_handler");
 
 // db query cout
 // 记录数据库查询执行次数，这也是一个优化的手段
