@@ -4,16 +4,6 @@ namespace ePHP\Http;
 class CookieSwoole
 {
     /**
-     * @var \swoole_http_response $response
-     */
-    private $response;
-
-    public function __construct($response)
-    {
-        $this->response = $response;
-    }
-
-    /**
      * Set Cookie
      *
      * @param string $name cookie name
@@ -27,9 +17,9 @@ class CookieSwoole
     {
         if (empty($domain)) {
             // $domain = '.' . $_SERVER['HTTP_HOST'];
-            $this->response->cookie($name, $value, $expire + time(), $path);
+            $GLOBALS['__$response']->cookie($name, $value, $expire + time(), $path);
         } else {
-            $this->response->cookie($name, $value, $expire + time(), $path, $domain);
+            $GLOBALS['__$response']->cookie($name, $value, $expire + time(), $path, $domain);
         }
 
         // Make it come into effect immediately.
@@ -90,10 +80,10 @@ class CookieSwoole
     public function delete($name, $path = '/', $domain = '')
     {
         if (empty($domain)) {
-            $this->response->cookie($name, null, time() - 3600, '/');
+            $GLOBALS['__$response']->cookie($name, null, time() - 3600, '/');
         } else {
             $domain = '.' . $_SERVER['HTTP_HOST'];
-            $this->response->cookie($name, null, time() - 3600, '/', $domain);
+            $GLOBALS['__$response']->cookie($name, null, time() - 3600, '/', $domain);
         }
 
         unset($_COOKIE[$name]);

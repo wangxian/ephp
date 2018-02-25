@@ -3,15 +3,15 @@ namespace ePHP\Core;
 
 class Controller
 {
-    /**
-     * \swoole_http_request $request
-     */
-    public $request;
+    // /**
+    //  * \swoole_http_request $request
+    //  */
+    // public $request;
 
-    /**
-     * @var \swoole_http_response $response
-     */
-    public $response;
+    // /**
+    //  * @var \swoole_http_response $response
+    //  */
+    // public $response;
 
     /**
      * Magic method, Automatic initialization of some commonly used classes
@@ -39,7 +39,7 @@ class Controller
                 return $this->session = (new \ePHP\Http\Session())->start($session_name);
                 break;
             case 'cookie':
-                return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole($this->response);
+                return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole();
                 break;
             case 'server':
                 return \ePHP\Core\Server::init()->server;
@@ -93,7 +93,7 @@ class Controller
     protected function setHeader($key, $value)
     {
         if (SERVER_MODE === 'swoole') {
-            $this->response->header($key, $value);
+            $GLOBALS['__$response']->header($key, $value);
         } else {
             if (!headers_sent()) {
                 header($key . ': '. $value);
@@ -113,13 +113,7 @@ class Controller
     {
         if (!headers_sent()) {
             if (SERVER_MODE === 'swoole' ) {
-                if ($this->response) {
-                    $this->response->status($code);
-                } else {
-                    echo '<html><head><meta charset="UTF-8" /><title></title></head><body>';
-                    echo '<script>window.location.href="'. $url .'";</script></body></html>';
-                    $this->stopRun();
-                }
+                $GLOBALS['__$response']->status($code);
             } else if ($code == 301) {
                 header('HTTP/1.1 301 Moved Permanently');
             } else {
