@@ -284,10 +284,10 @@ class BaseModel
             $where = implode(' AND ', $tmp);
         } elseif (is_string($where) && !empty($replacement)) {
             // 支持model->where("id>? and name=?", [12, "name"])
-            $i     = 0;
+            $i = 0;
             $where = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement) {
                 $v = $replacement[$i++];
-                return !is_string($v) ? $v : "'" . $this->escape_string($v) . "'";
+                return !is_string($v) ? ( !is_null($v) ? $v : "''" ) : "'" . $this->escape_string($v) . "'";
             }, $where);
         }
 
