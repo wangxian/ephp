@@ -73,7 +73,7 @@ class Server
 \ \____ \\ \_\   \ \_\ \_\ \_\
  \/____/ \/_/    \/_/\/_/\/_/ \033[43;37mv{$version}\033[0m
  \033[0m
->>> \033[41;37m{$software}\033[0m started ...
+>>> \033[35m{$software}\033[0m started ...
 Listening on \033[36;4mhttp://{$bind_http}/\033[0m
 Document root is \033[34m{$document_root}\033[0m
 Press Ctrl-C to quit.

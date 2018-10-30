@@ -41,6 +41,6 @@ class FileLogger
         //     show_error('ERROR: {' . $filename . '} is not writeable, check the file permissions');
         // }
 
-        error_log('[' . date('H:i:s') . ']' . $value . "\n", 3, $filename);
+        error_log(date('H:i:s') . ' | ' . $value . "\n", 3, $filename);
     }
 }
