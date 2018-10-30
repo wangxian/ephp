@@ -4,9 +4,9 @@ namespace ePHP\Core;
 
 class Application
 {
-    public function __construct()
-    {
-    }
+    // public function __construct()
+    // {
+    // }
 
     /**
      * Start run the application
@@ -25,42 +25,57 @@ class Application
             define('SERVER_MODE', 'fpm');
         }
 
-        try {
-            $route = (\ePHP\Core\Route::init())->findRoute();
-            // dumpdie($route);
+        $route = (\ePHP\Core\Route::init())->findRoute();
+        // dumpdie($route);
 
-            if (!empty($route)) {
-                $_GET['controller'] = $route[0];
-                $_GET['action']     = $route[1];
+        if (empty($route)) {
+            \show_404();
+        }
 
-                $controller_name = $route[2];
-                $action_name     = $_GET['action'];
+        // 整理参数
+        $_GET['controller'] = $route[0];
+        $_GET['action']     = $route[1];
 
-                $_REQUEST = array_merge($_GET, $_REQUEST);
+        $controller_name = $route[2];
+        $action_name     = $_GET['action'];
 
-                if (method_exists($controller_name, $action_name)) {
-                    $c_init = new $controller_name();
-                    // $c_init = new $controller_name($request, $response);
-                    // if (SERVER_MODE === 'swoole') {
-                    //     $c_init->request = $request;
-                    //     $c_init->response = $response;
-                    // }
+        $_REQUEST = array_merge($_GET, $_REQUEST);
 
-                    // Under swoole server, can't use call_user_func
-                    // call_user_func(array($c_init, $action_name));
-                    $c_init->{$action_name}();
-                } elseif (defined('RUN_ENV') && RUN_ENV == 'prod') {
-                    \show_404();
-                } else {
-                    \show_error("method {$action_name}() is not defined in {$controller_name}");
-                }
-            } else {
+        // 检查ACTION是否存在
+        if ( !method_exists($controller_name, $action_name) ) {
+            if (defined('RUN_ENV') && RUN_ENV == 'prod') {
                 \show_404();
+            } else {
+                \show_error("method {$action_name}() is not defined in {$controller_name}");
             }
-        } catch (\ePHP\Exception\CommonException $e) {
-            // ExitException don't show error message
-            if ($e->getCode() !== -99) {
+        }
+
+        if (SERVER_MODE === 'fpm') {
+            try {
+                call_user_func(array(new $controller_name(), $action_name));
+            } catch (\ePHP\Exception\CommonException $e) {
+                // ExitException don't show error message
+                if ($e->getCode() === -99) {
+                    return ;
+                }
                 echo $e;
+            }
+        } else if (SERVER_MODE === 'swoole') {
+            try {
+                // $c_init = new $controller_name();
+                // // $c_init->request = $request;
+                // // $c_init->response = $response;
+
+                // $c_init->{$action_name}();
+                call_user_func(array(new $controller_name(), $action_name));
+            } catch (\ePHP\Exception\CommonException $e) {
+                // ExitException don't show error message
+                if ($e->getCode() === -99) {
+                    return ;
+                }
+                echo $e;
+            } catch (\Swoole\ExitException $e) {
+                // 屏蔽exit异常，不输出任何信息
             }
         }
     }

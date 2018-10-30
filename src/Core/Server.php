@@ -23,7 +23,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.0.22';
+    private $version = '7.2.0';
 
     /**
      * Handle of Swoole http server
@@ -71,11 +71,11 @@ class Server
  /'__`\ \ ,__/\ \  _  \ \ ,__/
 /\  __/\ \ \   \ \ \ \ \ \ \
 \ \____ \\ \_\   \ \_\ \_\ \_\
- \/____/ \/_/    \/_/\/_/\/_/ \033[31mv{$version}\033[0m
+ \/____/ \/_/    \/_/\/_/\/_/ \033[43;37mv{$version}\033[0m
  \033[0m
-{$software} started ...
-Listening on \033[34mhttp://{$bind_http}/\033[0m
-Document root is \033[36m{$document_root}\033[0m
+>>> \033[41;37m{$software}\033[0m started ...
+Listening on \033[36;4mhttp://{$bind_http}/\033[0m
+Document root is \033[34m{$document_root}\033[0m
 Press Ctrl-C to quit.
 -----------------------------------
 
@@ -174,6 +174,7 @@ EOT;
         $GLOBALS['__$response'] = $response;
         $GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
+        // 兼容php-fpm的$_SERVER
         $_SERVER = [];
         foreach ($request->server as $key => $value) {
             $key = strtoupper($key);
@@ -185,6 +186,7 @@ EOT;
             }
         }
 
+        // 兼容php-fpm的header传值
         foreach ($request->header as $key => $value) {
             $key = strtoupper(str_replace('-', '_', $key));
             if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH') {
@@ -229,6 +231,7 @@ EOT;
                 //     $response->end(file_get_contents($filename));
                 // }
             } else {
+                // 都匹配不到，展示404界面
                 ob_start();
                 $tpl = Config::get('tpl_404');
                 if (!$tpl) {
