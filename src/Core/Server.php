@@ -83,6 +83,20 @@ EOT;
     }
 
     /**
+     * 打印访问日志
+     * @return null
+     */
+    private function printAccessLog()
+    {
+        // 非DEBUG模式，不打印
+        if ( !getenv('DEBUG') ) {
+            return;
+        }
+
+        echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36mGET {$_SERVER['REQUEST_URI']}\033[0m\n";
+    }
+
+    /**
      * Start a PHP Development Server
      *
      * @param  string $host
@@ -231,6 +245,7 @@ EOT;
                 //     $response->end(file_get_contents($filename));
                 // }
             } else {
+
                 // 都匹配不到，展示404界面
                 ob_start();
                 $tpl = Config::get('tpl_404');
@@ -244,6 +259,9 @@ EOT;
                 $response->end($h);
             }
         }
+
+        // 非调试模式，打印访问日志
+        $this->printAccessLog();
     }
 
     function onStart(\swoole_http_server $server)
@@ -254,7 +272,7 @@ EOT;
 
     function onShutdown(\swoole_http_server $server)
     {
-        echo "http server shutdown ...... \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
     }
 
     function onWorkerStart(\swoole_http_server $server, int $worker_id)
@@ -264,12 +282,12 @@ EOT;
 
     function onWorkerStop(\swoole_http_server $server, int $worker_id)
     {
-        echo "http worker stop[{$worker_id}] ...... \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m http worker stop[{$worker_id}] ......\033[0m \n";
     }
 
     function onWorkerError(\swoole_http_server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
-        echo "http worker error[{$worker_id}] ...... \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m http worker error[{$worker_id}] ......\033[0m \n";
     }
 
     function onTask(\swoole_server $serv, $task_id, $from_id, $data)
