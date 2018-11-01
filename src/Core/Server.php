@@ -282,6 +282,10 @@ EOT;
 
     function onWorkerStop(\swoole_http_server $server, int $worker_id)
     {
+        // DEBUG模式，不打印 worker stop 输出
+        if ( getenv('DEBUG') ) {
+            return;
+        }
         echo date('Y-m-d H:i:s') . " |\033[31m http worker stop[{$worker_id}] ......\033[0m \n";
     }
 
