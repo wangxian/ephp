@@ -6,25 +6,56 @@ use ePHP\Core\Config;
 class DB_mysqli
 {
     public $db = false;
+    private $config = [];
 
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
-        if (false == ($iconfig = Config::get($db_config))) {
-            \show_error('Invalid database configuration！');
+        if (false == ($config = Config::get($db_config))) {
+            \throw_error('invalid database configuration', 12005);
         }
 
-        if (empty($iconfig['port'])) {
-            $iconfig['port'] = 3306;
+        // Set default value
+        $this->config = $config + array(
+            'host'     => '127.0.0.1',
+            'user'     => '',
+            'password' => '',
+            'dbname'   => '',
+            'port'     => 3306,
+            'charset'  => 'utf8',
+            'tb_prefix'=> '',
+            'timeout'  => 3
+        );
+
+        $this->reconnect();
+    }
+
+    /**
+     * Reconnect database
+     *
+     * @return null
+     */
+    function reconnect()
+    {
+        // Connect to MySQL
+        // $this->db = new \mysqli($this->config['host'], $this->config['user'], $this->config['password'], $this->config['dbname'], $this->config['port']);
+        $db = \mysqli_init();
+        if ( !$db->options(MYSQLI_OPT_CONNECT_TIMEOUT, $this->config['timeout']) ) {
+            \throw_error('Setting MYSQLI_OPT_CONNECT_TIMEOUT failed', $db->errno);
         }
 
-        $this->db = new \mysqli($iconfig['host'], $iconfig['user'], $iconfig['password'], $iconfig['dbname'], $iconfig['port']);
-        if (mysqli_connect_errno()) {
-            \show_error('Can not connect to MySQL, message: ' . mysqli_connect_error());
+        if ( !$db->real_connect($this->config['host'], $this->config['user'], $this->config['password'], $this->config['dbname'], $this->config['port']) ) {
+            \throw_error('Can not real_connect to MySQL server, message: ' . $db->connect_error);
+        }
+
+        if ($db->connect_errno) {
+            \throw_error('Can not connect to MySQL server, message: ' . $db->connect_error, $db->errno);
         }
 
         // Set charset
-        $this->db->set_charset(isset($iconfig['charset']) ? $iconfig['charset'] : 'utf8');
+        $db->set_charset(isset($this->config['charset']));
+
+        $this->db = $db;
     }
 
     /**
@@ -42,8 +73,16 @@ class DB_mysqli
         if (true == ($rs = $this->db->query($sql))) {
             $GLOBALS['__$DB_QUERY_COUNT']++;
             return $rs;
+        } else if($this->db->errno == 2006 || $this->db->errno == 2013) {
+            // Catch database pool long running
+            // 2013 Lost connection to MySQL server during query
+            // 2006 MySQL server has gone away
+            $this->reconnect();
+
+            $GLOBALS['__$DB_QUERY_COUNT']++;
+            return $this->db->query($sql);
         } else {
-            throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 2045);
+            \throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, $this->db->errno);
         }
     }
 

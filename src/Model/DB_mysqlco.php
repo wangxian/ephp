@@ -4,7 +4,6 @@ namespace ePHP\Model;
 
 use ePHP\Core\Config;
 use ePHP\Model\DBPool;
-use ePHP\Exception\ExitException;
 
 class DB_mysqlco
 {
@@ -22,7 +21,7 @@ class DB_mysqlco
      *
      * @var array
      */
-    private $iconfig = [];
+    private $config = [];
 
     /**
      * Last insert id
@@ -41,50 +40,44 @@ class DB_mysqlco
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
-        if (false == ($iconfig = Config::get($db_config))) {
-            \show_error('Invalid database configuration！');
+        if (false == ($config = Config::get($db_config))) {
+            \throw_error('invalid database configuration', 12005);
         }
 
-        if (empty($iconfig['port'])) {
-            $iconfig['port'] = 3306;
+        // Rename key dbname->database
+        if (isset($config['dbname'])) {
+            $config['database'] = $config['dbname'];
+            unset($config['dbname']);
         }
 
-        if (empty($iconfig['idle_pool_size'])) {
-            $iconfig['idle_pool_size'] = 5;
-        }
+        // Set default value
+        $this->config = $config + array(
+            'host'      => '127.0.0.1',
+            'user'      => '',
+            'password'  => '',
+            'database'  => '',
+            'port'      => 3306,
+            'charset'   => 'utf8',
+            'tb_prefix' => '',
+            'timeout'   => 3,
 
-        if (empty($iconfig['max_pool_size'])) {
-            $iconfig['max_pool_size'] = 10;
-        }
-
-        if (empty($iconfig['timeout'])) {
-            $iconfig['timeout'] = 10;
-        }
-
-        if (empty($iconfig['charset'])) {
-            $iconfig['charset'] = 'utf8';
-        }
+            'idle_pool_size'=> 1,
+            'max_pool_size'=> 2
+        );
 
         $this->db_config = $db_config;
-        $this->iconfig = $iconfig;
+        $this->config = $config;
     }
 
     private function reconnect()
     {
-        $this->db = new \Swoole\Coroutine\MySQL();
-        $this->db->connect([
-            'host' => $this->iconfig['host'],
-            'port' => $this->iconfig['port'],
-            'user' => $this->iconfig['user'],
-            'password' => $this->iconfig['password'],
-            'database' => $this->iconfig['dbname'],
-            'timeout' => $this->iconfig['timeout'],
-            'charset' => $this->iconfig['charset']
-        ]);
+        $db = new \Swoole\Coroutine\MySQL();
 
-        if (!$this->db->connected) {
-            throw new ExitException('Can not connect to your MySQL Server. Then exit');
+        if ( !$db->connect($this->config) ) {
+            \throw_error('Can not connect to MySQL server', 12006);
         }
+
+        $this->db = $db;
     }
 
     /**
@@ -97,12 +90,12 @@ class DB_mysqlco
         $dbpool = DBPool::init($this->db_config);
         // var_dump($dbpool->cap + $dbpool->acticeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
 
-        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->iconfig['max_pool_size'])) {
-            throw new ExitException('MySQL pool is empty...');
+        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->config['max_pool_size'])) {
+            \throw_error('MySQL pool is empty...', 12009);
         }
 
-        if ($dbpool->cap < $this->iconfig['idle_pool_size']
-            || ($dbpool->queue->isEmpty() && $dbpool->cap < $this->iconfig['max_pool_size'])
+        if ($dbpool->cap < $this->config['idle_pool_size']
+            || ($dbpool->queue->isEmpty() && $dbpool->cap < $this->config['max_pool_size'])
         ) {
             // var_dump('........................reconnect........................');
             $this->reconnect();
@@ -110,7 +103,7 @@ class DB_mysqlco
             return false;
         } else {
             // var_dump('........................using pool........................');
-            $this->db = $dbpool->out($this->iconfig['idle_pool_size']);
+            $this->db = $dbpool->out($this->config['idle_pool_size']);
             return true;
         }
     }
@@ -136,21 +129,20 @@ class DB_mysqlco
             $this->reconnect();
         }
 
-        // $this->db->setDefer();
+        $this->db->setDefer();
         $this->db->query($sql);
-        // $result = $this->db->recv();
+        $result = $this->db->recv();
 
         // Fix Lost connection to MySQL server during query
         // MySQL server has gone away
-        // if($this->db->errno == 2006 || $this->db->errno == 2013)
-        // {
-        //     var_dump('........................mysql go away........................');
-        //     $this->reconnect();
+        if($this->db->errno == 2006 || $this->db->errno == 2013) {
+            // var_dump('........................mysql go away........................');
+            $this->reconnect();
 
-        //     $this->db->setDefer();
-        //     $this->db->query($sql);
-        //     $result = $this->db->recv();
-        // }
+            $this->db->setDefer();
+            $this->db->query($sql);
+            $result = $this->db->recv();
+        }
 
         // Put db connction to pool
         // If it is new client, queue in, else put pool client back
@@ -163,7 +155,7 @@ class DB_mysqlco
         if ($this->db->errno == 0) {
             $GLOBALS['__$DB_QUERY_COUNT']++;
         } else {
-            throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 2045);
+            \throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 12045);
         }
 
         $this->insert_id = $this->db->insert_id;
