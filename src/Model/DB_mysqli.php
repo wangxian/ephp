@@ -6,7 +6,7 @@ use ePHP\Core\Config;
 class DB_mysqli
 {
     public $db = false;
-    private $config = [];
+    protected $config = [];
 
     function __construct($db_config = 'default')
     {

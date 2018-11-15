@@ -39,8 +39,9 @@ class DB_mysqlco
 
     function __construct($db_config = 'default')
     {
-        $db_config = 'dbconfig.' . $db_config;
-        if (false == ($config = Config::get($db_config))) {
+        $this->db_config = $db_config;
+
+        if (false == ($config = Config::get('dbconfig.' . $db_config))) {
             \throw_error('invalid database configuration', 12005);
         }
 
@@ -64,9 +65,6 @@ class DB_mysqlco
             'idle_pool_size'=> 1,
             'max_pool_size'=> 2
         );
-
-        $this->db_config = $db_config;
-        $this->config = $config;
     }
 
     private function reconnect()
@@ -88,9 +86,9 @@ class DB_mysqlco
     private function prepareDB()
     {
         $dbpool = DBPool::init($this->db_config);
-        // var_dump($dbpool->cap + $dbpool->acticeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
+        // var_dump($dbpool->cap + $dbpool->activeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
 
-        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->acticeCount >= $this->config['max_pool_size'])) {
+        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->activeCount >= $this->config['max_pool_size'])) {
             \throw_error('MySQL pool is empty...', 12009);
         }
 
@@ -99,7 +97,7 @@ class DB_mysqlco
         ) {
             // var_dump('........................reconnect........................');
             $this->reconnect();
-            $dbpool->acticeCount++;
+            $dbpool->activeCount++;
             return false;
         } else {
             // var_dump('........................using pool........................');

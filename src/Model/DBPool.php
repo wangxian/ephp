@@ -22,7 +22,7 @@ class DBPool
      *
      * @var integer
      */
-    public $acticeCount = 0;
+    public $activeCount = 0;
 
     /**
      * The cap last update time
@@ -56,7 +56,7 @@ class DBPool
      */
     public function in($db)
     {
-        $this->acticeCount--;
+        $this->activeCount--;
         $this->cap++;
         $this->_capLastRiseTime = time();
         $this->queue->enqueue($db);
@@ -67,7 +67,7 @@ class DBPool
      */
     public function back($db)
     {
-        $this->acticeCount--;
+        $this->activeCount--;
         $this->queue->enqueue($db);
     }
 
@@ -89,7 +89,7 @@ class DBPool
             $this->_capLastRiseTime = time();
         }
 
-        $this->acticeCount++;
+        $this->activeCount++;
         return $this->queue->dequeue();
     }
 }
