@@ -135,4 +135,60 @@ class DB_mysqli_pool extends DB_mysqli
 
         return $rs;
     }
+
+    /**
+     * 过滤SQL中的不安全字符
+     *
+     * @param string $str
+     */
+    public function escape_string($str)
+    {
+        // Prepare one MySQL client connect
+        $isFromPool = $this->prepareDB();
+
+        $str = $this->db->real_escape_string($str);
+
+        if ($isFromPool) {
+            DBPool::init($this->db_config)->back($this->db);
+        } else {
+            DBPool::init($this->db_config)->in($this->db);
+        }
+
+        return $str;
+    }
+
+    /*
+     * Set auto commit
+     *
+     * @param bool $f
+     * @return bool
+     */
+    public function autocommit($f)
+    {
+        \throw_error('DB_mysqli_pool not support transaction', 12021);
+    }
+
+    /*
+     * Commit transaction
+     *
+     * @return bool
+     */
+    public function commit()
+    {
+        \throw_error('DB_mysqli_pool not support transaction', 12022);
+    }
+
+    /*
+     * Roollback transaction
+     *
+     * @return bool
+     */
+    public function rollback()
+    {
+        \throw_error('DB_mysqli_pool not support transaction', 12023);
+    }
+
+    function __destruct()
+    {
+    }
 }
