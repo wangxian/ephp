@@ -44,7 +44,7 @@ class CommonException extends \Exception
             && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest" ) {
             echo $str;
         } else {
-            dump('error', $str);
+            dd('error', $str);
         }
 
         return '';

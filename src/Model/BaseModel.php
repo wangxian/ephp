@@ -297,7 +297,7 @@ class BaseModel
             $this->where .= " AND " . $where;
         }
 
-        // dump($this->where);
+        // dd($this->where);
 
         return $this;
     }

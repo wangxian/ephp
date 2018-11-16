@@ -274,7 +274,7 @@ class ModelMongodb
                 $tmp[$k1] = $v1;
             }
         }
-        dump($tmp);
+        dd($tmp);
     }
 
     /**

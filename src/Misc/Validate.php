@@ -23,8 +23,8 @@ namespace ePHP\Misc;
  *     'age'  => array('type' => 'int', 'range' => array(10,40), 'message' => '年龄范围不符合。')
  * );
  *
- * dump($this->validate->check($data, $rules, true));
- * dump($this->validate->error());
+ * dd($this->validate->check($data, $rules, true));
+ * dd($this->validate->error());
  * </code>
  */
 

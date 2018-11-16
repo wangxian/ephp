@@ -70,7 +70,7 @@ class Image
             throw_error('只支持gif,jpg,png的图片');
         }
 
-        // dump($imageinfo);
+        // dd($imageinfo);
 
         if ($imageinfo[2] == 1) {
             $im = imagecreatefromgif($srcfile);

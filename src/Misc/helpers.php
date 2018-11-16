@@ -3,24 +3,23 @@
 use ePHP\Core\Config;
 
 /**
- * 打印，调试方法
+ * 使用浏览器console打印，调试方法
  *
  * 使用Chrome/Firefox JavaScript的 `console.info` 方法打印服务器端信息
  * 默认使用console.info打印信息
- * 使用方法：dump('当前变量', $your_vars1, $your_vars2)
- * 进阶：可使用dump('error', 错误信息)
+ * 使用方法：ee('当前变量', $your_vars1, $your_vars2)
+ * 进阶：ee('error', 错误信息), 使用console.error输出
  *
  * @param mixed $args
  * @return void
  */
-function dump()
+function ee()
 {
-    // 关闭dump
     if (!Config::get('show_dump')) {
         return false;
     }
 
-    $args         = func_get_args();
+    $args = func_get_args();
     $console_func = func_get_arg(0);
 
     if (count($args) > 1 && in_array($console_func, ['log', 'info', 'error'])) {
@@ -33,13 +32,46 @@ function dump()
 }
 
 /**
- * 等同于dump();exit;
+ * console.log and die
  *
  * @return void
  */
-function dumpdie()
+function eee()
 {
-    call_user_func_array('dump', func_get_args());
+    call_user_func_array('ee', func_get_args());
+    throw new \ePHP\Exception\ExitException();
+}
+
+/**
+ * dump variable
+ *
+ * @return void
+ */
+function dd()
+{
+    if (!Config::get('show_dump')) {
+        return false;
+    }
+
+    $data = func_get_args();
+    ob_start();
+    foreach ($data as $v) {
+        var_dump($v);
+    }
+    $output = ob_get_clean();
+    $output = preg_replace('/\]\=\>\n(\s+)/m', "] => ", $output);
+
+    echo str_replace('&lt;?php', '', highlight_string("<?php\n" . $output, true));
+}
+
+/**
+ * dump variable and die
+ *
+ * @return void
+ */
+function ddd()
+{
+    call_user_func_array('dd', func_get_args());
     throw new \ePHP\Exception\ExitException();
 }
 
@@ -114,7 +146,6 @@ function shutdown_handler()
     }
 }
 
-
 // 捕获系统所有的异常
 set_error_handler("error_handler");
 register_shutdown_function("shutdown_handler");
@@ -126,9 +157,9 @@ $GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
 function run_info($verbose = false)
 {
-    dump('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
+    dd('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
-        dump('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
+        dd('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
     }
 }
 
