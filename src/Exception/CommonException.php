@@ -40,8 +40,8 @@ class CommonException extends \Exception
         // 记录异常信息到文件中
         wlog('ExceptionLog', $str);
 
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-            && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest" ) {
+        if (PHP_SAPI || (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+            && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") ) {
             echo $str;
         } else {
             dd('error', $str);
