@@ -153,6 +153,32 @@ class Route
     }
 
     /**
+     * Find One websocket by controller handler name
+     *
+     * @return array [$controller_name, $controller_class]
+     */
+    public function findWebSocketRoute()
+    {
+        $pathinfo = !empty($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] != '/' ? $_SERVER['PATH_INFO'] : '/index';
+        $items    = $pathinfo ? explode('/', ltrim($pathinfo, '/')) : [];
+        $count    = count($items);
+
+        $route = [];
+        foreach ($this->routes as $value) {
+            if ($value['method'] == 'WEBSOCKET') {
+                $controller_name = strtolower(substr($value['controller'], strrpos($value['controller'], '\\') + 1, -10));
+
+                if ($count > 0 && $controller_name === $items[0]) {
+                    $route = [$controller_name, $value['controller']];
+                    break;
+                }
+            }
+        }
+
+        return $route;
+    }
+
+    /**
      * Register a new GET route with the router.
      *
      * @param  string $uri

@@ -52,7 +52,7 @@ class Application
             }
 
             if (SERVER_MODE === 'fpm') {
-                call_user_func(array(new $controller_name(), $action_name));
+                call_user_func([new $controller_name(), $action_name]);
             } else if (SERVER_MODE === 'swoole') {
                 try {
                     // $c_init = new $controller_name();
@@ -60,7 +60,7 @@ class Application
                     // // $c_init->response = $response;
 
                     // $c_init->{$action_name}();
-                    call_user_func(array(new $controller_name(), $action_name));
+                    call_user_func([new $controller_name(), $action_name]);
                 } catch (\Swoole\ExitException $e) {
                     // 屏蔽exit异常，不输出任何信息
                     return ;

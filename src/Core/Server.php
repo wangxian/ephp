@@ -26,7 +26,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.2.0';
+    private $version = '7.2.2';
 
     /**
      * Handle of Swoole http server
@@ -57,14 +57,15 @@ class Server
      * Print server finger description
      *
      * @param  string $bind_http    eg: 127.0.0.1:8000
-     * @param  bool   $is_swoole    Whether swoole server
      * @return null
      */
-    private function printServerFinger(string $bind_http, bool $is_swoole)
+    private function printServerFinger(string $bind_http)
     {
         $version       = $this->version;
-        $software      = $is_swoole ? 'Swoole Server' : 'PHP Development Server';
+        $software      = SERVER_MODE === 'swoole' ? 'Swoole Server' : 'PHP Development Server';
         $document_root = APP_PATH . '/public';
+
+
 
         echo <<<EOT
 -----------------------------------\033[32m
@@ -104,13 +105,13 @@ EOT;
      * @param  int    $port
      * @return null
      */
-    function devServer(string $host, int $port)
+    public function devServer(string $host, int $port)
     {
         // Mark server mode
         define('SERVER_MODE', 'buildin');
 
         $bind_http = $host . ':' . $port;
-        $this->printServerFinger($bind_http, false);
+        $this->printServerFinger($bind_http);
 
         // Start cli Development Server
         passthru("php -S {$bind_http} -t " . APP_PATH . "/public");
@@ -122,7 +123,7 @@ EOT;
      * @param  array $config server config
      * @return \Swoole\Http\Server
      */
-    function createServer(array $config)
+    public function createServer(array $config)
     {
         // Mark server mode
         define('SERVER_MODE', 'swoole');
@@ -130,11 +131,23 @@ EOT;
         $host = $config['host'] ?? '127.0.0.1';
         $port = $config['port'] ?? '8000';
 
-        $this->server = new \Swoole\Http\Server($host, $port);
+        // Start websocket or http server
+        if ( empty($config['enable_websocket']) ) {
+            $this->server = new \Swoole\Http\Server($host, $port);
+        } else {
+            $config['open_http_protocol'] = true;
+            $this->server = new \Swoole\WebSocket\Server($host, $port, SWOOLE_SOCK_TCP);
+        }
         $this->server->set($config);
 
-        $this->server->on('task', [$this, 'onTask']);
-        $this->server->on('finish', [$this, 'onFinish']);
+        $bind_http = $config['host'] . ':' . $config['port'];
+        $this->printServerFinger($bind_http);
+
+        echo "\033[32m>>> Http Server is enabled\033[0m \n";
+        if ( !empty($config['enable_websocket']) ) {
+            echo "\033[32m>>> WebSocket Server is enabled\033[0m \n";
+        }
+        echo "-----------------------------------\n";
 
         return $this;
     }
@@ -144,7 +157,7 @@ EOT;
      *
      * @return null
      */
-    function start()
+    public function start()
     {
         // Linsten http Event
         $this->server->on('request', [$this, 'onRequest']);
@@ -156,25 +169,35 @@ EOT;
         $this->server->on('workerStop', [$this, 'onWorkerStop']);
         $this->server->on('workerError', [$this, 'onWorkerError']);
 
+        // listen websocket
+        $this->server->on('open', [$this, 'onOpen']);
+        $this->server->on('message', [$this, 'onMessage']);
+        $this->server->on('close', [$this, 'onClose']);
+
+        // listen task
+        $this->server->on('task', [$this, 'onTask']);
+        $this->server->on('finish', [$this, 'onFinish']);
+
         // Start a new http server
         $this->server->start();
     }
 
-    function stop()
+    public function stop()
     {
     }
 
-    function reload()
+    public function reload()
     {
     }
 
     /**
-     * Linsten http server onRequest
+     * Compat fpm server
+     * Contains: `$_GET`, `$_POST`, `$_FILES`, `$_SERVER` etc.
      *
-     * @param  \Swoole\Http\Request  $request
-     * @param  \Swoole\Http\Response $response
+     * @param \Swoole\Http\Request $request
+     * @return void
      */
-    function onRequest(Request $request, Response $response)
+    private function _compatFPM(Request $request)
     {
         // Override php globals array
         // Store $_GET, $_POST ....
@@ -186,7 +209,6 @@ EOT;
 
         // 注入全局变量
         $GLOBALS['__$request']  = $request;
-        $GLOBALS['__$response'] = $response;
         $GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
         // 兼容php-fpm的$_SERVER
@@ -210,6 +232,21 @@ EOT;
                 $_SERVER['HTTP_' . $key] = $value;
             }
         }
+    }
+
+    /**
+     * Linsten http server onRequest
+     *
+     * @param  \Swoole\Http\Request  $request
+     * @param  \Swoole\Http\Response $response
+     */
+    public function onRequest(Request $request, Response $response)
+    {
+        // Compat fpm server
+        $this->_compatFPM($request);
+
+        // 注入全局变量
+        $GLOBALS['__$response'] = $response;
 
         $response->header('Server', 'ePHP/'. $this->version);
 
@@ -265,43 +302,182 @@ EOT;
         $this->printAccessLog();
     }
 
-    function onStart(\Swoole\Server $server)
+    /**
+     * On server started
+     *
+     * @param \Swoole\Server $server
+     * @return void
+     */
+    public function onStart(\Swoole\Server $server)
     {
-        $bind_http = $server->setting['host'] . ':' . $server->setting['port'];
-        $this->printServerFinger($bind_http, true);
+        echo date('Y-m-d H:i:s') . " |\033[31m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
     }
 
-    function onShutdown(\Swoole\Server $server)
+    /**
+     * On server shutdown
+     *
+     * @param \Swoole\Server $server
+     * @return void
+     */
+    public function onShutdown(\Swoole\Server $server)
     {
         echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
     }
 
-    function onWorkerStart(\Swoole\Server $server, int $worker_id)
+    /**
+     * On wroker started
+     *
+     * @param \Swoole\Server $server
+     * @param integer $worker_id
+     * @return void
+     */
+    public function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if ( getenv('STDOUT_LOG') ) {
-            echo date('Y-m-d H:i:s') . " |\033[31m ...... http worker start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[31m ...... http worker process start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
     }
 
-    function onWorkerStop(\Swoole\Server $server, int $worker_id)
+    /**
+     * On wroker stop
+     *
+     * @param \Swoole\Server $server
+     * @param integer $worker_id
+     * @return void
+     */
+    public function onWorkerStop(\Swoole\Server $server, int $worker_id)
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if ( getenv('STDOUT_LOG') ) {
-            echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker stop[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker process stop[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
     }
 
-    function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code)
+    /**
+     * On work stop
+     *
+     * @param \Swoole\Server $server
+     * @param integer $worker_id
+     * @param integer $worker_pid
+     * @param integer $exit_code
+     * @return void
+     */
+    public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
-        echo date('Y-m-d H:i:s') . " |\033[31m http worker error[id={$worker_id} pid={$worker_pid}] ......\033[0m \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m http worker process error[id={$worker_id} pid={$worker_pid}] ......\033[0m \n";
     }
 
-    function onTask(\Swoole\Server $server, $task_id, $from_id, $data)
+    public function onTask(\Swoole\Server $server, $task_id, $from_id, $data)
     {
     }
 
-    function onFinish(\Swoole\Server $server, $task_id, $data)
+    public function onFinish(\Swoole\Server $server, $task_id, $data)
     {
+    }
+
+    /**
+     * WebSocket frame context
+     *
+     * @var array
+     */
+    public static $websocketFrameContext = [];
+
+    /**
+     * WebSocket on open
+     *
+     * @param Swoole\WebSocket\Server $server
+     * @param \Swoole\Http\Request $request
+     * @return void
+     */
+    public function onOpen(\Swoole\WebSocket\Server $server, \Swoole\Http\Request $request)
+    {
+        // echo "[websocket][onopen]server: handshake success with fd{$request->fd} url={$request->server['request_uri']}?{$request->server['query_string']}\n";
+
+        // Compat fpm server
+        $this->_compatFPM($request);
+
+        // print_r(self::$websocketFrameContext);
+
+        // filter websocket router class
+        // route struct: [$controller_name, $controller_class]
+        $route = (\ePHP\Core\Route::init())->findWebSocketRoute();
+        if ( !empty($route) ) {
+            $controller_class = $route[1];
+
+            // Save websocket connection Context
+            self::$websocketFrameContext[$request->fd] = [
+                'get'    => $_GET,
+                'cookie' => $_COOKIE,
+                'controller_class' => $controller_class
+            ];
+
+            // print_r(self::$websocketFrameContext);
+
+            call_user_func([new $controller_class(), 'onOpen'], $server, $request);
+        }
+
+    }
+
+    /**
+     * WebSocket on message
+     *
+     * @param Swoole\WebSocket\Server $server
+     * @param [type] $frame
+     * @return void
+     */
+    public function onMessage(\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame)
+    {
+        // echo "[websocket][onmessage]receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
+        // $server->push($frame->fd, "this is server");
+        // print_r(self::$websocketFrameContext);
+
+        if ( empty(self::$websocketFrameContext[$frame->fd]) ) {
+            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onMessage] WebSocket has been stoped before frame sending data\033[0m \n";
+            return;
+        }
+
+        // Save websocket connection Context
+        $context = self::$websocketFrameContext[$frame->fd];
+
+        // Restore global data
+        $_POST   = $_SERVER = [];
+        $_GET    = $_REQUEST = $context['get'];
+        $_COOKIE = $context['cookie'];
+        $controller_class = $context['controller_class'];
+
+        call_user_func([new $controller_class(), 'onMessage'], $server, $frame);
+    }
+
+    /**
+     * WebSocket on close
+     *
+     * @param Swoole\WebSocket\Server $server
+     * @param int $fd
+     * @return void
+     */
+    public function onClose (\Swoole\WebSocket\Server $server, int $fd)
+    {
+        // echo "[websocket][onclose]client {$fd} closed\n";
+
+        if ( empty(self::$websocketFrameContext[$fd])) {
+            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] WebSocket has been stoped\033[0m \n";
+            return;
+        }
+
+        // Save websocket connection Context
+        $context = self::$websocketFrameContext[$fd];
+
+        // Restore global data
+        $_POST   = $_SERVER = [];
+        $_GET    = $_REQUEST = $context['get'];
+        $_COOKIE = $context['cookie'];
+        $controller_class = $context['controller_class'];
+
+        // Clear websocket cache
+        unset(self::$websocketFrameContext[$fd]);
+
+        call_user_func([new $controller_class(), 'onClose'], $server, $fd);
     }
 }
