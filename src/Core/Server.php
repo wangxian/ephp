@@ -88,8 +88,8 @@ EOT;
      */
     private function printAccessLog()
     {
-        // 非DEBUG模式，不打印
-        if ( !getenv('DEBUG') ) {
+        // 非STDOUT_LOG模式，不打印
+        if ( !getenv('STDOUT_LOG') ) {
             return;
         }
 
@@ -119,7 +119,7 @@ EOT;
      * Create a swoole server
      *
      * @param  array $config server config
-     * @return \swoole_http_server
+     * @return \Swoole\Http\Server
      */
     function createServer(array $config)
     {
@@ -129,7 +129,7 @@ EOT;
         $host = $config['host'] ?? '127.0.0.1';
         $port = $config['port'] ?? '8000';
 
-        $this->server = new \swoole_http_server($host, $port);
+        $this->server = new \Swoole\Http\Server($host, $port);
         $this->server->set($config);
 
         $this->server->on('task', [$this, 'onTask']);
@@ -264,41 +264,45 @@ EOT;
         $this->printAccessLog();
     }
 
-    function onStart(\swoole_http_server $server)
+    function onStart(\Swoole\Http\Server $server)
     {
         $bind_http = $server->setting['host'] . ':' . $server->setting['port'];
         $this->printServerFinger($bind_http, true);
     }
 
-    function onShutdown(\swoole_http_server $server)
+    function onShutdown(\Swoole\Http\Server $server)
     {
         echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
     }
 
-    function onWorkerStart(\swoole_http_server $server, int $worker_id)
+    function onWorkerStart(\Swoole\Http\Server $server, int $worker_id)
     {
-        // echo "http worker start ...... \n";
+        // STDOUT_LOG模式，不打印 worker stop 输出
+        if ( getenv('STDOUT_LOG') ) {
+            return;
+        }
+        echo date('Y-m-d H:i:s') . " |\033[31m http worker start[{$worker_id}] ......\033[0m \n";
     }
 
-    function onWorkerStop(\swoole_http_server $server, int $worker_id)
+    function onWorkerStop(\Swoole\Http\Server $server, int $worker_id)
     {
-        // DEBUG模式，不打印 worker stop 输出
-        if ( getenv('DEBUG') ) {
+        // STDOUT_LOG模式，不打印 worker stop 输出
+        if ( getenv('STDOUT_LOG') ) {
             return;
         }
         echo date('Y-m-d H:i:s') . " |\033[31m http worker stop[{$worker_id}] ......\033[0m \n";
     }
 
-    function onWorkerError(\swoole_http_server $server, int $worker_id, int $worker_pid, int $exit_code)
+    function onWorkerError(\Swoole\Http\Server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
         echo date('Y-m-d H:i:s') . " |\033[31m http worker error[{$worker_id}] ......\033[0m \n";
     }
 
-    function onTask(\swoole_server $serv, $task_id, $from_id, $data)
+    function onTask(\Swoole\Server $server, $task_id, $from_id, $data)
     {
     }
 
-    function onFinish(\swoole_http_server $serv, $task_id, $data)
+    function onFinish(\Swoole\Http\Server $server, $task_id, $data)
     {
     }
 }

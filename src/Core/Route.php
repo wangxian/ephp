@@ -55,7 +55,7 @@ class Route
     {
         // Prefix route uri, concat it and clear
         if (strlen($this->prefixUri) > 0) {
-            $uri             = $this->prefixUri . $uri;
+            $uri = $this->prefixUri . $uri;
             $this->prefixUri = '';
         }
 
@@ -160,7 +160,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function get($uri, $controller, $action)
+    public function get(string $uri, string $controller, string $action)
     {
         $this->addRoute('GET', $uri, $controller, $action);
     }
@@ -173,7 +173,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function post($uri, $controller, $action)
+    public function post(string $uri, string $controller, string $action)
     {
         $this->addRoute('POST', $uri, $controller, $action);
     }
@@ -186,7 +186,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function put($uri, $controller, $action)
+    public function put(string $uri, string $controller, string $action)
     {
         $this->addRoute('PUT', $uri, $controller, $action);
     }
@@ -199,7 +199,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function delete($uri, $controller, $action)
+    public function delete(string $uri, string $controller, string $action)
     {
         $this->addRoute('DELETE', $uri, $controller, $action);
     }
@@ -212,7 +212,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function head($uri, $controller, $action)
+    public function head(string $uri, string $controller, string $action)
     {
         $this->addRoute('HEAD', $uri, $controller, $action);
     }
@@ -225,7 +225,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function options($uri, $controller, $action)
+    public function options(string $uri, string $controller, string $action)
     {
         $this->addRoute('OPTIONS', $uri, $controller, $action);
     }
@@ -238,9 +238,22 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function patch($uri, $controller, $action)
+    public function patch(string $uri, string $controller, string $action)
     {
         $this->addRoute('PATCH', $uri, $controller, $action);
+    }
+
+    /**
+     * Register a new `WebSocket` route with the router.
+     *
+     * @param  string $uri
+     * @param  string $controller
+     * @param  string $action
+     * @return null
+     */
+    public function websocket(string $uri, string $controller)
+    {
+        $this->addRoute('WEBSOCKET', $uri, $controller, null);
     }
 
     /**
@@ -251,7 +264,7 @@ class Route
      * @param  string $action
      * @return null
      */
-    public function all($uri, $controller, $action)
+    public function all(string $uri, string $controller, string $action)
     {
         $this->addRoute('ALL', $uri, $controller, $action);
     }
@@ -262,7 +275,7 @@ class Route
      * @param  string $controller
      * @return null
      */
-    public function auto($controller)
+    public function auto(string $controller)
     {
         $this->addRoute('ALL', null, $controller, null);
     }
@@ -273,7 +286,7 @@ class Route
      * @param  string $prefix_uri like /api
      * @return \ePHP\Core\Route
      */
-    public function prefix($uri)
+    public function prefix(string $uri)
     {
         $this->prefixUri = $uri;
         return $this;
