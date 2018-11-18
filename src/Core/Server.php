@@ -1,6 +1,9 @@
 <?php
 namespace ePHP\Core;
 
+use \Swoole\Http\Request;
+use \Swoole\Http\Response;
+
 class Server
 {
     /**
@@ -28,7 +31,7 @@ class Server
     /**
      * Handle of Swoole http server
      *
-     * @var swoole_http_server
+     * @var \Swoole\Http\Server
      */
     public $server;
 
@@ -89,11 +92,9 @@ EOT;
     private function printAccessLog()
     {
         // 非STDOUT_LOG模式，不打印
-        if ( !getenv('STDOUT_LOG') ) {
-            return;
+        if ( getenv('STDOUT_LOG') ) {
+            echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36mGET {$_SERVER['REQUEST_URI']}\033[0m\n";
         }
-
-        echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36mGET {$_SERVER['REQUEST_URI']}\033[0m\n";
     }
 
     /**
@@ -170,10 +171,10 @@ EOT;
     /**
      * Linsten http server onRequest
      *
-     * @param  swoole_http_request  $request
-     * @param  swoole_http_response $response
+     * @param  \Swoole\Http\Request  $request
+     * @param  \Swoole\Http\Response $response
      */
-    function onRequest(\swoole_http_request $request, \swoole_http_response $response)
+    function onRequest(Request $request, Response $response)
     {
         // Override php globals array
         // Store $_GET, $_POST ....
@@ -264,45 +265,43 @@ EOT;
         $this->printAccessLog();
     }
 
-    function onStart(\Swoole\Http\Server $server)
+    function onStart(\Swoole\Server $server)
     {
         $bind_http = $server->setting['host'] . ':' . $server->setting['port'];
         $this->printServerFinger($bind_http, true);
     }
 
-    function onShutdown(\Swoole\Http\Server $server)
+    function onShutdown(\Swoole\Server $server)
     {
         echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
     }
 
-    function onWorkerStart(\Swoole\Http\Server $server, int $worker_id)
+    function onWorkerStart(\Swoole\Server $server, int $worker_id)
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if ( getenv('STDOUT_LOG') ) {
-            return;
+            echo date('Y-m-d H:i:s') . " |\033[31m ...... http worker start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
-        echo date('Y-m-d H:i:s') . " |\033[31m http worker start[{$worker_id}] ......\033[0m \n";
     }
 
-    function onWorkerStop(\Swoole\Http\Server $server, int $worker_id)
+    function onWorkerStop(\Swoole\Server $server, int $worker_id)
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if ( getenv('STDOUT_LOG') ) {
-            return;
+            echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker stop[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
-        echo date('Y-m-d H:i:s') . " |\033[31m http worker stop[{$worker_id}] ......\033[0m \n";
     }
 
-    function onWorkerError(\Swoole\Http\Server $server, int $worker_id, int $worker_pid, int $exit_code)
+    function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
-        echo date('Y-m-d H:i:s') . " |\033[31m http worker error[{$worker_id}] ......\033[0m \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m http worker error[id={$worker_id} pid={$worker_pid}] ......\033[0m \n";
     }
 
     function onTask(\Swoole\Server $server, $task_id, $from_id, $data)
     {
     }
 
-    function onFinish(\Swoole\Http\Server $server, $task_id, $data)
+    function onFinish(\Swoole\Server $server, $task_id, $data)
     {
     }
 }
