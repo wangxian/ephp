@@ -181,7 +181,7 @@ EOT;
         $_POST   = $request->post ?? [];
         $_COOKIE = $request->cookie ?? [];
         $_FILES  = $request->files ?? [];
-        $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
+        // $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
 
         // 注入全局变量
         $GLOBALS['__$request']  = $request;
