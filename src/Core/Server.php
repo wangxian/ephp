@@ -148,7 +148,8 @@ EOT;
         $this->config = $config + [
             'host' => '0.0.0.0',
             'port' => '8000',
-            'task_worker_num' => 0
+            'task_worker_num' => 0,
+            'enable_websocket'=> false
         ];
 
         // Start websocket or http server
@@ -185,9 +186,11 @@ EOT;
         $this->server->on('workerError', [$this, 'onWorkerError']);
 
         // listen websocket
-        $this->server->on('open', [$this, 'onOpen']);
-        $this->server->on('message', [$this, 'onMessage']);
-        $this->server->on('close', [$this, 'onClose']);
+        if ( !empty($this->config['enable_websocket']) ) {
+            $this->server->on('open', [$this, 'onOpen']);
+            $this->server->on('message', [$this, 'onMessage']);
+            $this->server->on('close', [$this, 'onClose']);
+        }
 
         // Automatically instantiate this class
         if ( class_exists("\App\Boot") ) {
