@@ -42,7 +42,8 @@ class CommonException extends \Exception
 
         if (PHP_SAPI == 'cli' || (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
             && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") ) {
-            echo $str;
+            echo '<pre>' . $str . '</pre>';
+
         } else {
             dd('error', $str);
         }

@@ -427,7 +427,7 @@ EOT;
                 'controller_class' => $controller_class
             ];
 
-            // echo 'pid='. getmypid() . ',fd=' . implode(',', array_keys(self::$websocketFrameContext))
+            // echo 'pid='. getmypid() . ', fd=' . implode(',', array_keys(self::$websocketFrameContext))
             //     . ', connections=' . count($this->server->connections) . "\n";
 
             call_user_func([new $controller_class(), 'onOpen'], $server, $request);
@@ -472,12 +472,12 @@ EOT;
      * @param int $fd
      * @return void
      */
-    public function onClose (\Swoole\WebSocket\Server $server, int $fd)
+    public function onClose(\Swoole\WebSocket\Server $server, int $fd)
     {
-        // echo "[websocket][onclose]client {$fd} closed\n";
+        // echo "[websocket][onclose]client fd{$fd} closed\n";
 
         if ( empty(self::$websocketFrameContext[$fd])) {
-            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] WebSocket has been stoped\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] fd{$fd} WebSocket has been stoped...\033[0m \n";
             return;
         }
 
