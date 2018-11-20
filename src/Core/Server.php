@@ -41,6 +41,17 @@ class Server
     private static $instance;
 
     /**
+     * Swoole server config setting
+     *
+     * @var array
+     */
+    public $config = [
+        'host' => '0.0.0.0',
+        'port' => '8000',
+        'task_worker_num' => 0
+    ];
+
+    /**
      * Dynamically handle calls to the class.
      *
      * @return \ePHP\Core\Server
@@ -56,16 +67,13 @@ class Server
     /**
      * Print server finger description
      *
-     * @param  string $bind_http    eg: 127.0.0.1:8000
-     * @return null
+     * @return void
      */
-    private function printServerFinger(string $bind_http)
+    private function printServerFinger()
     {
         $version       = $this->version;
         $software      = SERVER_MODE === 'swoole' ? 'Swoole Server' : 'PHP Development Server';
         $document_root = APP_PATH . '/public';
-
-
 
         echo <<<EOT
 -----------------------------------\033[32m
@@ -78,12 +86,18 @@ class Server
  \/____/ \/_/    \/_/\/_/\/_/ \033[43;37mv{$version}\033[0m
  \033[0m
 >>> \033[35m{$software}\033[0m started ...
-Listening on \033[36;4mhttp://{$bind_http}/\033[0m
+Listening on \033[36;4mhttp://{$this->config['host']}:{$this->config['port']}/\033[0m
 Document root is \033[34m{$document_root}\033[0m
 Press Ctrl-C to quit.
 -----------------------------------
 
 EOT;
+
+        echo "\033[32m>>> Http Server is enabled\033[0m \n";
+        if ( !empty($this->config['enable_websocket']) ) {
+            echo "\033[32m>>> WebSocket Server is enabled\033[0m \n";
+        }
+        echo "-----------------------------------\n";
     }
 
     /**
@@ -110,10 +124,13 @@ EOT;
         // Mark server mode
         define('SERVER_MODE', 'buildin');
 
-        $bind_http = $host . ':' . $port;
-        $this->printServerFinger($bind_http);
+        $this->config['host'] = $host;
+        $this->config['port'] = $port;
+
+        $this->printServerFinger();
 
         // Start cli Development Server
+        $bind_http = $host . ':' . $port;
         passthru("php -S {$bind_http} -t " . APP_PATH . "/public");
     }
 
@@ -128,26 +145,24 @@ EOT;
         // Mark server mode
         define('SERVER_MODE', 'swoole');
 
-        $host = $config['host'] ?? '127.0.0.1';
-        $port = $config['port'] ?? '8000';
+        $this->config = $config + [
+            'host' => '0.0.0.0',
+            'port' => '8000',
+            'task_worker_num' => 0
+        ];
 
         // Start websocket or http server
         if ( empty($config['enable_websocket']) ) {
-            $this->server = new \Swoole\Http\Server($host, $port);
+            $this->server = new \Swoole\Http\Server($this->config['host'], $this->config['port']);
         } else {
-            $config['open_http_protocol'] = true;
-            $this->server = new \Swoole\WebSocket\Server($host, $port, SWOOLE_SOCK_TCP);
+            $this->config['open_http_protocol'] = true;
+            $this->server = new \Swoole\WebSocket\Server($config['host'], $config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
         }
-        $this->server->set($config);
 
-        $bind_http = $config['host'] . ':' . $config['port'];
-        $this->printServerFinger($bind_http);
+        $this->server->set($this->config);
 
-        echo "\033[32m>>> Http Server is enabled\033[0m \n";
-        if ( !empty($config['enable_websocket']) ) {
-            echo "\033[32m>>> WebSocket Server is enabled\033[0m \n";
-        }
-        echo "-----------------------------------\n";
+        // Show welcome finger
+        $this->printServerFinger();
 
         return $this;
     }
@@ -174,21 +189,27 @@ EOT;
         $this->server->on('message', [$this, 'onMessage']);
         $this->server->on('close', [$this, 'onClose']);
 
-        // listen task
-        $this->server->on('task', [$this, 'onTask']);
-        $this->server->on('finish', [$this, 'onFinish']);
+        // Automatically instantiate this class
+        if ( class_exists("\App\Boot") ) {
+            // Excute a boot instance
+            $boot = new \App\Boot();
+
+            // listen task
+            $this->server->on('task', [$boot, 'onTask']);
+            $this->server->on('finish', [$boot, 'onFinish']);
+        }
 
         // Start a new http server
         $this->server->start();
     }
 
-    public function stop()
-    {
-    }
+    // public function stop()
+    // {
+    // }
 
-    public function reload()
-    {
-    }
+    // public function reload()
+    // {
+    // }
 
     /**
      * Compat fpm server
@@ -265,8 +286,6 @@ EOT;
             (new \ePHP\Core\Application())->run();
             $h = ob_get_clean();
 
-            // echo "----------------------\n". $h ."\n";
-
             // Fixed output o byte
             if (strlen($h) === 0) {
                 $h = ' ';
@@ -310,8 +329,11 @@ EOT;
      */
     public function onStart(\Swoole\Server $server)
     {
-        echo date('Y-m-d H:i:s') . " |\033[31m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
-        echo date('Y-m-d H:i:s') . " |\033[31m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
+        // STDOUT_LOG 开启才显示日志
+        if ( getenv('STDOUT_LOG') ) {
+            echo date('Y-m-d H:i:s') . " |\033[31m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[31m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
+        }
     }
 
     /**
@@ -369,14 +391,6 @@ EOT;
         echo date('Y-m-d H:i:s') . " |\033[31m http worker process error[id={$worker_id} pid={$worker_pid}] ......\033[0m \n";
     }
 
-    public function onTask(\Swoole\Server $server, $task_id, $from_id, $data)
-    {
-    }
-
-    public function onFinish(\Swoole\Server $server, $task_id, $data)
-    {
-    }
-
     /**
      * WebSocket frame context
      *
@@ -413,7 +427,8 @@ EOT;
                 'controller_class' => $controller_class
             ];
 
-            // print_r(self::$websocketFrameContext);
+            // echo 'pid='. getmypid() . ',fd=' . implode(',', array_keys(self::$websocketFrameContext))
+            //     . ', connections=' . count($this->server->connections) . "\n";
 
             call_user_func([new $controller_class(), 'onOpen'], $server, $request);
         }
