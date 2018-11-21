@@ -157,9 +157,9 @@ $GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
 function run_info($verbose = false)
 {
-    dd('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
+    ee('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
-        dd('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
+        ee('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
     }
 }
 
