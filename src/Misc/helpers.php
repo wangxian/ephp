@@ -13,7 +13,7 @@ use ePHP\Core\Config;
  * @param mixed $args
  * @return void
  */
-function ee()
+function cc()
 {
     if (!Config::get('show_dump')) {
         return false;
@@ -36,7 +36,7 @@ function ee()
  *
  * @return void
  */
-function eee()
+function ccc()
 {
     call_user_func_array('ee', func_get_args());
     throw new \ePHP\Exception\ExitException();
@@ -157,9 +157,9 @@ $GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
 function run_info($verbose = false)
 {
-    ee('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
+    cc('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
-        ee('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
+        cc('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
     }
 }
 
