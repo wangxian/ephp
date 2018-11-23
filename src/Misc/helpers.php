@@ -348,13 +348,19 @@ function requestv($key, $default = '', $callback = 'trim')
 }
 
 /**
- * 获取配置信息
+ * Gets the value of the environment variable
  *
  * @param  string $key
- * @param  string $config_name 配置项名称，如mian
+ * @param  mixed  $default
  * @return mixed
  */
-function C($key, $config_name = 'main')
+function env($key, $default = '')
 {
-    return \ePHP\Core\Config::get($key, $config_name);
+    $value = getenv($key);
+
+    if ($value === false) {
+        return $default;
+    }
+
+    return $value;
 }
