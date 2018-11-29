@@ -45,7 +45,7 @@ class CommonException extends \Exception
             echo '<pre>' . $str . '</pre>';
 
         } else {
-            dd('error', $str);
+            \cc('error', $str);
         }
 
         return '';

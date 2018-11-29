@@ -36,7 +36,7 @@ class Controller
                 if (!$session_name) {
                     $session_name = 'pppid';
                 }
-                return $this->session = (new \ePHP\Http\Session())->start($session_name);
+                return $this->session = new \ePHP\Http\Session($session_name);
                 break;
             case 'cookie':
                 return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole();

@@ -4,45 +4,13 @@ namespace ePHP\Http;
 class Session
 {
     /**
-     * Store session
+     * init session
      *
-     * @param string $name
-     * @param mixed $value
+     * @param string $name session name
      */
-    public function set($name, $value)
+    public function __construct($name)
     {
-        $_SESSION[$name] = $value;
-    }
-
-    /**
-     * Delete session
-     *
-     * @param string $name
-     */
-    public function delete($name)
-    {
-        unset($_SESSION[$name]);
-    }
-
-    /**
-     * Delete all session
-     */
-    public function deleteAll()
-    {
-        if (isset($_SESSION)) {
-            $_SESSION = array();
-        }
-    }
-
-    /**
-     * Start session if it is not started
-     *
-     * @param string $name Session name
-     * @return \ePHP\Http\Session
-     */
-    public function start($name = '')
-    {
-        if (!isset($_SESSION)) {
+        if ( !headers_sent() && !isset($_SESSION)) {
             if ($name) {
                 session_name($name);
             }
@@ -53,6 +21,41 @@ class Session
     }
 
     /**
+     * Store session
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function set($name, $value)
+    {
+        if ( isset($_SESSION) ) {
+            $_SESSION[$name] = $value;
+        }
+    }
+
+    /**
+     * Delete session
+     *
+     * @param string $name
+     */
+    public function delete($name)
+    {
+        if ( isset($_SESSION) ) {
+            unset($_SESSION[$name]);
+        }
+    }
+
+    /**
+     * Delete all session
+     */
+    public function deleteAll()
+    {
+        if ( isset($_SESSION) ) {
+            $_SESSION = array();
+        }
+    }
+
+    /**
      * Get session value, Support new Session()->get('user.info.name')
      *
      * @param string $key
@@ -60,6 +63,10 @@ class Session
      */
     public function get($key = '')
     {
+        if ( !isset($_SESSION) ) {
+            return false;
+        }
+
         if ($key == '') {
             return $_SESSION;
         } elseif (array_key_exists($key, $_SESSION)) {
