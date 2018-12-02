@@ -26,7 +26,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.2.2';
+    private $version = '7.2.3';
 
     /**
      * Handle of Swoole http server
