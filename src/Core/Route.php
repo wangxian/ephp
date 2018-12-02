@@ -78,7 +78,7 @@ class Route
     /**
      * Find the matching route based on the current PATH_INFO
      *
-     * @return array
+     * @return array contains [$controller_name, $action_name, $controller_class]
      */
     public function findRoute()
     {
@@ -150,32 +150,30 @@ class Route
                 }
             }
         }
+
+        return [];
     }
 
     /**
      * Find One websocket by controller handler name
      *
-     * @return array [$controller_name, $controller_class]
+     * @return string $controller_class
      */
     public function findWebSocketRoute()
     {
         $pathinfo = !empty($_SERVER['PATH_INFO']) && $_SERVER['PATH_INFO'] != '/' ? $_SERVER['PATH_INFO'] : '/index';
-        $items    = $pathinfo ? explode('/', ltrim($pathinfo, '/')) : [];
-        $count    = count($items);
 
-        $route = [];
         foreach ($this->routes as $value) {
             if ($value['method'] == 'WEBSOCKET') {
-                $controller_name = strtolower(substr($value['controller'], strrpos($value['controller'], '\\') + 1, -10));
+                $route_uri = '/' . implode('/', $value['params']);
 
-                if ($count > 0 && $controller_name === $items[0]) {
-                    $route = [$controller_name, $value['controller']];
-                    break;
+                if ($pathinfo === $route_uri) {
+                    return $value['controller'];
                 }
             }
         }
 
-        return $route;
+        return '';
     }
 
     /**

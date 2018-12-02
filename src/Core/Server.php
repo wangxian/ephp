@@ -26,7 +26,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.2.3';
+    private $version = '7.2.2';
 
     /**
      * Handle of Swoole http server
@@ -419,10 +419,8 @@ EOT;
 
         // filter websocket router class
         // route struct: [$controller_name, $controller_class]
-        $route = (\ePHP\Core\Route::init())->findWebSocketRoute();
-        if ( !empty($route) ) {
-            $controller_class = $route[1];
-
+        $controller_class = (\ePHP\Core\Route::init())->findWebSocketRoute();
+        if ( !empty($controller_class) ) {
             // Save websocket connection Context
             self::$websocketFrameContext[$request->fd] = [
                 'get'    => $_GET,
