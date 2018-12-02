@@ -197,6 +197,12 @@ EOT;
             // Excute a boot instance
             $boot = new \App\Boot();
 
+            if ( !method_exists($boot, 'onStart') ) {
+                \throw_error('Class \App\Boot must register onStart() method', 19120);
+            }
+
+            call_user_func([$boot, 'onStart'], $this->server);
+
             // listen task
             $this->server->on('task', [$boot, 'onTask']);
             $this->server->on('finish', [$boot, 'onFinish']);
@@ -449,7 +455,7 @@ EOT;
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
 
-        if ( empty(self::$websocketFrameContext[$frame->fd]) ) {
+        if ( getenv('STDOUT_LOG') && empty(self::$websocketFrameContext[$frame->fd]) ) {
             echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onMessage] WebSocket has been stoped before frame sending data\033[0m \n";
             return;
         }
@@ -477,7 +483,7 @@ EOT;
     {
         // echo "[websocket][onclose]client fd{$fd} closed\n";
 
-        if ( empty(self::$websocketFrameContext[$fd])) {
+        if ( getenv('STDOUT_LOG') && empty(self::$websocketFrameContext[$fd])) {
             echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] fd{$fd} WebSocket has been stoped...\033[0m \n";
             return;
         }
