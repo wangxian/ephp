@@ -138,7 +138,7 @@ function shutdown_handler()
 
                 if (SERVER_MODE !== 'swoole') {
                     echo $str;
-                } else {
+                } else if ( isset($GLOBALS['__$response']) ) {
                     $GLOBALS['__$response']->end($str);
                 }
                 break;
