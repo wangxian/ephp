@@ -26,7 +26,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.2.5';
+    private $version = '7.2.6';
 
     /**
      * Handle of Swoole http server
@@ -169,6 +169,31 @@ EOT;
     }
 
     /**
+     * Add envent Listener
+     *
+     * @param string $event
+     * @return void
+     */
+    public function add_event_listener(string $event)
+    {
+        // Automatically instantiate this class
+        if ( class_exists("\App\Boot") ) {
+            // Excute a boot instance
+            $boot = new \App\Boot();
+
+            if ( method_exists($boot, $event) ) {
+                call_user_func([$boot, $event], $this->server);
+            }
+
+            // Listen Background task listener
+            if ($event == 'onBoot') {
+                $this->server->on('task', [$boot, 'onTask']);
+                $this->server->on('finish', [$boot, 'onFinish']);
+            }
+        }
+    }
+
+    /**
      * Start swoole server
      *
      * @return null
@@ -192,21 +217,8 @@ EOT;
             $this->server->on('close', [$this, 'onClose']);
         }
 
-        // Automatically instantiate this class
-        if ( class_exists("\App\Boot") ) {
-            // Excute a boot instance
-            $boot = new \App\Boot();
-
-            if ( !method_exists($boot, 'onStart') ) {
-                \throw_error('Class \App\Boot must register onStart() method', 19120);
-            }
-
-            call_user_func([$boot, 'onStart'], $this->server);
-
-            // listen task
-            $this->server->on('task', [$boot, 'onTask']);
-            $this->server->on('finish', [$boot, 'onFinish']);
-        }
+        // Add event Listener
+        $this->add_event_listener('onBoot');
 
         // Start a new http server
         $this->server->start();
@@ -343,6 +355,9 @@ EOT;
             echo date('Y-m-d H:i:s') . " |\033[31m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
             echo date('Y-m-d H:i:s') . " |\033[31m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
         }
+
+        // Add event Listener
+        $this->add_event_listener('onStart');
     }
 
     /**
@@ -354,6 +369,9 @@ EOT;
     public function onShutdown(\Swoole\Server $server)
     {
         echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
+
+        // Add event Listener
+        $this->add_event_listener('onShutdown');
     }
 
     /**
@@ -369,6 +387,9 @@ EOT;
         if ( getenv('STDOUT_LOG') ) {
             echo date('Y-m-d H:i:s') . " |\033[31m ...... http worker process start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
+
+        // Add event Listener
+        $this->add_event_listener('onWorkerStart');
     }
 
     /**
@@ -384,6 +405,9 @@ EOT;
         if ( getenv('STDOUT_LOG') ) {
             echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker process stop[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
+
+        // Add event Listener
+        $this->add_event_listener('onWorkerStop');
     }
 
     /**
@@ -398,6 +422,9 @@ EOT;
     public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code)
     {
         echo date('Y-m-d H:i:s') . " |\033[31m http worker process error[id={$worker_id} pid={$worker_pid}] ......\033[0m \n";
+
+        // Add event Listener
+        $this->add_event_listener('onWorkerError');
     }
 
     /**
@@ -455,8 +482,10 @@ EOT;
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
 
-        if ( getenv('STDOUT_LOG') && empty(self::$websocketFrameContext[$frame->fd]) ) {
-            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onMessage] WebSocket has been stoped before frame sending data\033[0m \n";
+        if ( empty(self::$websocketFrameContext[$frame->fd]) ) {
+            if ( getenv('STDOUT_LOG') ) {
+                echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onMessage] WebSocket has been stoped before frame sending data\033[0m \n";
+            }
             return;
         }
 
@@ -483,8 +512,10 @@ EOT;
     {
         // echo "[websocket][onclose]client fd{$fd} closed\n";
 
-        if ( getenv('STDOUT_LOG') && empty(self::$websocketFrameContext[$fd])) {
-            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] fd{$fd} WebSocket has been stoped...\033[0m \n";
+        if ( empty(self::$websocketFrameContext[$fd]) ) {
+            if ( getenv('STDOUT_LOG') ) {
+                echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] fd{$fd} WebSocket has been stoped...\033[0m \n";
+            }
             return;
         }
 
