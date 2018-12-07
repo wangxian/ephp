@@ -61,9 +61,7 @@ class HttpclientSwoole extends Httpclient
         $uri = (isset($paths['path']) ? $paths['path'] : '/') . '?' . (isset($paths['query']) ? $paths['query'] : '');
 
         // Set request timeout
-        if (isset($options['timeout'])) {
-            $cli->set(['timeout' => $options['timeout']]);
-        }
+        $cli->set(['timeout' => isset($options['timeout']) ? $options['timeout'] * 1000 : 10e3 ]);
 
         // Support get, post
         if ( $method === self::GET ) {
