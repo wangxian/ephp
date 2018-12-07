@@ -90,8 +90,13 @@ class Route
             if ($count === $value['count'] && !is_null($value['action'])
                 && ($value['method'] === 'ALL' || $_SERVER['REQUEST_METHOD'] === $value['method'])
             ) {
+                // match full uri
+                if ($pathinfo === '/' . implode('/', $value['params'])) {
+                    return [strtolower(substr($value['controller'], strrpos($value['controller'], '\\') + 1, -10)), $value['action'], $value['controller']];
+                }
+
                 // match RESTful uri
-                $f        = false;
+                $f = false;
                 $url_args = [];
                 foreach ($items as $k => $v) {
                     $slug = $value['params'][$k];
@@ -101,27 +106,21 @@ class Route
                         // match :id(\d+)
                         $preg = substr($slug, $origin_key_pos + 1, -1);
                         if (preg_match('/^' . $preg . '$/', $v) > 0) {
-                            $f               = true;
-                            $slug            = substr($slug, 1, $origin_key_pos - 1);
+                            $f = true;
+                            $slug = substr($slug, 1, $origin_key_pos - 1);
                             $url_args[$slug] = $v;
                             continue;
                         }
                     } elseif (substr($slug, 0, 1) === ':') {
                         // match :id
-                        $f               = true;
-                        $slug            = substr($slug, 1);
-                        $url_args[$slug] = $v;
-                        continue;
-                    }
-
-                    if ($v === $slug) {
                         $f = true;
-                    } else {
-                        $f = false;
+                        $slug = substr($slug, 1);
+                        $url_args[$slug] = $v;
                         continue;
                     }
                 }
 
+                // Match uri success
                 if ($f) {
                     if (count($url_args) > 0) {
                         $_GET = array_merge($_GET, $url_args);
