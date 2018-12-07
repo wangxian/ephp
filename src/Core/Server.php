@@ -7,6 +7,13 @@ use \Swoole\Http\Response;
 class Server
 {
     /**
+     * ePHP latest verson
+     *
+     * @var string
+     */
+    private $version = '7.2';
+
+    /**
      * Static file content type
      *
      * @var array
@@ -20,13 +27,6 @@ class Server
         'css'  => 'text/css',
         'js'   => 'text/js'
     ];
-
-    /**
-     * ePHP latest verson
-     *
-     * @var string
-     */
-    private $version = '7.2.6';
 
     /**
      * Handle of Swoole http server
