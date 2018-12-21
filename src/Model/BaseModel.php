@@ -418,6 +418,7 @@ class BaseModel
             $this->query_sql = $sql;
             return $this;
         } else {
+            $this->sql = $sql;
             return $this->conn()->query($sql);
         }
     }
