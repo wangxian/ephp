@@ -22,7 +22,7 @@ class Server
         'text' => 'text/plain',
         'html' => 'text/html',
         'css'  => 'text/css',
-        'js'   => 'text/js',
+        'js'   => 'text/javascript',
 
         'png'  => 'image/png',
         'jpg'  => 'image/jpeg',
