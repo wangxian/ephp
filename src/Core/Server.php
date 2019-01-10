@@ -19,13 +19,23 @@ class Server
      * @var array
      */
     private $contentType = [
+        'text' => 'text/plain',
         'html' => 'text/html',
+        'css'  => 'text/css',
+        'js'   => 'text/js',
+
         'png'  => 'image/png',
         'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
         'gif'  => 'image/gif',
         'ico'  => 'image/x-icon',
-        'css'  => 'text/css',
-        'js'   => 'text/js'
+
+
+        'ttf'   => 'font/ttf',
+        'eot'   => 'font/eot',
+        'otf'   => 'font/otf',
+        'woff'  => 'font/woff',
+        'woff2' => 'font/woff2'
     ];
 
     /**
@@ -293,49 +303,26 @@ EOT;
         $response->header('Server', 'ePHP/'. $this->version);
 
         $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
-        $extname = substr($filename, strrpos($filename, '.')+1);
 
-        if (!( $extname === 'html'
-                || $extname === 'css'
-                || $extname === 'js'
-                || $extname === 'png'
-                || $extname === 'jpg'
-                || $extname === 'gif'
-                || $extname === 'ico')
-        ) {
+        // !in_array($extname, ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'ico'])
+        // Try files, otherwise route to app
+        if ( !is_file($filename) ) {
             ob_start();
             (new \ePHP\Core\Application())->run();
             $h = ob_get_clean();
 
             // Fixed output o byte
-            if (strlen($h) === 0) {
-                $h = ' ';
-            }
+            // if (strlen($h) === 0) {
+            //     $h = ' ';
+            // }
 
             $response->end($h);
         } else {
-            if (is_file($filename)) {
+            $extname = substr($filename, strrpos($filename, '.') + 1);
+            if ( isset( $this->contentType[$extname] ) ) {
                 $response->header('Content-Type', $this->contentType[$extname]);
-                $response->sendfile($filename);
-                // if (PHP_OS !== 'Darwin') {
-                //     $response->sendfile($filename);
-                // } else {
-                //     $response->end(file_get_contents($filename));
-                // }
-            } else {
-
-                // 都匹配不到，展示404界面
-                ob_start();
-                $tpl = Config::get('tpl_404');
-                if (!$tpl) {
-                    include __DIR__ . '/../Template/404.html';
-                } else {
-                    include APP_PATH . '/views/' . $tpl;
-                }
-                $h = ob_get_clean();
-
-                $response->end($h);
             }
+            $response->sendfile($filename);
         }
 
         // 非调试模式，打印访问日志
