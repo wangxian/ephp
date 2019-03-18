@@ -279,7 +279,7 @@ class BaseModel
         if (is_array($where)) {
             $tmp = array();
             foreach ($where as $k => $v) {
-                $tmp[] = !is_string($v) ? $k . "=" . $v : $k . "='" . $v . "'";
+                $tmp[] = !is_string($v) ? $k . "=" . $v : $k . "='" . $this->escape_string($v) . "'";
             }
             $where = implode(' AND ', $tmp);
         } elseif (is_string($where) && !empty($replacement)) {
