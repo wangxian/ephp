@@ -2117,7 +2117,7 @@ class PHPMailer
 }
 
 /** @ignore */
-class phpmailerException extends Exception
+class phpmailerException extends \Exception
 {
     public function errorMessage()
     {
