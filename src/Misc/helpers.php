@@ -10,7 +10,6 @@ use ePHP\Core\Config;
  * 使用方法：ee('当前变量', $your_vars1, $your_vars2)
  * 进阶：ee('error', 错误信息), 使用console.error输出
  *
- * @param mixed $args
  * @return void
  */
 function cc()
@@ -97,7 +96,7 @@ function throw_error($message, $code = 0)
  * @ignore
  * @return void
  *
- * @throws throw \ePHP\Exception\CommonException
+ * @throws \ePHP\Exception\CommonException
  */
 function error_handler($errno, $errstr, $errfile, $errline)
 {
@@ -286,7 +285,7 @@ function R($url, $wait = 0, $message = '')
  * 获取 $_GET 中的值，不存在，返回default的值
  *
  * @param string $key      要获取的键名
- * @param string $default  可选，如果不存在返回的默认值，默认返回空字符串
+ * @param mixed  $default  可选，如果不存在返回的默认值，默认返回空字符串
  * @param string $callback 可选，回调函数，比如 trim, intval, floatval 默认trim
  * @return mixed
  */
@@ -300,7 +299,7 @@ function getv($key, $default = '', $callback = 'trim')
  * 例如：url: /user/info/12.html, getp(3)的值为12
  *
  * @param int    $pos      获取url片段的位置($pos>=1)
- * @param string $default  可选，返回的默认值
+ * @param mixed  $default  可选，返回的默认值
  * @param string $callback 可选，回调函数，比如 trim, intval, floatval 默认trim
  * @return mixed
  */
@@ -325,7 +324,7 @@ function getp($pos, $default = '', $callback = 'trim')
  * 获取 $_POST 中的值
  *
  * @param string $key      要获取的键名
- * @param string $default  可选，如果不存在返回的默认值，默认返回空字符串
+ * @param mixed  $default  可选，如果不存在返回的默认值，默认返回空字符串
  * @param string $callback 可选，回调函数，比如 trim, intval, floatval 默认trim
  * @return mixed
  */
@@ -338,7 +337,7 @@ function postv($key, $default = '', $callback = 'trim')
  * 获取 $_REQUEST 中的值
  *
  * @param string $key      要获取的键名
- * @param string $default  可选，如果不存在返回的默认值，默认返回空字符串
+ * @param mixed  $default  可选，如果不存在返回的默认值，默认返回空字符串
  * @param string $callback 可选，回调函数，比如 trim, intval, floatval 默认trim
  * @return mixed
  */

@@ -137,7 +137,7 @@ class Route
                     return [$controller_name, isset($items[1])?$items[1]:'index', $value['controller']];
                 } elseif ($value['count'] > 0) {
                     // has prefixUri
-                    $prefix = '/' . implode($value['params'], '/');
+                    $prefix = '/' . implode('/', $value['params']);
                     // check has same prefix uri
                     if (substr($pathinfo, 0, strlen($prefix)) === $prefix) {
                         $items = $pathinfo ? explode('/', substr($pathinfo, strlen($prefix)+1)) : [];
