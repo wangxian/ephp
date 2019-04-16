@@ -37,7 +37,7 @@ function cc()
  */
 function ccc()
 {
-    call_user_func_array('ee', func_get_args());
+    call_user_func_array('cc', func_get_args());
     throw new \ePHP\Exception\ExitException();
 }
 
