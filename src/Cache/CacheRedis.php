@@ -96,7 +96,7 @@ class CacheRedis
      */
     function delete($key)
     {
-        return $this->connection->delete($key);
+        return $this->connection->del($key);
     }
 
     /**
