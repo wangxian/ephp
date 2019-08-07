@@ -45,6 +45,11 @@ class Config
             }
         }
 
+        // 默认返回数组
+        if (empty(self::$_config[$config_name])) {
+            self::$_config[$config_name] = [];
+        }
+
         // 返回需要value
         if ($key === '') {
             return self::$_config[$config_name];
@@ -57,7 +62,7 @@ class Config
             } elseif (count($array) === 3) {
                 return isset(self::$_config[$config_name][$array[0]][$array[1]][$array[2]]) ? self::$_config[$config_name][$array[0]][$array[1]][$array[2]] : false;
             } else {
-                show_error('Config::get("a.b.c") Only 3 levels are allowed.');
+                show_error('Config::get("a.b.c") only 3 levels are allowed.');
             }
         } else {
             return false;
