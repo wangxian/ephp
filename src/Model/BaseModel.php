@@ -403,6 +403,7 @@ class BaseModel
      */
     public function query($sql, $replacement = array())
     {
+        $sql = trim($sql);
         if (!empty($replacement)) {
             // 支持model->query("cid=? and name=?", [12, "name"])
             $i   = 0;
