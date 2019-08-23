@@ -238,7 +238,7 @@ class BaseModel
             }
 
             $this->data += $data;
-        } else if (is_string($data) && !empty($replacement)) {
+        } else if (is_string($data) && is_array($replacement)) {
             // 支持model->set("cid=? and name=?", [12, "name"])
             $i = 0;
 
@@ -249,7 +249,7 @@ class BaseModel
 
             $this->data = $data;
         } else {
-            throw_error('model::set参数错误, 只接收string或array类型');
+            throw_error('BaseModel::set($data, $replacement)第二个参数$replacement只接收array类型');
         }
 
         return $this;
