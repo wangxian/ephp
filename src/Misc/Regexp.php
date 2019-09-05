@@ -47,9 +47,9 @@ class Regexp
         $regExpValue = array_key_exists($regExp, $regExpType) ? $regExpType[$regExp] : $regExp;
 
         if (substr($regExpValue, 0, 1) != '/') {
-            throw new ephpException('<font color="red">在默认库中 ' . $regExp . ' 的规则匹配失败，系统使用你的输入作为正则规则，但你输入的正则语法错误。</font> 合法的规则如： /^[0-9]+$/ 请检查后重试！', 1554);
+            \throw_error('<font color="red">在默认库中 ' . $regExp . ' 的规则匹配失败，系统使用你的输入作为正则规则，但你输入的正则语法错误。</font> 合法的规则如： /^[0-9]+$/ 请检查后重试！', 1554);
         }
-        //dump($regExpValue);
+
         return preg_match($regExpValue, $string);
     }
 }
