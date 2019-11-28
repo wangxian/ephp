@@ -1542,7 +1542,7 @@ class PHPMailer
         $eol    = "\r\n";
         $escape = '=';
         $output = '';
-        while (list(, $line) = each($lines)) {
+        foreach ($lines as $line) {
             $linlen  = strlen($line);
             $newline = '';
             for ($i = 0; $i < $linlen; $i++) {
@@ -2507,7 +2507,7 @@ class SMTP
             $lines_out[] = $line;
 
             // send the lines to the server
-            foreach($lines_out as $line_out)
+            foreach ($lines_out as $line_out) {
                 if (strlen($line_out) > 0) {
                     if (substr($line_out, 0, 1) == ".") {
                         $line_out = "." . $line_out;
