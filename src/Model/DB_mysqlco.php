@@ -258,16 +258,6 @@ class DB_mysqlco
     public function autocommit($f)
     {
         return true;
-        // if ($f)
-        // {
-        //     return $this->query('SET AUTOCOMMIT=1');
-        // }
-        // else
-        // {
-        //     // Disable auto commit
-        //     $this->query('SET AUTOCOMMIT=0');
-        //     return $this->query('START TRANSACTION');
-        // }
     }
 
     /*
@@ -278,7 +268,6 @@ class DB_mysqlco
     public function commit()
     {
         return true;
-        // return $this->query('COMMIT');
     }
 
     /*
@@ -289,6 +278,5 @@ class DB_mysqlco
     public function rollback()
     {
         return true;
-        // return $this->query('ROLLBACK');
     }
 }

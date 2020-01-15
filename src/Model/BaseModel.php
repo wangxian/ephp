@@ -35,7 +35,11 @@ class BaseModel
     // Model Db handle
     private $db = null;
 
-    static private $_db_handle;
+    // Standard fpm db handle
+    static private $_db_handle = [];
+
+    // Swoole mode db handle
+    private $_swoole_db_handle = [];
 
     /**
      * Connect to the database
@@ -46,14 +50,26 @@ class BaseModel
      */
     private function conn()
     {
-        if (!isset(self::$_db_handle[$this->db_config_name])) {
-            $dbdriver = 'DB_' . Config::get('dbdriver');
-            include_once __DIR__ . '/' . $dbdriver . '.php';
+        if (SERVER_MODE === 'swoole') {
+            if ( isset($this->_swoole_db_handle[$this->db_config_name]) ) {
+                $this->db = $this->_swoole_db_handle[$this->db_config_name];
+            } else {
+                $dbdriver = 'DB_' . Config::get('dbdriver');
+                include_once __DIR__ . '/' . $dbdriver . '.php';
 
-            $dbdriver = '\\ePHP\\Model\\' . $dbdriver;
-            self::$_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
+                $dbdriver = '\\ePHP\\Model\\' . $dbdriver;
+                $this->_swoole_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
+            }
         } else {
-            $this->db = self::$_db_handle[$this->db_config_name];
+            if ( isset(self::$_db_handle[$this->db_config_name]) ) {
+                $this->db = self::$_db_handle[$this->db_config_name];
+            } else {
+                $dbdriver = 'DB_' . Config::get('dbdriver');
+                include_once __DIR__ . '/' . $dbdriver . '.php';
+
+                $dbdriver = '\\ePHP\\Model\\' . $dbdriver;
+                self::$_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
+            }
         }
 
         return $this->db;
@@ -536,12 +552,13 @@ class BaseModel
         $_field      = $this->field;
         $_join       = $this->join;
 
-        //清理使用过的变量
+        // 清理使用过的变量
         $this->where = '';
         $this->field = '*';
         $this->join  = '';
 
-        $this->conn(); //连接数据库
+        // 连接数据库
+        $this->conn();
         $this->sql = 'SELECT count(' . $_field . ') count FROM ' . $_table_name . $_join . $_where;
         return $this->db->fetch_object($this->sql)->count;
     }
