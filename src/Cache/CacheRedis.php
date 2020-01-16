@@ -110,8 +110,8 @@ class CacheRedis
         return $this->connection->flushDb();
     }
 
-    // function __destruct()
-    // {
-    //     $this->connection->close();
-    // }
+    function __destruct()
+    {
+        $this->connection->close();
+    }
 }

@@ -32,7 +32,21 @@ class Cache
     public static function init()
     {
         // !self::$_instance instanceof self
-        if (!isset(self::$instance)) {
+        if (SERVER_MODE === 'swoole') {
+            self::$instance = new self();
+
+            // 使用哪种方式的cache
+            $cache_driver = Config::get('cache_driver');
+
+            // 兼容predis(PHP扩展), phpredis(C扩展)
+            $type = $cache_driver;
+            if ($cache_driver === 'predis') {
+                $cache_driver = 'redis';
+            }
+
+            $cache_driver = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
+            self::$instance->handle = new $cache_driver($type);
+        } else if (!isset(self::$instance)) { // php-fpm
             self::$instance = new self();
 
             // 使用哪种方式的cache
