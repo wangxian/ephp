@@ -3,18 +3,10 @@
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
-use ePHP\Model\DBPool;
 
 class DB_mysqlco
 {
     public $db = false;
-
-    /**
-     * Default db config
-     *
-     * @var string
-     */
-    public $db_config = 'default';
 
     /**
      * Current db config
@@ -39,8 +31,6 @@ class DB_mysqlco
 
     function __construct($db_config = 'default')
     {
-        $this->db_config = $db_config;
-
         if (false == ($config = Config::get('dbconfig.' . $db_config))) {
             \throw_error('invalid database configuration', 12005);
         }
@@ -53,18 +43,17 @@ class DB_mysqlco
 
         // Set default value
         $this->config = $config + array(
-            'host'      => '127.0.0.1',
-            'user'      => '',
-            'password'  => '',
-            'database'  => '',
-            'port'      => 3306,
-            'charset'   => 'utf8',
-            'tb_prefix' => '',
-            'timeout'   => 3,
+                'host'      => '127.0.0.1',
+                'user'      => '',
+                'password'  => '',
+                'database'  => '',
+                'port'      => 3306,
+                'charset'   => 'utf8',
+                'tb_prefix' => '',
+                'timeout'   => 3
+            );
 
-            'idle_pool_size'=> 1,
-            'max_pool_size'=> 2
-        );
+        $this->reconnect();
     }
 
     private function reconnect()
@@ -72,38 +61,10 @@ class DB_mysqlco
         $db = new \Swoole\Coroutine\MySQL();
 
         if ( !$db->connect($this->config) ) {
-            \throw_error('Can not connect to MySQL server', 12006);
+            \throw_error('Can not connect to MySQL server, message: ' . $db->connect_error, 12006);
         }
 
         $this->db = $db;
-    }
-
-    /**
-     * Get one MySQL connect from pool
-     *
-     * @return bool
-     */
-    private function prepareDB()
-    {
-        $dbpool = DBPool::init($this->db_config);
-        // var_dump($dbpool->cap + $dbpool->activeCount, $dbpool->queue->isEmpty(), $dbpool->queue->count());
-
-        if ($dbpool->queue->isEmpty() && ($dbpool->cap + $dbpool->activeCount >= $this->config['max_pool_size'])) {
-            \throw_error('MySQL pool is empty...', 12009);
-        }
-
-        if ($dbpool->cap < $this->config['idle_pool_size']
-            || ($dbpool->queue->isEmpty() && $dbpool->cap < $this->config['max_pool_size'])
-        ) {
-            // var_dump('........................reconnect........................');
-            $this->reconnect();
-            $dbpool->activeCount++;
-            return false;
-        } else {
-            // var_dump('........................using pool........................');
-            $this->db = $dbpool->out($this->config['idle_pool_size']);
-            return true;
-        }
     }
 
     /**
@@ -118,15 +79,6 @@ class DB_mysqlco
             wlog('SQL-Log', $sql);
         }
 
-        // Prepare one MySQL client connect
-        $isFromPool = $this->prepareDB();
-
-        // If disconnect, Must connection
-        if (!$this->db->connected) {
-            // var_dump('........................mysql disconnected........................');
-            $this->reconnect();
-        }
-
         $this->db->setDefer();
         $this->db->query($sql);
         $result = $this->db->recv();
@@ -134,20 +86,11 @@ class DB_mysqlco
         // Fix Lost connection to MySQL server during query
         // MySQL server has gone away
         if($this->db->errno == 2006 || $this->db->errno == 2013) {
-            // var_dump('........................mysql go away........................');
             $this->reconnect();
 
             $this->db->setDefer();
             $this->db->query($sql);
             $result = $this->db->recv();
-        }
-
-        // Put db connction to pool
-        // If it is new client, queue in, else put pool client back
-        if ($isFromPool) {
-            DBPool::init($this->db_config)->back($this->db);
-        } else {
-            DBPool::init($this->db_config)->in($this->db);
         }
 
         if ($this->db->errno == 0) {
@@ -246,6 +189,8 @@ class DB_mysqlco
      */
     public function escape_string($str)
     {
+        // Not support
+        // return $this->db->escape($str);
         return addslashes($str);
     }
 
@@ -257,7 +202,11 @@ class DB_mysqlco
      */
     public function autocommit($f)
     {
-        return true;
+        if ($f) {
+            return $this->db->commit();
+        } else {
+            return $this->db->begin();
+        }
     }
 
     /*
@@ -267,7 +216,7 @@ class DB_mysqlco
      */
     public function commit()
     {
-        return true;
+        return $this->db->commit();
     }
 
     /*
@@ -277,6 +226,11 @@ class DB_mysqlco
      */
     public function rollback()
     {
-        return true;
+        return $this->db->rollback();
+    }
+
+    function __destruct()
+    {
+        $this->db->close();
     }
 }
