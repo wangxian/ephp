@@ -118,7 +118,14 @@ EOT;
     {
         // 非STDOUT_LOG模式，不打印
         if ( getenv('STDOUT_LOG') ) {
+            // 特别情况下 REMOTE_ADDR, REMOTE_PORT 没有被赋值
+            if ( !isset($_SERVER['REMOTE_ADDR']) ) {
+                $_SERVER['REMOTE_ADDR'] = 'UNKNOW_ADDR';
+                $_SERVER['REMOTE_PORT'] = 'UNKNOW_PORT';
+                $_SERVER['REQUEST_URI'] = 'UNKNOW_REQUEST_URI';
+            }
             echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36mGET {$_SERVER['REQUEST_URI']}\033[0m\n";
+            echo 'SERVER=' . json_encode($_SERVER) . "\n------\n";
         }
     }
 
@@ -156,18 +163,21 @@ EOT;
         define('SERVER_MODE', 'swoole');
 
         $this->config = $config + [
-            'host' => '0.0.0.0',
-            'port' => '8000',
-            'task_worker_num' => 0,
-            'enable_websocket'=> false
-        ];
+                'host' => '0.0.0.0',
+                'port' => '8000',
+                'task_worker_num' => 0,
+                'enable_websocket'=> false
+            ];
 
         // Start websocket or http server
         if ( empty($config['enable_websocket']) ) {
             $this->server = new \Swoole\Http\Server($this->config['host'], $this->config['port']);
         } else {
             $this->config['open_http_protocol'] = true;
-            $this->server = new \Swoole\WebSocket\Server($config['host'], $config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
+            // 参考文档 https://wiki.swoole.com/#/server/methods
+            // 这里推荐使用SWOOLE_PROCESS模式，当worker挂掉时，fd连接并不会一起断掉，manger会重新创建worker且保持fd不变
+            // 因为fd是由reactor进行管理的，这样不会影响websocketFrameContext缓存的映射关系，也不会影响应用中全局 如共享table数据，因为fd并没有变化
+            $this->server = new \Swoole\WebSocket\Server($this->config['host'], $this->config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
         }
 
         $this->server->set($this->config);
@@ -339,8 +349,8 @@ EOT;
     {
         // STDOUT_LOG 开启才显示日志
         if ( getenv('STDOUT_LOG') ) {
-            echo date('Y-m-d H:i:s') . " |\033[31m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
-            echo date('Y-m-d H:i:s') . " |\033[31m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[32m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[32m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
@@ -372,7 +382,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if ( getenv('STDOUT_LOG') ) {
-            echo date('Y-m-d H:i:s') . " |\033[31m ...... http worker process start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
+            echo date('Y-m-d H:i:s') . " |\033[32m ...... http worker process start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
@@ -430,8 +440,6 @@ EOT;
      */
     public function onOpen(\Swoole\WebSocket\Server $server, \Swoole\Http\Request $request)
     {
-        // echo "[websocket][onopen]server: handshake success with fd{$request->fd} url={$request->server['request_uri']}?{$request->server['query_string']}\n";
-
         // Compat fpm server
         $this->_compatFPM($request);
 
@@ -448,12 +456,17 @@ EOT;
                 'controller_class' => $controller_class
             ];
 
-            // echo 'pid='. getmypid() . ', fd=' . implode(',', array_keys(self::$websocketFrameContext))
-            //     . ', connections=' . count($this->server->connections) . "\n";
+            if ( getenv('STDOUT_LOG') ) {
+                echo date('Y-m-d H:i:s') . " |\033[34m [websocket][onopen]fd{$request->fd}, pid=". getmypid() .", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\033[0m\n";
+                echo '>>> pid='. getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext))
+                    . ', connections=' . count(self::$websocketFrameContext) . "\n";
+                echo '>>> GET=' . json_encode($_GET, JSON_UNESCAPED_UNICODE) . "\n------\n";
+            }
 
             call_user_func([new $controller_class(), 'onOpen'], $server, $request);
+        } else {
+            $server->close($request->fd);
         }
-
     }
 
     /**
@@ -465,18 +478,17 @@ EOT;
      */
     public function onMessage(\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame)
     {
-        // echo "[websocket][onmessage]receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
 
         if ( empty(self::$websocketFrameContext[$frame->fd]) ) {
             if ( getenv('STDOUT_LOG') ) {
-                echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onMessage] WebSocket has been stoped before frame sending data\033[0m \n";
+                echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\033[0m \n";
             }
             return;
         }
 
-        // Save websocket connection Context
+        // Get websocket connection Context
         $context = self::$websocketFrameContext[$frame->fd];
 
         // Restore global data
@@ -484,6 +496,11 @@ EOT;
         $_GET    = $_REQUEST = $context['get'];
         $_COOKIE = $context['cookie'];
         $controller_class = $context['controller_class'];
+
+        if ( getenv('STDOUT_LOG') && $frame->data != '{"action":"ping"}' ) {
+            echo date('Y-m-d H:i:s') . " |\033[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\033[0m\n";
+            echo 'GET=' . json_encode($context['get']) . "\n------\n";
+        }
 
         call_user_func([new $controller_class(), 'onMessage'], $server, $frame);
     }
@@ -500,14 +517,17 @@ EOT;
         // echo "[websocket][onclose]client fd{$fd} closed\n";
 
         if ( empty(self::$websocketFrameContext[$fd]) ) {
-            if ( getenv('STDOUT_LOG') ) {
-                echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose] fd{$fd} WebSocket has been stoped...\033[0m \n";
-            }
+            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\033[0m \n";
             return;
         }
 
-        // Save websocket connection Context
+        // Get websocket connection Context
         $context = self::$websocketFrameContext[$fd];
+
+        if ( getenv('STDOUT_LOG') ) {
+            echo date('Y-m-d H:i:s') . " |\033[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\033[0m \n";
+            echo 'GET=' . json_encode($context['get']) . "\n------\n";
+        }
 
         // Restore global data
         $_POST   = $_SERVER = [];
