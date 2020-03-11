@@ -16,29 +16,43 @@ class BaseModel
     // Default dbconfig name, AS default, master, slave
     protected $db_config_name = 'default';
 
-    private $field   = '*';
+    private $field = '*';
     private $orderby = '';
     private $groupby = '';
-    private $having  = '';
-    private $limit   = '';
-    private $where   = '';
-    private $join    = '';
-    private $data    = array();
+    private $having = '';
+    private $limit = '';
+    private $where = '';
+    private $join = '';
+    private $data = array();
 
-    // Expire seconds
+    /**
+     * Expire seconds
+     * @var int
+     */
     private $expire = -1;
 
-    // Raw query SQL
+    /**
+     * Raw query SQL
+     * @var string
+     */
     private $query_sql = '';
 
-
-    // Model Db handle
+    /**
+     * Model Db handle
+     * @var mixed
+     */
     private $db = null;
 
-    // Standard fpm db handle
+    /**
+     * Standard fpm db handle
+     * @var array
+     */
     static private $_db_handle = [];
 
-    // Swoole mode db handle
+    /**
+     * Swoole mode db handle
+     * @var array
+     */
     private $_swoole_db_handle = [];
 
     /**
@@ -47,27 +61,28 @@ class BaseModel
      * 该方法不需要直接调用, 在使用时每个数据库只创建一个链接，以后直接复用
      *
      * @access private
+     * @return $db
      */
     private function conn()
     {
         if (SERVER_MODE === 'swoole') {
-            if ( isset($this->_swoole_db_handle[$this->db_config_name]) ) {
+            if (isset($this->_swoole_db_handle[$this->db_config_name])) {
                 $this->db = $this->_swoole_db_handle[$this->db_config_name];
             } else {
                 $dbdriver = 'DB_' . Config::get('dbdriver');
                 include_once __DIR__ . '/' . $dbdriver . '.php';
 
-                $dbdriver = '\\ePHP\\Model\\' . $dbdriver;
+                $dbdriver                                       = '\\ePHP\\Model\\' . $dbdriver;
                 $this->_swoole_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
             }
         } else {
-            if ( isset(self::$_db_handle[$this->db_config_name]) ) {
+            if (isset(self::$_db_handle[$this->db_config_name])) {
                 $this->db = self::$_db_handle[$this->db_config_name];
             } else {
                 $dbdriver = 'DB_' . Config::get('dbdriver');
                 include_once __DIR__ . '/' . $dbdriver . '.php';
 
-                $dbdriver = '\\ePHP\\Model\\' . $dbdriver;
+                $dbdriver                                = '\\ePHP\\Model\\' . $dbdriver;
                 self::$_db_handle[$this->db_config_name] = $this->db = new $dbdriver($this->db_config_name);
             }
         }
@@ -77,11 +92,9 @@ class BaseModel
 
     /**
      * 生成SELECT类型的SQL语句
-     *
      * 不需要直接调用
-     *
      * @access private
-     * @return string $sql 查询sql语句
+     * @return string
      */
     private function _read_sql()
     {
@@ -111,7 +124,7 @@ class BaseModel
      * 获取表名
      *
      * @access private
-     * @return string $table_name 表名
+     * @return string
      */
     private function _get_table_name()
     {
@@ -119,10 +132,10 @@ class BaseModel
             // 如果是在实例化后使用，则使用当前模型名称
             $current_class = get_class($this);
             if ($current_class != 'model') {
-                $this->table_name = strtolower(substr($current_class, strrpos($current_class, '\\')+1, -5));
+                $this->table_name = strtolower(substr($current_class, strrpos($current_class, '\\') + 1, -5));
 
                 // 如果设置了表前缀
-                if (true == ($tb_prefix = Config::get('dbconfig.'.$this->db_config_name . '.tb_prefix'))) {
+                if (true == ($tb_prefix = Config::get('dbconfig.' . $this->db_config_name . '.tb_prefix'))) {
                     $this->table_name = $tb_prefix . $this->table_name;
                 }
             } else {
@@ -155,8 +168,8 @@ class BaseModel
     /**
      * 查询的表名
      *
-     * @param  string $table_name 表名
-     * @return string $this
+     * @param string $table_name 表名
+     * @return $this
      */
     public function table($table_name)
     {
@@ -179,7 +192,7 @@ class BaseModel
      * 和dbconfig配置一致
      *
      * @param string $db_config_name
-     * @return object $this
+     * @return $this
      */
     public function dbconfig($db_config_name)
     {
@@ -191,6 +204,7 @@ class BaseModel
      * 指定数据缓存时间，单位秒
      *
      * @param int $expire 缓存有效期。大于0：缓存时间，0：永久缓存，-1：不缓存
+     * @return $this
      */
     public function cache($expire)
     {
@@ -201,8 +215,8 @@ class BaseModel
     /**
      * 要查询的数据库字段，也就是SQL中select后的字段列表
      *
-     * @param  string $field 要查询的字段列表
-     * @return object $this
+     * @param string $field 要查询的字段列表
+     * @return $this
      */
     public function select($field)
     {
@@ -214,7 +228,7 @@ class BaseModel
      * select方法的别名，要查询的数据库字段
      *
      * @param string $field 要查询的字段列表
-     * @return object $this
+     * @return $this
      */
     public function field($field)
     {
@@ -226,12 +240,12 @@ class BaseModel
      *
      * @param int $offset 如果$limit=0则offset作为limit使用
      * @param int $limit 每次查询的数据量
-     * @return object $this
+     * @return $this
      */
     public function limit($offset, $limit = 0)
     {
         if ($limit > 0) {
-            $this->limit = $offset .','. $limit;
+            $this->limit = $offset . ',' . $limit;
         } else {
             $this->limit = $offset;
         }
@@ -243,8 +257,8 @@ class BaseModel
      * 写入数据库的内容(for insert|update)
      *
      * @param mixed $data 要写入数据库的内容
-     * @param array $replacement 当data是字符串时，按照位置替换问号“？”
-     * @return object $this
+     * @param array $replacement 当data是字符串时，按照位置替换问号「?」
+     * @return $this
      */
     public function set($data, $replacement = array())
     {
@@ -276,7 +290,7 @@ class BaseModel
      *
      * @param mixed $data 要写入数据库的内容。
      * @param array $replacement 当data是字符串时，按照位置替换问号“？”
-     * @return object $this
+     * @return $this
      */
     public function data($data, $replacement = array())
     {
@@ -286,9 +300,9 @@ class BaseModel
     /**
      * SQL中的where条件
      *
-     * @param  mixed $where 可以是一个字符串或数组。
-     * @param  array $replacement 当where是字符串时，按照位置替换问号“？”
-     * @return object $this
+     * @param mixed $where 可以是一个字符串或数组。
+     * @param array $replacement 当where是字符串时，按照位置替换问号“？”
+     * @return $this
      */
     public function where($where, $replacement = array())
     {
@@ -300,10 +314,10 @@ class BaseModel
             $where = implode(' AND ', $tmp);
         } elseif (is_string($where) && !empty($replacement)) {
             // 支持model->where("id>? and name=?", [12, "name"])
-            $i = 0;
+            $i     = 0;
             $where = preg_replace_callback(["/(\?)/"], function () use (&$i, &$replacement) {
                 $v = $replacement[$i++];
-                return !is_string($v) ? ( !is_null($v) ? $v : "''" ) : "'" . $this->escape_string($v) . "'";
+                return !is_string($v) ? (!is_null($v) ? $v : "''") : "'" . $this->escape_string($v) . "'";
             }, $where);
         }
 
@@ -322,7 +336,7 @@ class BaseModel
      * SQL left join
      *
      * @param string $join_string
-     * @param object $this
+     * @param $this
      */
     public function leftjoin($join_string)
     {
@@ -334,7 +348,7 @@ class BaseModel
      * SQL left join
      *
      * @param string $join
-     * @param object $this
+     * @param $this
      */
     public function rightjoin($join_string)
     {
@@ -345,8 +359,8 @@ class BaseModel
     /**
      * SQL order by
      *
-     * @param  string $orderby
-     * @return object $this
+     * @param string $orderby
+     * @return $this
      */
     public function orderby($orderby)
     {
@@ -358,7 +372,7 @@ class BaseModel
      * SQL group by
      *
      * @param string $groupby 分组
-     * @return object $this
+     * @return $this
      */
     public function groupby($groupby)
     {
@@ -370,7 +384,7 @@ class BaseModel
      * SQL having
      *
      * @param string $having
-     * @return object $this
+     * @return $this
      */
     public function having($having)
     {
@@ -391,7 +405,7 @@ class BaseModel
     /**
      * 插入返回的主键ID
      *
-     * @return int $insert_id
+     * @return int
      */
     public function insert_id()
     {
@@ -486,6 +500,7 @@ class BaseModel
      * 查询基础方法
      *
      * @param string $type 查询类型,fetch_array fetch_arrays...
+     * @return mixed
      */
     protected function _find($type)
     {
@@ -540,10 +555,9 @@ class BaseModel
 
     /**
      * 统计数据条数
+     * 示例: $m->table('test')->select('id')->where('id<12')->count();
      *
-     * 示例:$m->table('test')->select('id')->where('id<12')->count();
-     *
-     * @return int $count
+     * @return int
      */
     public function count()
     {
@@ -563,7 +577,7 @@ class BaseModel
         return $this->db->fetch_object($this->sql)->count;
     }
 
-// ------------------------------------------------------------------------------insert update delete操作
+    // ------------------------------------------------------------------------------insert update delete操作
 
     /**
      * 删除一行或多行，如果希望删除所有行,使用delete(true)
@@ -667,6 +681,7 @@ class BaseModel
      *
      * @param string $type 类型
      * @param string $update_string 更新字段
+     * @return int
      */
     protected function _insert($type, $update_string = '')
     {
