@@ -11,7 +11,7 @@ trait Single
     /**
      * Dynamically handle calls to the class.
      *
-     * @return \ePHP\Core\Server
+     * @return $this
      */
     public static function init()
     {
