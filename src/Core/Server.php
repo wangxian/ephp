@@ -124,7 +124,7 @@ EOT;
                 $_SERVER['REMOTE_PORT'] = 'UNKNOW_PORT';
                 $_SERVER['REQUEST_URI'] = 'UNKNOW_REQUEST_URI';
             }
-            echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36mGET {$_SERVER['REQUEST_URI']}\033[0m\n";
+            echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36m{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} ". http_build_query($_POST) ."\033[0m\n";
             echo 'SERVER=' . json_encode($_SERVER) . "\n------\n";
         }
     }
