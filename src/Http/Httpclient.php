@@ -59,7 +59,7 @@ class Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     public function get($url, $params = array(), $options = array())
     {
@@ -73,7 +73,7 @@ class Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     public function post($url, $params = array(), $options = array())
     {
@@ -87,7 +87,7 @@ class Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     public function put($url, $params = array(), $options = array())
     {
@@ -101,7 +101,7 @@ class Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     public function patch($url, $params = array(), $options = array())
     {
@@ -115,7 +115,7 @@ class Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     public function delete($url, $params = array(), $options = array())
     {
@@ -130,7 +130,7 @@ class Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     protected function request($url, $method = self::GET, $params = array(), $options = array())
     {
@@ -213,16 +213,10 @@ class Httpclient
 
         // Separate headers and body
         $headerSize = $response['curl_info']['header_size'];
-        $header = substr($response['response'], 0, $headerSize);
-        $body = substr($response['response'], $headerSize);
+        $header = trim(substr($response['response'], 0, $headerSize));
+        $body = trim(substr($response['response'], $headerSize));
 
-        return (object)array(
-            'curl_info'    => $response['curl_info'],
-            'content_type' => $response['curl_info']['content_type'],
-            'status_code'  => $response['curl_info']['http_code'],
-            'headers'      => $this->splitHeaders($header),
-            'body'         => $body,
-        );
+        return new HttpclientResponse($body, $response['curl_info']['http_code'], $this->splitHeaders($header), $response['curl_info']['content_type'], $response['curl_info']);
     }
 
     /**
@@ -252,7 +246,7 @@ class Httpclient
     {
         $headers = array();
 
-        $lines = explode("\n", trim($rawHeaders));
+        $lines = explode("\n", $rawHeaders);
         $headers['HTTP'] = array_shift($lines);
 
         foreach ($lines as $h) {
@@ -263,7 +257,7 @@ class Httpclient
             }
         }
 
-        return (object)$headers;
+        return $headers;
     }
 
     /**
@@ -281,11 +275,9 @@ class Httpclient
 
         $curlInfo = curl_getinfo($this->curl);
 
-        $results = array(
+        return array(
             'curl_info' => $curlInfo,
             'response' => $response,
         );
-
-        return $results;
     }
 }

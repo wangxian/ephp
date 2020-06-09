@@ -30,7 +30,7 @@ class HttpclientSwoole extends Httpclient
      * @param mixed  $params
      * @param array  $options
      *
-     * @return array
+     * @return HttpclientResponse
      */
     protected function request($url, $method = self::GET, $params = array(), $options = array())
     {
@@ -90,10 +90,6 @@ class HttpclientSwoole extends Httpclient
         // Close
         $cli->close();
 
-        return (object)array(
-            'status_code'  => $cli->statusCode,
-            // 'headers'      => [],
-            'body'         => $cli->body,
-        );
+        return new HttpclientResponse($cli->body, $cli->statusCode, $cli->getHeaders());
     }
 }
