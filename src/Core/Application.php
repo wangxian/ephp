@@ -11,7 +11,8 @@ class Application
     /**
      * Start run the application
      *
-     * @return null
+     * @return void
+     * @noinspection PhpRedundantCatchClauseInspection
      */
     function run()
     {
@@ -26,24 +27,27 @@ class Application
         }
 
         try {
-            $route = (\ePHP\Core\Route::init())->findRoute();
-            // dumpdie($route);
+            $route = (Route::init())->findRoute();
 
             if (empty($route)) {
                 \show_404();
             }
 
-            // 整理参数
-            $_GET['controller'] = $route[0];
-            $_GET['action']     = $route[1];
-
             $controller_name = $route[2];
-            $action_name     = $_GET['action'];
+            $action_name     = $route[1];
 
-            $_REQUEST  = array_merge($_GET, $_POST);
+            if (SERVER_MODE != 'swoole') {
+                $_GET['controller'] = $controller_name;
+                $_GET['action']     = $action_name;
+                $_REQUEST           = array_merge($_GET, $_POST);
+            } else {
+                \Swoole\Coroutine::getContext()['__$request']->get['controller'] = $controller_name;
+                \Swoole\Coroutine::getContext()['__$request']->get['action']     = $action_name;
+                \Swoole\Coroutine::getContext()['__$_REQUEST']                   = array_merge(\Swoole\Coroutine::getContext()['__$request']->get, \Swoole\Coroutine::getContext()['__$request']->post);
+            }
 
-            // 检查ACTION是否存在
-            if ( !method_exists($controller_name, $action_name) ) {
+            // Check action function is exist
+            if (!method_exists($controller_name, $action_name)) {
                 if (defined('RUN_ENV') && RUN_ENV == 'prod') {
                     \show_404();
                 } else {
@@ -51,9 +55,9 @@ class Application
                 }
             }
 
-            if (SERVER_MODE === 'fpm') {
+            if (SERVER_MODE !== 'swoole') {
                 call_user_func([new $controller_name(), $action_name]);
-            } else if (SERVER_MODE === 'swoole') {
+            } else {
                 try {
                     // $c_init = new $controller_name();
                     // // $c_init->request = $request;
@@ -62,14 +66,13 @@ class Application
                     // $c_init->{$action_name}();
                     call_user_func([new $controller_name(), $action_name]);
                 } catch (\Swoole\ExitException $e) {
-                    // 屏蔽exit异常，不输出任何信息
-                    return ;
+                    return; // 屏蔽exit异常，不输出任何信息
                 }
             }
         } catch (\ePHP\Exception\CommonException $e) {
             // ExitException don't show error message
             if ($e->getCode() === -99) {
-                return ;
+                return;
             }
             echo $e;
         }

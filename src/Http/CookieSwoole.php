@@ -17,7 +17,6 @@ class CookieSwoole
     public function set($name, $value, $expire = 604800, $path = '/', $domain = '')
     {
         if (empty($domain)) {
-            // $domain = '.' . $_SERVER['HTTP_HOST'];
             \Swoole\Coroutine::getContext()['__$response']->cookie($name, $value, $expire + time(), $path);
         } else {
             \Swoole\Coroutine::getContext()['__$response']->cookie($name, $value, $expire + time(), $path, $domain);

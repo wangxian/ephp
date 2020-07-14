@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedConstantInspection */
 
 namespace ePHP\Core;
 
@@ -47,7 +47,7 @@ class Server
     public $server;
 
     /**
-     * @var \ePHP\Core\Server
+     * @var Server
      */
     private static $instance;
 
@@ -65,7 +65,7 @@ class Server
     /**
      * Dynamically handle calls to the class.
      *
-     * @return \ePHP\Core\Server
+     * @return Server
      */
     public static function init()
     {
@@ -113,20 +113,12 @@ EOT;
 
     /**
      * 打印访问日志
-     * @return null
      */
     private function printAccessLog()
     {
         // 非STDOUT_LOG模式，不打印
         if (getenv('STDOUT_LOG')) {
-            // 特别情况下 REMOTE_ADDR, REMOTE_PORT 没有被赋值
-            if (!isset($_SERVER['REMOTE_ADDR'])) {
-                $_SERVER['REMOTE_ADDR']    = 'UNKNOW_ADDR';
-                $_SERVER['REMOTE_PORT']    = 'UNKNOW_PORT';
-                $_SERVER['REQUEST_URI']    = 'UNKNOW_REQUEST_URI';
-                $_SERVER['REQUEST_METHOD'] = 'UNKNOW_METHOD';
-            }
-            echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36m{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} " . http_build_query($_POST) . "\033[0m\n";
+            echo date('Y-m-d H:i:s') . " | \033[32m" . serverv('REMOTE_ADDR') . ":" . serverv('REMOTE_PORT') . " \033[0m | \033[36m" . serverv('REQUEST_METHOD') . ' ' . serverv('REQUEST_URI') . http_build_query(postv()) . "\033[0m\n";
             echo 'SERVER=' . json_encode($_SERVER) . "\n------\n";
         }
     }
@@ -136,7 +128,6 @@ EOT;
      *
      * @param string $host
      * @param int $port
-     * @return null
      */
     public function devServer(string $host, int $port)
     {
@@ -157,7 +148,7 @@ EOT;
      * Create a swoole server
      *
      * @param array $config server config
-     * @return \Swoole\Http\Server
+     * @return Server
      */
     public function createServer(array $config)
     {
@@ -200,7 +191,9 @@ EOT;
     {
         // Automatically instantiate this class
         if (class_exists("\App\Boot")) {
-            // Excute a boot instance
+            // Execute a boot instance
+            /** @noinspection PhpUndefinedNamespaceInspection */
+            /** @noinspection PhpUndefinedClassInspection */
             $boot = new \App\Boot();
 
             if (method_exists($boot, $event)) {
@@ -219,8 +212,6 @@ EOT;
 
     /**
      * Start swoole server
-     *
-     * @return null
      */
     public function start()
     {
@@ -252,34 +243,25 @@ EOT;
 
     /**
      * Compat fpm server
-     * Contains: `$_GET`, `$_POST`, `$_FILES`, `$_SERVER` etc.
      *
-     * @param \Swoole\Http\Request $request
+     * @param Request $request
      * @return void
      */
     private function _compatFPM(Request $request)
     {
-        // 不建议直接使用这个变量
-        // Override php globals array
-        // Store $_GET, $_POST ....
-        $_GET    = $request->get ?? [];
-        $_POST   = $request->post ?? [];
-        $_COOKIE = $request->cookie ?? [];
-        $_FILES  = $request->files ?? [];
-
         // 注入全局变量
         \Swoole\Coroutine::getContext()['__$request']        = $request;
         \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT'] = 0;
 
-        // 兼容php-fpm的$_SERVER
-        $_SERVER = [];
+        // 兼容php-fpm的$_SERVER，存入context中，使用`serverv()`获取
+        $serverValue = [];
         foreach ($request->server as $key => $value) {
-            $key           = strtoupper($key);
-            $_SERVER[$key] = $value;
+            $key               = strtoupper($key);
+            $serverValue[$key] = $value;
 
             // FIXED: swoole REQUEST_URI don't contains QUERY_STRING
-            if ($key === 'REQUEST_URI' && isset($_SERVER['QUERY_STRING'])) {
-                $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
+            if ($key === 'REQUEST_URI' && isset($serverValue['QUERY_STRING'])) {
+                $serverValue['REQUEST_URI'] .= '?' . $serverValue['QUERY_STRING'];
             }
         }
 
@@ -287,18 +269,20 @@ EOT;
         foreach ($request->header as $key => $value) {
             $key = strtoupper(str_replace('-', '_', $key));
             if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH') {
-                $_SERVER[$key] = $value;
+                $serverValue[$key] = $value;
             } else {
-                $_SERVER['HTTP_' . $key] = $value;
+                $serverValue['HTTP_' . $key] = $value;
             }
         }
+
+        \Swoole\Coroutine::getContext()['__$_SERVER'] = $serverValue;
     }
 
     /**
-     * Linsten http server onRequest
+     * Listen http server onRequest
      *
-     * @param \Swoole\Http\Request $request
-     * @param \Swoole\Http\Response $response
+     * @param Request $request
+     * @param Response $response
      */
     public function onRequest(Request $request, Response $response)
     {
@@ -310,19 +294,14 @@ EOT;
 
         $response->header('Server', 'ePHP/' . $this->version);
 
-        $filename = APP_PATH . '/public' . $_SERVER['PATH_INFO'];
+        $filename = APP_PATH . '/public' . serverv('PATH_INFO');
 
         // !in_array($extname, ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'ico'])
         // Try files, otherwise route to app
         if (!is_file($filename)) {
             ob_start();
-            (new \ePHP\Core\Application())->run();
+            (new Application())->run();
             $h = ob_get_clean();
-
-            // Fixed output o byte
-            // if (strlen($h) === 0) {
-            //     $h = ' ';
-            // }
 
             $response->end($h);
         } else {
@@ -433,11 +412,11 @@ EOT;
     /**
      * WebSocket on open
      *
-     * @param Swoole\WebSocket\Server $server
-     * @param \Swoole\Http\Request $request
+     * @param \Swoole\WebSocket\Server $server
+     * @param Request $request
      * @return void
      */
-    public function onOpen(\Swoole\WebSocket\Server $server, \Swoole\Http\Request $request)
+    public function onOpen(\Swoole\WebSocket\Server $server, Request $request)
     {
         // Compat fpm server
         $this->_compatFPM($request);
@@ -446,11 +425,11 @@ EOT;
 
         // filter websocket router class
         // route struct: [$controller_name, $controller_class]
-        $controller_class = (\ePHP\Core\Route::init())->findWebSocketRoute();
+        $controller_class = (Route::init())->findWebSocketRoute();
         if (!empty($controller_class)) {
             // Save websocket connection Context
             self::$websocketFrameContext[$request->fd] = [
-                'get'              => $_GET,
+                'get'              => getv(),
                 'cookie'           => $_COOKIE,
                 'controller_class' => $controller_class
             ];
@@ -459,7 +438,7 @@ EOT;
                 echo date('Y-m-d H:i:s') . " |\033[34m [websocket][onopen]fd{$request->fd}, pid=" . getmypid() . ", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\033[0m\n";
                 echo '>>> pid=' . getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext))
                     . ', connections=' . count(self::$websocketFrameContext) . "\n";
-                echo '>>> GET=' . json_encode($_GET, JSON_UNESCAPED_UNICODE) . "\n------\n";
+                echo '>>> GET=' . json_encode(getv(), JSON_UNESCAPED_UNICODE) . "\n------\n";
             }
 
             call_user_func([new $controller_class(), 'onOpen'], $server, $request);
@@ -471,9 +450,8 @@ EOT;
     /**
      * WebSocket on message
      *
-     * @param Swoole\WebSocket\Server $server
-     * @param [type] $frame
-     * @return void
+     * @param \Swoole\WebSocket\Server $server
+     * @param $frame
      */
     public function onMessage(\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame)
     {
@@ -486,6 +464,8 @@ EOT;
             }
             return;
         }
+
+        var_dump(\Swoole\Coroutine::getContext());
 
         // Get websocket connection Context
         $context = self::$websocketFrameContext[$frame->fd];

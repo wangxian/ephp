@@ -49,14 +49,14 @@ class Http
      */
     public static function limitRefresh($seconds = 5)
     {
-        $cookie_name   = 'limitRefresh_' . md5($_SERVER['PHP_SELF']);
-        $cache_control = isset($_SERVER['HTTP_CACHE_CONTROL']) ? $_SERVER['HTTP_CACHE_CONTROL'] : '';
+        $cookie_name   = 'limitRefresh_' . md5(serverv('PHP_SELF'));
+        $cache_control = serverv('HTTP_CACHE_CONTROL');
         if (isset($_COOKIE[$cookie_name]) && ($_COOKIE[$cookie_name] + $seconds > time()) && $cache_control != 'no-cache') {
             header('HTTP/1.1 304 Not Modified');
             exit;
         } else {
-            $expire = $_SERVER['REQUEST_TIME'] + $seconds;
-            setcookie($cookie_name, $_SERVER['REQUEST_TIME'], $expire + 3600, '/', $_SERVER['SERVER_NAME']);
+            $expire = serverv('REQUEST_TIME', 0) + $seconds;
+            setcookie($cookie_name, serverv('REQUEST_TIME'), $expire + 3600, '/', serverv('SERVER_NAME'));
             header('Last-Modified: ' . date('D,d M Y H:i:s', $expire) . ' GMT');
             header('Expires: ' . date('D,d M Y H:i:s', $expire) . ' GMT');
         }
@@ -212,13 +212,12 @@ class Http
      *  - array('user'=>'yuanwei',
      *       'pwd'=>'123456');
      *
-     * @return array
+     * @return mixed|array
      */
     public static function getAuthUser()
     {
-        if (isset($_SERVER['PHP_AUTH_USER'])) {
-            return array('user' => $_SERVER['PHP_AUTH_USER'],
-                'pwd'               => $_SERVER['PHP_AUTH_PW']);
+        if (serverv('PHP_AUTH_USER')) {
+            return array('user' => serverv('PHP_AUTH_USER'), 'pwd' => serverv('PHP_AUTH_PW'));
         } else {
             return false;
         }

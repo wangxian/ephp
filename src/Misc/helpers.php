@@ -389,7 +389,7 @@ function requestv($key = '', $default = '', $callback = 'trim')
  */
 function serverv($key = '', $default = '')
 {
-    $serverValue = SERVER_MODE != 'swoole' ? $_SERVER : (\Swoole\Coroutine::getContext()['__$request']->server ?? []);
+    $serverValue = SERVER_MODE != 'swoole' ? $_SERVER : (\Swoole\Coroutine::getContext()['__$_SERVER'] ?? []);
 
     // Get all values
     if (!$key) {

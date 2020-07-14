@@ -33,7 +33,7 @@ class BaseView
     protected function __filename($file)
     {
         if (empty($file)) {
-            $file = $_GET['controller'] . '/' . $_GET['action'] . '.ptpl';
+            $file = getv('controller') . '/' . getv('action') . '.ptpl';
         }
 
         return $file;
