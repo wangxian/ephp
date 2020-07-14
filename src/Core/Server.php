@@ -1,4 +1,5 @@
 <?php
+
 namespace ePHP\Core;
 
 use \Swoole\Http\Request;
@@ -56,8 +57,8 @@ class Server
      * @var array
      */
     public $config = [
-        'host' => '0.0.0.0',
-        'port' => '8000',
+        'host'            => '0.0.0.0',
+        'port'            => '8000',
         'task_worker_num' => 0
     ];
 
@@ -104,7 +105,7 @@ Press Ctrl-C to quit.
 EOT;
 
         echo "\033[32m>>> Http Server is enabled\033[0m \n";
-        if ( !empty($this->config['enable_websocket']) ) {
+        if (!empty($this->config['enable_websocket'])) {
             echo "\033[32m>>> WebSocket Server is enabled\033[0m \n";
         }
         echo "-----------------------------------\n";
@@ -117,15 +118,15 @@ EOT;
     private function printAccessLog()
     {
         // 非STDOUT_LOG模式，不打印
-        if ( getenv('STDOUT_LOG') ) {
+        if (getenv('STDOUT_LOG')) {
             // 特别情况下 REMOTE_ADDR, REMOTE_PORT 没有被赋值
-            if ( !isset($_SERVER['REMOTE_ADDR']) ) {
-                $_SERVER['REMOTE_ADDR'] = 'UNKNOW_ADDR';
-                $_SERVER['REMOTE_PORT'] = 'UNKNOW_PORT';
-                $_SERVER['REQUEST_URI'] = 'UNKNOW_REQUEST_URI';
+            if (!isset($_SERVER['REMOTE_ADDR'])) {
+                $_SERVER['REMOTE_ADDR']    = 'UNKNOW_ADDR';
+                $_SERVER['REMOTE_PORT']    = 'UNKNOW_PORT';
+                $_SERVER['REQUEST_URI']    = 'UNKNOW_REQUEST_URI';
                 $_SERVER['REQUEST_METHOD'] = 'UNKNOW_METHOD';
             }
-            echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36m{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} ". http_build_query($_POST) ."\033[0m\n";
+            echo date('Y-m-d H:i:s') . " | \033[32m{$_SERVER['REMOTE_ADDR']}:{$_SERVER['REMOTE_PORT']}\033[0m | \033[36m{$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} " . http_build_query($_POST) . "\033[0m\n";
             echo 'SERVER=' . json_encode($_SERVER) . "\n------\n";
         }
     }
@@ -133,8 +134,8 @@ EOT;
     /**
      * Start a PHP Development Server
      *
-     * @param  string $host
-     * @param  int    $port
+     * @param string $host
+     * @param int $port
      * @return null
      */
     public function devServer(string $host, int $port)
@@ -155,7 +156,7 @@ EOT;
     /**
      * Create a swoole server
      *
-     * @param  array $config server config
+     * @param array $config server config
      * @return \Swoole\Http\Server
      */
     public function createServer(array $config)
@@ -164,14 +165,14 @@ EOT;
         define('SERVER_MODE', 'swoole');
 
         $this->config = $config + [
-                'host' => '0.0.0.0',
-                'port' => '8000',
-                'task_worker_num' => 0,
-                'enable_websocket'=> false
+                'host'             => '0.0.0.0',
+                'port'             => '8000',
+                'task_worker_num'  => 0,
+                'enable_websocket' => false
             ];
 
         // Start websocket or http server
-        if ( empty($config['enable_websocket']) ) {
+        if (empty($config['enable_websocket'])) {
             $this->server = new \Swoole\Http\Server($this->config['host'], $this->config['port']);
         } else {
             $this->config['open_http_protocol'] = true;
@@ -190,20 +191,22 @@ EOT;
     }
 
     /**
-     * Add envent Listener
+     * Trigger event
      *
      * @param string $event
      * @return void
      */
-    public function add_event_listener(string $event)
+    private function trigger_event(string $event)
     {
         // Automatically instantiate this class
-        if ( class_exists("\App\Boot") ) {
+        if (class_exists("\App\Boot")) {
             // Excute a boot instance
             $boot = new \App\Boot();
 
-            if ( method_exists($boot, $event) ) {
-                call_user_func([$boot, $event], $this->server);
+            if (method_exists($boot, $event)) {
+                $args = func_get_args();
+                array_shift($args);
+                call_user_func_array([$boot, $event], $args);
             }
 
             // Listen Background task listener
@@ -232,26 +235,20 @@ EOT;
         $this->server->on('workerError', [$this, 'onWorkerError']);
 
         // listen websocket
-        if ( !empty($this->config['enable_websocket']) ) {
+        if (!empty($this->config['enable_websocket'])) {
             $this->server->on('open', [$this, 'onOpen']);
             $this->server->on('message', [$this, 'onMessage']);
-            $this->server->on('close', [$this, 'onClose']);
         }
 
-        // Add event Listener
-        $this->add_event_listener('onBoot');
+        $this->server->on('close', [$this, 'onConnect']);
+        $this->server->on('close', [$this, 'onClose']);
+
+        // Trigger onBoot event
+        $this->trigger_event('onBoot', $this->server);
 
         // Start a new http server
         $this->server->start();
     }
-
-    // public function stop()
-    // {
-    // }
-
-    // public function reload()
-    // {
-    // }
 
     /**
      * Compat fpm server
@@ -271,13 +268,13 @@ EOT;
         // $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
 
         // 注入全局变量
-        $GLOBALS['__$request']  = $request;
+        $GLOBALS['__$request']        = $request;
         $GLOBALS['__$DB_QUERY_COUNT'] = 0;
 
         // 兼容php-fpm的$_SERVER
         $_SERVER = [];
         foreach ($request->server as $key => $value) {
-            $key = strtoupper($key);
+            $key           = strtoupper($key);
             $_SERVER[$key] = $value;
 
             // FIXED: swoole REQUEST_URI don't contains QUERY_STRING
@@ -300,8 +297,8 @@ EOT;
     /**
      * Linsten http server onRequest
      *
-     * @param  \Swoole\Http\Request  $request
-     * @param  \Swoole\Http\Response $response
+     * @param \Swoole\Http\Request $request
+     * @param \Swoole\Http\Response $response
      */
     public function onRequest(Request $request, Response $response)
     {
@@ -311,13 +308,13 @@ EOT;
         // 注入全局变量
         $GLOBALS['__$response'] = $response;
 
-        $response->header('Server', 'ePHP/'. $this->version);
+        $response->header('Server', 'ePHP/' . $this->version);
 
-        $filename = APP_PATH . '/public'. $_SERVER['PATH_INFO'];
+        $filename = APP_PATH . '/public' . $_SERVER['PATH_INFO'];
 
         // !in_array($extname, ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'ico'])
         // Try files, otherwise route to app
-        if ( !is_file($filename) ) {
+        if (!is_file($filename)) {
             ob_start();
             (new \ePHP\Core\Application())->run();
             $h = ob_get_clean();
@@ -330,7 +327,7 @@ EOT;
             $response->end($h);
         } else {
             $extname = substr($filename, strrpos($filename, '.') + 1);
-            if ( isset( $this->contentType[$extname] ) ) {
+            if (isset($this->contentType[$extname])) {
                 $response->header('Content-Type', $this->contentType[$extname]);
             }
             $response->sendfile($filename);
@@ -349,13 +346,13 @@ EOT;
     public function onStart(\Swoole\Server $server)
     {
         // STDOUT_LOG 开启才显示日志
-        if ( getenv('STDOUT_LOG') ) {
+        if (getenv('STDOUT_LOG')) {
             echo date('Y-m-d H:i:s') . " |\033[32m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
             echo date('Y-m-d H:i:s') . " |\033[32m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
-        $this->add_event_listener('onStart');
+        $this->trigger_event('onStart', $server);
     }
 
     /**
@@ -369,60 +366,61 @@ EOT;
         echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
 
         // Add event Listener
-        $this->add_event_listener('onShutdown');
+        $this->trigger_event('onShutdown', $server);
     }
 
     /**
      * On wroker started
      *
      * @param \Swoole\Server $server
-     * @param integer $worker_id
+     * @param int $workerId
      * @return void
      */
-    public function onWorkerStart(\Swoole\Server $server, int $worker_id)
+    public function onWorkerStart(\Swoole\Server $server, int $workerId)
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
-        if ( getenv('STDOUT_LOG') ) {
-            echo date('Y-m-d H:i:s') . " |\033[32m ...... http worker process start[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
+        if (getenv('STDOUT_LOG')) {
+            echo date('Y-m-d H:i:s') . " |\033[32m ...... http worker process start[id={$workerId} pid={$server->worker_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
-        $this->add_event_listener('onWorkerStart');
+        $this->trigger_event('onWorkerStart', $server, $workerId);
     }
 
     /**
      * On wroker stop
      *
      * @param \Swoole\Server $server
-     * @param integer $worker_id
+     * @param int $workerId
      * @return void
      */
-    public function onWorkerStop(\Swoole\Server $server, int $worker_id)
+    public function onWorkerStop(\Swoole\Server $server, int $workerId)
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
-        if ( getenv('STDOUT_LOG') ) {
-            echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker process stop[id={$worker_id} pid={$server->worker_pid}] ......\033[0m \n";
+        if (getenv('STDOUT_LOG')) {
+            echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker process stop[id={$workerId} pid={$server->worker_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
-        $this->add_event_listener('onWorkerStop');
+        $this->trigger_event('onWorkerStop', $server, $workerId);
     }
 
     /**
-     * On work stop
+     * On work error
      *
      * @param \Swoole\Server $server
-     * @param integer $worker_id
-     * @param integer $worker_pid
-     * @param integer $exit_code
+     * @param int $workerId
+     * @param int $worker_pid
+     * @param int $exit_code
+     * @param int $signal
      * @return void
      */
-    public function onWorkerError(\Swoole\Server $server, int $worker_id, int $worker_pid, int $exit_code)
+    public function onWorkerError(\Swoole\Server $server, int $workerId, int $worker_pid, int $exit_code, int $signal)
     {
-        echo date('Y-m-d H:i:s') . " |\033[31m http worker process error[id={$worker_id} pid={$worker_pid}] ......\033[0m \n";
+        echo date('Y-m-d H:i:s') . " |\033[31m http worker process error[id={$workerId} pid={$worker_pid}] ......\033[0m \n";
 
         // Add event Listener
-        $this->add_event_listener('onWorkerError');
+        $this->trigger_event('onWorkerError', $server, $workerId, $worker_pid, $exit_code, $signal);
     }
 
     /**
@@ -449,17 +447,17 @@ EOT;
         // filter websocket router class
         // route struct: [$controller_name, $controller_class]
         $controller_class = (\ePHP\Core\Route::init())->findWebSocketRoute();
-        if ( !empty($controller_class) ) {
+        if (!empty($controller_class)) {
             // Save websocket connection Context
             self::$websocketFrameContext[$request->fd] = [
-                'get'    => $_GET,
-                'cookie' => $_COOKIE,
+                'get'              => $_GET,
+                'cookie'           => $_COOKIE,
                 'controller_class' => $controller_class
             ];
 
-            if ( getenv('STDOUT_LOG') ) {
-                echo date('Y-m-d H:i:s') . " |\033[34m [websocket][onopen]fd{$request->fd}, pid=". getmypid() .", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\033[0m\n";
-                echo '>>> pid='. getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext))
+            if (getenv('STDOUT_LOG')) {
+                echo date('Y-m-d H:i:s') . " |\033[34m [websocket][onopen]fd{$request->fd}, pid=" . getmypid() . ", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\033[0m\n";
+                echo '>>> pid=' . getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext))
                     . ', connections=' . count(self::$websocketFrameContext) . "\n";
                 echo '>>> GET=' . json_encode($_GET, JSON_UNESCAPED_UNICODE) . "\n------\n";
             }
@@ -482,8 +480,8 @@ EOT;
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
 
-        if ( empty(self::$websocketFrameContext[$frame->fd]) ) {
-            if ( getenv('STDOUT_LOG') ) {
+        if (empty(self::$websocketFrameContext[$frame->fd])) {
+            if (getenv('STDOUT_LOG')) {
                 echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\033[0m \n";
             }
             return;
@@ -493,12 +491,12 @@ EOT;
         $context = self::$websocketFrameContext[$frame->fd];
 
         // Restore global data
-        $_POST   = $_SERVER = [];
-        $_GET    = $_REQUEST = $context['get'];
-        $_COOKIE = $context['cookie'];
+        $_POST            = $_SERVER = [];
+        $_GET             = $_REQUEST = $context['get'];
+        $_COOKIE          = $context['cookie'];
         $controller_class = $context['controller_class'];
 
-        if ( getenv('STDOUT_LOG') && $frame->data != '{"action":"ping"}' ) {
+        if (getenv('STDOUT_LOG') && $frame->data != '{"action":"ping"}') {
             echo date('Y-m-d H:i:s') . " |\033[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\033[0m\n";
             echo 'GET=' . json_encode($context['get']) . "\n------\n";
         }
@@ -507,17 +505,30 @@ EOT;
     }
 
     /**
-     * WebSocket on close
+     * 有新的连接进入时，在 worker 进程中回调。
      *
-     * @param Swoole\WebSocket\Server $server
+     * @param \Swoole\Server $server
      * @param int $fd
-     * @return void
+     * @param int $reactorId
      */
-    public function onClose(\Swoole\WebSocket\Server $server, int $fd)
+    public function onConnect(\Swoole\Server $server, int $fd, int $reactorId)
+    {
+        // Add event Listener
+        $this->trigger_event('onConnect', $server, $fd, $reactorId);
+    }
+
+    /**
+     * TCP 客户端连接关闭后，在 worker 进程中回调此函数。
+     *
+     * @param \Swoole\Server $server
+     * @param int $fd
+     * @param int $reactorId
+     */
+    public function onClose(\Swoole\Server $server, int $fd, int $reactorId)
     {
         // echo "[websocket][onclose]client fd{$fd} closed\n";
 
-        if ( empty(self::$websocketFrameContext[$fd]) ) {
+        if (empty(self::$websocketFrameContext[$fd])) {
             echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\033[0m \n";
             return;
         }
@@ -525,20 +536,23 @@ EOT;
         // Get websocket connection Context
         $context = self::$websocketFrameContext[$fd];
 
-        if ( getenv('STDOUT_LOG') ) {
+        if (getenv('STDOUT_LOG')) {
             echo date('Y-m-d H:i:s') . " |\033[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\033[0m \n";
             echo 'GET=' . json_encode($context['get']) . "\n------\n";
         }
 
         // Restore global data
-        $_POST   = $_SERVER = [];
-        $_GET    = $_REQUEST = $context['get'];
-        $_COOKIE = $context['cookie'];
+        $_POST            = $_SERVER = [];
+        $_GET             = $_REQUEST = $context['get'];
+        $_COOKIE          = $context['cookie'];
         $controller_class = $context['controller_class'];
 
         // Clear websocket cache
         unset(self::$websocketFrameContext[$fd]);
 
         call_user_func([new $controller_class(), 'onClose'], $server, $fd);
+
+        // Add event Listener
+        $this->trigger_event('onClose', $server, $fd, $reactorId);
     }
 }
