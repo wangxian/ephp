@@ -71,7 +71,7 @@ class DB_mysqli
         }
 
         if (true == ($rs = $this->db->query($sql))) {
-            $GLOBALS['__$DB_QUERY_COUNT']++;
+            \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
             return $rs;
         } else if($this->db->errno == 2006 || $this->db->errno == 2013) {
             // Catch database pool long running
@@ -79,7 +79,7 @@ class DB_mysqli
             // 2006 MySQL server has gone away
             $this->reconnect();
 
-            $GLOBALS['__$DB_QUERY_COUNT']++;
+            \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
             return $this->db->query($sql);
         } else {
             \throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, $this->db->errno);

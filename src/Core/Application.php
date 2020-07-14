@@ -40,7 +40,7 @@ class Application
             $controller_name = $route[2];
             $action_name     = $_GET['action'];
 
-            $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
+            $_REQUEST  = array_merge($_GET, $_POST);
 
             // 检查ACTION是否存在
             if ( !method_exists($controller_name, $action_name) ) {

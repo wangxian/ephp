@@ -17,9 +17,9 @@ class CookieSwoole
     {
         if (empty($domain)) {
             // $domain = '.' . $_SERVER['HTTP_HOST'];
-            $GLOBALS['__$response']->cookie($name, $value, $expire + time(), $path);
+            \Swoole\Coroutine::getContext()['__$response']->cookie($name, $value, $expire + time(), $path);
         } else {
-            $GLOBALS['__$response']->cookie($name, $value, $expire + time(), $path, $domain);
+            \Swoole\Coroutine::getContext()['__$response']->cookie($name, $value, $expire + time(), $path, $domain);
         }
 
         // Make it come into effect immediately.
@@ -80,10 +80,10 @@ class CookieSwoole
     public function delete($name, $path = '/', $domain = '')
     {
         if (empty($domain)) {
-            $GLOBALS['__$response']->cookie($name, null, time() - 3600, '/');
+            \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, '/');
         } else {
             $domain = '.' . $_SERVER['HTTP_HOST'];
-            $GLOBALS['__$response']->cookie($name, null, time() - 3600, '/', $domain);
+            \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, '/', $domain);
         }
 
         unset($_COOKIE[$name]);

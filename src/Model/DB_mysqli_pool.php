@@ -99,7 +99,7 @@ class DB_mysqli_pool extends DB_mysqli
         }
 
         if ( !empty($rs) ) {
-            $GLOBALS['__$DB_QUERY_COUNT']++;
+            \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
         } else if($this->db->errno == 2006 || $this->db->errno == 2013) {
             // Catch database pool long running
             // 2013 Lost connection to MySQL server during query
@@ -112,7 +112,7 @@ class DB_mysqli_pool extends DB_mysqli
                 \throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, $this->db->errno);
             }
 
-            $GLOBALS['__$DB_QUERY_COUNT']++;
+            \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
             $rs = $this->db->query($sql);
         } else {
             DBPool::init($this->db_config)->cap--;

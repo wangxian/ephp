@@ -137,8 +137,8 @@ function shutdown_handler()
 
                 if (SERVER_MODE !== 'swoole') {
                     echo $str;
-                } else if ( isset($GLOBALS['__$response']) ) {
-                    $GLOBALS['__$response']->end($str);
+                } else if ( isset(\Swoole\Coroutine::getContext()['__$response']) ) {
+                    \Swoole\Coroutine::getContext()['__$response']->end($str);
                 }
                 break;
         }
@@ -152,13 +152,13 @@ register_shutdown_function("shutdown_handler");
 // db query cout
 // 记录数据库查询执行次数，这也是一个优化的手段
 // 用在run_info方法中
-$GLOBALS['__$DB_QUERY_COUNT'] = 0;
+\Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT'] = 0;
 
 function run_info($verbose = false)
 {
     cc('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
-        cc('当前数据库查询次数:', $GLOBALS['__$DB_QUERY_COUNT']);
+        cc('当前数据库查询次数:', \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']);
     }
 }
 

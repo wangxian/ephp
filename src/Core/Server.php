@@ -259,17 +259,17 @@ EOT;
      */
     private function _compatFPM(Request $request)
     {
+        // 不建议直接使用这个变量
         // Override php globals array
         // Store $_GET, $_POST ....
         $_GET    = $request->get ?? [];
         $_POST   = $request->post ?? [];
         $_COOKIE = $request->cookie ?? [];
         $_FILES  = $request->files ?? [];
-        // $_REQUEST  = array_merge($_COOKIE, $_GET, $_POST);
 
         // 注入全局变量
-        $GLOBALS['__$request']        = $request;
-        $GLOBALS['__$DB_QUERY_COUNT'] = 0;
+        \Swoole\Coroutine::getContext()['__$request']        = $request;
+        \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT'] = 0;
 
         // 兼容php-fpm的$_SERVER
         $_SERVER = [];
@@ -305,8 +305,8 @@ EOT;
         // Compat fpm server
         $this->_compatFPM($request);
 
-        // 注入全局变量
-        $GLOBALS['__$response'] = $response;
+        // 注入上下文
+        \Swoole\Coroutine::getContext()['__$response'] = $response;
 
         $response->header('Server', 'ePHP/' . $this->version);
 

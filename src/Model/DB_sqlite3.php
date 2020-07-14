@@ -40,7 +40,7 @@ class DB_sqlite3
         }
 
         if (true == ($rs = $this->db->$qt($sql))) {
-            $GLOBALS['__$DB_QUERY_COUNT']++;
+            \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
             return $rs;
         } else {
             \show_error('DB_ERROR: ' . $this->db->lastErrorMsg() . "\nRAW_SQL: " . $sql);
@@ -78,7 +78,7 @@ class DB_sqlite3
     {
         $rs   = $this->query($sql);
         $data = $rs->fetchArray(SQLITE3_ASSOC);
-        $GLOBALS['__$DB_QUERY_COUNT']++;
+        \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
 
         $rs->finalize();
         return $data;
@@ -97,7 +97,7 @@ class DB_sqlite3
         while (true == ($row = $result->fetchArray(SQLITE3_ASSOC))) {
             $array[] = $row;
         }
-        $GLOBALS['__$DB_QUERY_COUNT']++;
+        \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
 
         $result->finalize();
         return $array;
@@ -111,7 +111,7 @@ class DB_sqlite3
      */
     public function fetch_object($sql)
     {
-        $GLOBALS['__$DB_QUERY_COUNT']++;
+        \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
         return (object) $this->fetch_array($sql);
     }
 
@@ -130,7 +130,7 @@ class DB_sqlite3
             }
         }
 
-        $GLOBALS['__$DB_QUERY_COUNT']++;
+        \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
         return $arr;
     }
 

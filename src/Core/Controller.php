@@ -4,12 +4,12 @@ namespace ePHP\Core;
 class Controller
 {
     // /**
-    //  * \swoole_http_request $request
+    //  * @var \Swoole\Http\Request
     //  */
     // public $request;
-
+    //
     // /**
-    //  * @var \swoole_http_response $response
+    //  * @var \Swoole\Http\Response $response
     //  */
     // public $response;
 
@@ -93,7 +93,7 @@ class Controller
     protected function setHeader($key, $value)
     {
         if (SERVER_MODE === 'swoole') {
-            $GLOBALS['__$response']->header($key, $value);
+            \Swoole\Coroutine::getContext()['__$response']->header($key, $value);
         } else {
             if (!headers_sent()) {
                 header($key . ': '. $value);
@@ -113,7 +113,7 @@ class Controller
     {
         if (!headers_sent()) {
             if (SERVER_MODE === 'swoole' ) {
-                $GLOBALS['__$response']->status($code);
+                \Swoole\Coroutine::getContext()['__$response']->status($code);
             } else if ($code == 301) {
                 header('HTTP/1.1 301 Moved Permanently');
             } else {
@@ -139,7 +139,7 @@ class Controller
         if (SERVER_MODE !== 'swoole') {
             return file_get_contents('php://input');
         } else {
-            return $GLOBALS['__$request']->rawContent();
+            return \Swoole\Coroutine::getContext()['__$request']->rawContent();
         }
     }
 }
