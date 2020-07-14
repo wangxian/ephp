@@ -1,31 +1,35 @@
 {
-    "name": "wangxian/ephp",
-    "description": "The ephp Framework.",
-    "keywords": ["framework", "ephp"],
-    "type": "library",
-    "license": "MIT",
-    "homepage": "https://github.com/wangxian/ephp",
-    "support": {
-        "issues": "https://github.com/wangxian/ephp/issues",
-        "source": "https://github.com/wangxian/ephp"
-    },
-    "authors": [
-        {
-            "name": "wangxian",
-            "email": "xian366@126.com"
-        }
-    ],
-    "require": {
-        "php": ">=5.5.9",
-        "ext-mbstring": "*",
-        "ext-openssl": "*"
-    },
-    "autoload": {
-        "files": [
-            "src/Misc/helpers.php"
-        ],
-        "psr-4": {
-            "ePHP\\": "src/"
-        }
+  "name": "wangxian/ephp",
+  "description": "The ephp Framework.",
+  "keywords": [
+    "framework",
+    "ephp"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/wangxian/ephp",
+  "support": {
+    "issues": "https://github.com/wangxian/ephp/issues",
+    "source": "https://github.com/wangxian/ephp"
+  },
+  "authors": [
+    {
+      "name": "wangxian",
+      "email": "xian366@126.com"
     }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "files": [
+      "src/Misc/helpers.php"
+    ],
+    "psr-4": {
+      "ePHP\\": "src/"
+    }
+  }
 }
