@@ -112,13 +112,15 @@ function error_handler($errno, $errstr, $errfile, $errline)
 /**
  * 捕获Swoole异常退出错误
  *
+ * @ignore
+ * @param \Swoole\Http\Response $swooleResponse
  * @return void
  * @throws \ePHP\Exception\ExitException
- * @ignore
  */
-function shutdown_handler()
+function shutdown_handler($swooleResponse = null)
 {
     $error = error_get_last();
+
     if (isset($error['type'])) {
         switch ($error['type']) {
             case E_ERROR:
@@ -133,29 +135,23 @@ function shutdown_handler()
                 wlog('ExceptionLog', $str);
 
                 $str = '<pre>' . $str . '</pre>';
-
                 if (SERVER_MODE !== 'swoole') {
                     echo $str;
-                } else if (isset(\Swoole\Coroutine::getContext()['__$response'])) {
-                    \Swoole\Coroutine::getContext()['__$response']->end($str);
+                } else {
+                    $swooleResponse->end($str);
                 }
                 break;
         }
     }
 }
 
-// 捕获系统所有的异常
-set_error_handler("error_handler");
-register_shutdown_function("shutdown_handler");
-
-// db query cout
 // 记录数据库查询执行次数，这也是一个优化的手段
 // 用在run_info方法中
 \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT'] = 0;
 
 function run_info($verbose = false)
 {
-    cc('当前系统运行耗时:', number_format((microtime(1) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000, 2, '.', ''), 'ms');
+    cc('当前系统运行耗时:', number_format((microtime(1) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
         cc('当前数据库查询次数:', \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']);
     }
@@ -216,9 +212,9 @@ function show_404()
  */
 function show_success($message, $url = '', $wait = 6)
 {
-    if ($url === '' && isset($_SERVER['HTTP_REFERER'])) {
+    if ($url === '' && serverv('HTTP_HOST')) {
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $url = $_SERVER['HTTP_REFERER'];
+        $url = serverv('HTTP_REFERER');
     }
 
     $tpl = Config::get('tpl_success');
@@ -248,9 +244,9 @@ function show_success($message, $url = '', $wait = 6)
 function show_error($message, $url = '', $wait = 6)
 {
     // header('HTTP/1.1 500 Internal Server Error');
-    if ($url === '' && isset($_SERVER['HTTP_REFERER'])) {
+    if ($url === '' && serverv('HTTP_REFERER')) {
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $url = $_SERVER['HTTP_REFERER'];
+        $url = serverv('HTTP_REFERER');
     }
 
     $tpl = Config::get('tpl_error');
@@ -328,8 +324,8 @@ function getp($pos, $default = '', $callback = 'trim')
     static $url_part = [];
     if (empty($url_part) || SERVER_MODE === 'swoole') {
         // only first time
-        $pos = strpos($_SERVER['PATH_INFO'], '?');
-        $url = $pos ? substr($_SERVER['PATH_INFO'], 1, $pos) : substr($_SERVER['PATH_INFO'], 1);
+        $pos = strpos(serverv('PATH_INFO'), '?');
+        $url = $pos ? substr(serverv('PATH_INFO'), 1, $pos) : substr(serverv('PATH_INFO'), 1);
         if (!empty($url)) {
             $url_part = explode('/', $url);
         } else {

@@ -1,6 +1,15 @@
 <?php
 namespace ePHP\Core;
 
+/**
+ * @property \ePHP\View\BaseView view
+ * @property \ePHP\Http\Httpclient httpclient
+ * @property \ePHP\Console\Console console
+ * @property \ePHP\Http\Session session
+ * @property \ePHP\Http\Cookie cookie
+ * @property \ePHP\Model\BaseModel model
+ * @property \ePHP\Cache\Cache cache
+ */
 class Controller
 {
     // /**
@@ -42,7 +51,7 @@ class Controller
                 return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole();
                 break;
             case 'server':
-                return \ePHP\Core\Server::init()->server;
+                return Server::init()->server;
             case substr($key, 0, 5) === 'model':
                 if ($key === 'model') {
                     return $this->model = new \ePHP\Model\BaseModel();
@@ -56,6 +65,8 @@ class Controller
             default:
                 throw_error("Undefined property {$key}");
         }
+
+        return '';
     }
 
     /**
@@ -76,8 +87,7 @@ class Controller
      */
     protected function isAjax()
     {
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-            && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest" ) {
+        if (serverv('HTTP_X_REQUESTED_WITH') == "XMLHttpRequest" ) {
             return true;
         }
         return false;
@@ -108,6 +118,8 @@ class Controller
      * @param string $url
      * @param int $code 301 or 302
      * @return void
+     * @throws \ePHP\Exception\ExitException
+     * @noinspection HtmlRequiredLangAttribute
      */
     protected function redirect($url, $code = 302)
     {

@@ -1,4 +1,6 @@
 <?php
+/** @noinspection ALL */
+
 namespace ePHP\Email;
 
 if (version_compare(PHP_VERSION, '5.0.0', '<')) {
@@ -349,6 +351,7 @@ class PHPMailer
      * @param string $address
      * @param string $name
      * @return boolean true on success, false if address already used
+     * @throws phpmailerException
      */
     public function AddBCC($address, $name = '')
     {
@@ -1857,8 +1860,8 @@ class PHPMailer
     {
         if (!empty($this->Hostname)) {
             $result = $this->Hostname;
-        } elseif (isset($_SERVER['SERVER_NAME'])) {
-            $result = $_SERVER['SERVER_NAME'];
+        } elseif (serverv('SERVER_NAME')) {
+            $result = serverv('SERVER_NAME');
         } else {
             $result = 'localhost.localdomain';
         }

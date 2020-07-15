@@ -2,8 +2,6 @@
 
 namespace ePHP\Exception;
 
-use ePHP\Core\Config;
-
 class CommonException extends \Exception
 {
     // 错误堆栈
@@ -40,10 +38,8 @@ class CommonException extends \Exception
         // 记录异常信息到文件中
         wlog('ExceptionLog', $str);
 
-        if (PHP_SAPI == 'cli' || (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-            && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest") ) {
-            echo '<pre>' . $str . '</pre>';
-
+        if (PHP_SAPI == 'cli' || serverv('HTTP_X_REQUESTED_WITH') == "XMLHttpRequest" ) {
+            echo '<meta charset="UTF-8"/><pre>' . $str . '</pre>';
         } else {
             \cc('error', $str);
         }

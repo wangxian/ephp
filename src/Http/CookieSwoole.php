@@ -35,7 +35,7 @@ class CookieSwoole
      */
     public function setSecret($name, $value, $expire = 604800, $path = '/', $domain = '')
     {
-        $value = \ePHP\Hash\Encrypt::encryptG($value, md5($_SERVER['HTTP_HOST'] . APP_PATH . SERVER_MODE));
+        $value = \ePHP\Hash\Encrypt::encryptG($value, md5(serverv('HTTP_HOST') . APP_PATH . SERVER_MODE));
         $this->set($name, $value, $expire, $path, $domain);
     }
 
@@ -62,7 +62,7 @@ class CookieSwoole
         if (empty($value)) {
             return false;
         } else {
-            return \ePHP\Hash\Encrypt::decryptG($value, md5($_SERVER['HTTP_HOST'] . APP_PATH . SERVER_MODE));
+            return \ePHP\Hash\Encrypt::decryptG($value, md5(serverv('HTTP_HOST') . APP_PATH . SERVER_MODE));
         }
     }
 
@@ -79,7 +79,7 @@ class CookieSwoole
         if (empty($domain)) {
             \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, '/');
         } else {
-            $domain = '.' . $_SERVER['HTTP_HOST'];
+            $domain = '.' . serverv('HTTP_HOST');
             \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, '/', $domain);
         }
     }

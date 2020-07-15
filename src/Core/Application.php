@@ -26,6 +26,15 @@ class Application
             define('SERVER_MODE', 'fpm');
         }
 
+        // 捕获系统所有的异常
+        set_error_handler("error_handler");
+
+        // 注册中止时执行的函数
+        // Swoole模式下必须在onRequest中单独调用，使用context无法得到response对象
+        if (SERVER_MODE !== 'swoole') {
+            register_shutdown_function("shutdown_handler");
+        }
+
         try {
             $route = (Route::init())->findRoute();
 
@@ -43,7 +52,7 @@ class Application
             } else {
                 \Swoole\Coroutine::getContext()['__$request']->get['controller'] = $controller_name;
                 \Swoole\Coroutine::getContext()['__$request']->get['action']     = $action_name;
-                \Swoole\Coroutine::getContext()['__$_REQUEST']                   = array_merge(\Swoole\Coroutine::getContext()['__$request']->get, \Swoole\Coroutine::getContext()['__$request']->post);
+                \Swoole\Coroutine::getContext()['__$_REQUEST']                   = array_merge(\Swoole\Coroutine::getContext()['__$request']->get, \Swoole\Coroutine::getContext()['__$request']->post ?? []);
             }
 
             // Check action function is exist

@@ -1,6 +1,8 @@
 <?php
 namespace ePHP\Http;
 
+use ePHP\Exception\CommonException;
+
 /**
  * HTTP相关工具
  *
@@ -45,7 +47,7 @@ class Http
     /**
      * 阻止浏览器刷新，但可以CTRL+F5强制刷新
      *
-     * @param $seconds 防刷新的时间
+     * @param int $seconds 防刷新的时间
      */
     public static function limitRefresh($seconds = 5)
     {
@@ -80,8 +82,9 @@ class Http
      *
      * @param string $filename 下载文件名,要是绝对路径
      * @param string $showname 下载时显示的文件名,默认为下载的文件名
-     * @param string $content  下载的内容
+     * @param string $content 下载的内容
      * @return void
+     * @throws CommonException
      */
     public static function download($filename = '', $showname = '', $content = '')
     {
@@ -91,7 +94,7 @@ class Http
         } elseif ($content != '') {
             $length = strlen($content);
         } else {
-            throw new ephpException('Not DownLoad Load File !');
+            throw new CommonException('Not DownLoad Load File !');
         }
 
         // 最到显示的下载文件名
@@ -111,7 +114,7 @@ class Http
         if ($content == '') {
             $file = @fopen($filename, "r");
             if (!$file) {
-                throw new ephpException('Not DownLoad Load File !');
+                throw new CommonException('Not DownLoad Load File !');
             }
             // 一次读一K内容
             while (!@feof($file)) {
@@ -232,8 +235,8 @@ class Http
             $ip = getenv("HTTP_X_FORWARDED_FOR");
         } elseif (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown")) {
             $ip = getenv("REMOTE_ADDR");
-        } elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown")) {
-            $ip = $_SERVER['REMOTE_ADDR'];
+        } elseif (strcasecmp(serverv('REMOTE_ADDR'), "unknown")) {
+            $ip = serverv('REMOTE_ADDR');
         } else {
             $ip = "unknown";
         }

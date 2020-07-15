@@ -118,8 +118,9 @@ EOT;
     {
         // 非STDOUT_LOG模式，不打印
         if (getenv('STDOUT_LOG')) {
-            echo date('Y-m-d H:i:s') . " | \033[32m" . serverv('REMOTE_ADDR') . ":" . serverv('REMOTE_PORT') . " \033[0m | \033[36m" . serverv('REQUEST_METHOD') . ' ' . serverv('REQUEST_URI') . http_build_query(postv()) . "\033[0m\n";
-            echo 'SERVER=' . json_encode($_SERVER) . "\n------\n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " | \033[32m" . serverv('REMOTE_ADDR') . ":" . serverv('REMOTE_PORT')
+                . " \033[0m | \033[36m" . serverv('REQUEST_METHOD') . ' ' . serverv('REQUEST_URI') . http_build_query(postv()) . "\033[0m\n";
+            echo 'SERVER=' . json_encode(serverv()) . "\n------\n";
         }
     }
 
@@ -286,14 +287,19 @@ EOT;
      */
     public function onRequest(Request $request, Response $response)
     {
+        // 捕获 Swoole Server 运行期致命错误
+        register_shutdown_function("shutdown_handler", $response);
+
         // Compat fpm server
         $this->_compatFPM($request);
 
         // 注入上下文
         \Swoole\Coroutine::getContext()['__$response'] = $response;
 
+        // Set server container
         $response->header('Server', 'ePHP/' . $this->version);
 
+        // filename full path
         $filename = APP_PATH . '/public' . serverv('PATH_INFO');
 
         // !in_array($extname, ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'ico'])
@@ -326,8 +332,8 @@ EOT;
     {
         // STDOUT_LOG 开启才显示日志
         if (getenv('STDOUT_LOG')) {
-            echo date('Y-m-d H:i:s') . " |\033[32m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
-            echo date('Y-m-d H:i:s') . " |\033[32m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[32m ...... http master process start[master_pid={$server->master_pid}] ......\033[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[32m ...... http manager process start[manager_pid={$server->manager_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
@@ -342,7 +348,7 @@ EOT;
      */
     public function onShutdown(\Swoole\Server $server)
     {
-        echo date('Y-m-d H:i:s') . " |\033[31m http server shutdown ......\033[0m \n";
+        echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m http server shutdown ......\033[0m \n";
 
         // Add event Listener
         $this->trigger_event('onShutdown', $server);
@@ -359,7 +365,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo date('Y-m-d H:i:s') . " |\033[32m ...... http worker process start[id={$workerId} pid={$server->worker_pid}] ......\033[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[32m ...... http worker process start[id={$workerId} pid={$server->worker_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
@@ -377,7 +383,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo date('Y-m-d H:i:s') . " |\033[35m ...... http worker process stop[id={$workerId} pid={$server->worker_pid}] ......\033[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[35m ...... http worker process stop[id={$workerId} pid={$server->worker_pid}] ......\033[0m \n";
         }
 
         // Add event Listener
@@ -396,7 +402,7 @@ EOT;
      */
     public function onWorkerError(\Swoole\Server $server, int $workerId, int $worker_pid, int $exit_code, int $signal)
     {
-        echo date('Y-m-d H:i:s') . " |\033[31m http worker process error[id={$workerId} pid={$worker_pid}] ......\033[0m \n";
+        echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m http worker process error[id={$workerId} pid={$worker_pid}] ......\033[0m \n";
 
         // Add event Listener
         $this->trigger_event('onWorkerError', $server, $workerId, $worker_pid, $exit_code, $signal);
@@ -435,7 +441,7 @@ EOT;
             ];
 
             if (getenv('STDOUT_LOG')) {
-                echo date('Y-m-d H:i:s') . " |\033[34m [websocket][onopen]fd{$request->fd}, pid=" . getmypid() . ", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\033[0m\n";
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[34m [websocket][onopen]fd{$request->fd}, pid=" . getmypid() . ", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\033[0m\n";
                 echo '>>> pid=' . getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext))
                     . ', connections=' . count(self::$websocketFrameContext) . "\n";
                 echo '>>> GET=' . json_encode(getv(), JSON_UNESCAPED_UNICODE) . "\n------\n";
@@ -460,7 +466,7 @@ EOT;
 
         if (empty(self::$websocketFrameContext[$frame->fd])) {
             if (getenv('STDOUT_LOG')) {
-                echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\033[0m \n";
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\033[0m \n";
             }
             return;
         }
@@ -477,7 +483,7 @@ EOT;
         $controller_class = $context['controller_class'];
 
         if (getenv('STDOUT_LOG') && $frame->data != '{"action":"ping"}') {
-            echo date('Y-m-d H:i:s') . " |\033[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\033[0m\n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\033[0m\n";
             echo 'GET=' . json_encode($context['get']) . "\n------\n";
         }
 
@@ -509,7 +515,7 @@ EOT;
         // echo "[websocket][onclose]client fd{$fd} closed\n";
 
         if (empty(self::$websocketFrameContext[$fd])) {
-            echo date('Y-m-d H:i:s') . " |\033[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\033[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\033[0m \n";
             return;
         }
 
@@ -517,7 +523,7 @@ EOT;
         $context = self::$websocketFrameContext[$fd];
 
         if (getenv('STDOUT_LOG')) {
-            echo date('Y-m-d H:i:s') . " |\033[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\033[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\033[0m \n";
             echo 'GET=' . json_encode($context['get']) . "\n------\n";
         }
 
