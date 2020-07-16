@@ -440,6 +440,12 @@ EOT;
      */
     public function onOpen(\Swoole\WebSocket\Server $server, Request $request)
     {
+        // 检查连接是否为有效的 WebSocket 客户端连接
+        if ($server->isEstablished($request->fd)) {
+            $server->disconnect($request->fd);
+            return;
+        }
+
         // Compat fpm server
         $this->_compatFPM($request);
 
@@ -449,10 +455,11 @@ EOT;
         // route struct: [$controller_name, $controller_class]
         $controller_class = (Route::init())->findWebSocketRoute();
         if (!empty($controller_class)) {
+            \Swoole\Coroutine::getContext()['controller_class'] = $controller_class;
             // Save websocket connection Context
             self::$websocketFrameContext[$request->fd] = [
-                'get'              => getv(),
-                'cookie'           => $_COOKIE,
+                'get'              => $this->get ?? [],
+                'cookie'           => $request->cookie ?? [],
                 'controller_class' => $controller_class
             ];
 
@@ -465,7 +472,8 @@ EOT;
 
             call_user_func([new $controller_class(), 'onOpen'], $server, $request);
         } else {
-            $server->close($request->fd);
+            // 无效的路由，则关闭客户端连接
+            $server->disconnect($request->fd);
         }
     }
 
@@ -479,26 +487,30 @@ EOT;
     {
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
-
-        if (empty(self::$websocketFrameContext[$frame->fd])) {
+        if (empty(self::$websocketFrameContext[$frame->fd]) || $server->isEstablished($frame->fd)) {
             if (getenv('STDOUT_LOG')) {
                 echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\033[0m \n";
             }
+
+            $server->disconnect($frame->fd);
             return;
         }
 
-        // Get websocket connection Context
+        // Get websocket connection context
         $context = self::$websocketFrameContext[$frame->fd];
 
-        // Restore global data
-        $_POST            = $_SERVER = [];
-        $_GET             = $_REQUEST = $context['get'];
-        $_COOKIE          = $context['cookie'];
-        $controller_class = $context['controller_class'];
+        // Restore context data
+        if (empty(\Swoole\Coroutine::getContext()['__$request'])) {
+            \Swoole\Coroutine::getContext()['__$request'] = new \Stdclass();
+        }
+        \Swoole\Coroutine::getContext()['__$request']->get    = $context['get'];
+        \Swoole\Coroutine::getContext()['__$request']->cookie = $context['cookie'];
+        $controller_class                                     = $context['controller_class'];
 
         if (getenv('STDOUT_LOG') && $frame->data != '{"action":"ping"}') {
             echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\033[0m\n";
-            echo 'GET=' . json_encode($context['get']) . "\n------\n";
+            echo '>>> pid=' . getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext)) . "\n";
+            echo '>>> GET=' . json_encode($context['get']) . "\n------\n";
         }
 
         call_user_func([new $controller_class(), 'onMessage'], $server, $frame);
@@ -526,10 +538,10 @@ EOT;
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactorId)
     {
-        // echo "[websocket][onclose]client fd{$fd} closed\n";
-
         if (empty(self::$websocketFrameContext[$fd])) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\033[0m \n";
+            if (getenv('STDOUT_LOG')) {
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\033[0m \n";
+            }
             return;
         }
 
@@ -541,11 +553,13 @@ EOT;
             echo 'GET=' . json_encode($context['get']) . "\n------\n";
         }
 
-        // Restore global data
-        $_POST            = $_SERVER = [];
-        $_GET             = $_REQUEST = $context['get'];
-        $_COOKIE          = $context['cookie'];
-        $controller_class = $context['controller_class'];
+        // Restore context data
+        if (empty(\Swoole\Coroutine::getContext()['__$request'])) {
+            \Swoole\Coroutine::getContext()['__$request'] = new \Stdclass();
+        }
+        \Swoole\Coroutine::getContext()['__$request']->get    = $context['get'];
+        \Swoole\Coroutine::getContext()['__$request']->cookie = $context['cookie'];
+        $controller_class                                     = $context['controller_class'];
 
         // Clear websocket cache
         unset(self::$websocketFrameContext[$fd]);
