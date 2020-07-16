@@ -441,7 +441,7 @@ EOT;
     public function onOpen(\Swoole\WebSocket\Server $server, Request $request)
     {
         // 检查连接是否为有效的 WebSocket 客户端连接
-        if ($server->isEstablished($request->fd)) {
+        if (!$server->isEstablished($request->fd)) {
             $server->disconnect($request->fd);
             return;
         }
@@ -487,7 +487,7 @@ EOT;
     {
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
-        if (empty(self::$websocketFrameContext[$frame->fd]) || $server->isEstablished($frame->fd)) {
+        if (empty(self::$websocketFrameContext[$frame->fd]) || !$server->isEstablished($frame->fd)) {
             if (getenv('STDOUT_LOG')) {
                 echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\033[0m \n";
             }
