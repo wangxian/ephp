@@ -35,6 +35,9 @@ class Application
             register_shutdown_function("shutdown_handler");
         }
 
+        // 记录数据库查询次数
+        append_server('__$DB_QUERY_COUNT', 0);
+
         try {
             $route = (Route::init())->findRoute();
 
@@ -46,13 +49,13 @@ class Application
             $action_name     = $route[1];
 
             if (SERVER_MODE != 'swoole') {
-                $_GET['controller'] = $controller_name;
+                $_GET['controller'] = $route[0];
                 $_GET['action']     = $action_name;
                 $_REQUEST           = array_merge($_GET, $_POST);
             } else {
-                \Swoole\Coroutine::getContext()['__$request']->get['controller'] = $controller_name;
+                \Swoole\Coroutine::getContext()['__$request']->get['controller'] = $route[0];
                 \Swoole\Coroutine::getContext()['__$request']->get['action']     = $action_name;
-                \Swoole\Coroutine::getContext()['__$_REQUEST']                   = array_merge(\Swoole\Coroutine::getContext()['__$request']->get, \Swoole\Coroutine::getContext()['__$request']->post ?? []);
+                \Swoole\Coroutine::getContext()['__$_REQUEST']                   = array_merge(\Swoole\Coroutine::getContext()['__$request']->get, \Swoole\Coroutine::getContext()['__$request']->post);
             }
 
             // Check action function is exist

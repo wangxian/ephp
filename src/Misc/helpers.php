@@ -145,18 +145,13 @@ function shutdown_handler($swooleResponse = null)
     }
 }
 
-// 记录数据库查询执行次数，这也是一个优化的手段
-// 用在run_info方法中
-\Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT'] = 0;
-
 function run_info($verbose = false)
 {
     cc('当前系统运行耗时:', number_format((microtime(1) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
-        cc('当前数据库查询次数:', \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']);
+        cc('数据库查询次数:', serverv('__$DB_QUERY_COUNT', 0));
     }
 }
-
 
 /**
  * 写文件日志
@@ -462,4 +457,47 @@ function env($key, $default = '')
 {
     $val = getenv($key);
     return $val !== false ? $val : $default;
+}
+
+/**
+ * Append value to getv Compat swoole mode
+ * @param $key
+ * @param $value
+ */
+function append_get($key, $value) {
+    if (SERVER_MODE != 'swoole') {
+        $_GET[$key] = $value;
+        $_REQUEST[$key] = $value;
+    } else {
+        \Swoole\Coroutine::getContext()['__$request']->get[$key] = $value;
+        \Swoole\Coroutine::getContext()['__$_REQUEST'][$key] = $value;
+    }
+}
+
+/**
+ * Append value to postv Compat swoole mode
+ * @param $key
+ * @param $value
+ */
+function append_post($key, $value) {
+    if (SERVER_MODE != 'swoole') {
+        $_POST[$key] = $value;
+        $_REQUEST[$key] = $value;
+    } else {
+        \Swoole\Coroutine::getContext()['__$request']->post[$key] = $value;
+        \Swoole\Coroutine::getContext()['__$_REQUEST'][$key] = $value;
+    }
+}
+
+/**
+ * Append value to serverv Compat swoole mode
+ * @param $key
+ * @param $value
+ */
+function append_server($key, $value) {
+    if (SERVER_MODE != 'swoole') {
+        $_SERVER[$key] = $value;
+    } else {
+        \Swoole\Coroutine::getContext()['__$_SERVER'][$key] = $value;
+    }
 }

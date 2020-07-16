@@ -1,4 +1,5 @@
 <?php
+
 namespace ePHP\Http;
 
 use ePHP\Exception\CommonException;
@@ -41,7 +42,6 @@ use ePHP\Exception\CommonException;
  * }
  *
  */
-
 class Http
 {
     /**
@@ -268,9 +268,9 @@ class Http
      * 发送 HTTP 请求,支持 GET POST 方式,推荐系统中安装 CURL 扩展库
      *  - 返回请求后的页面内容
      *
-     * @param string  $url : 请求的url地址
-     * @param mixed   $params : GET或POST的参数,如 array('id'=>1,'name'=>'yuanwei')或者可以能是一个entry的xml。
-     * @param string  $method : 请求方式 GET POST
+     * @param string $url : 请求的url地址
+     * @param mixed $params : GET或POST的参数,如 array('id'=>1,'name'=>'yuanwei')或者可以能是一个entry的xml。
+     * @param string $method : 请求方式 GET POST
      * @param array $header 发送http header信息
      * @param integer $timeout 超时秒数
      * @return string
@@ -322,12 +322,11 @@ class Http
             return curl_exec($ch);
         } else {
             $data_string = http_build_query($params);
-            $context     = array(
-                'http' => array('method' => $method,
-                    'header'                 => 'Content-type: application/x-www-form-urlencoded' . "\r\n" .
-                    'Content-length: ' . strlen($data_string),
-                    'content'                => $data_string),
-            );
+            $context     = ['http' => [
+                'method'  => $method,
+                'header'  => 'Content-type: application/x-www-form-urlencoded' . "\r\n" . 'Content-length: ' . strlen($data_string),
+                'content' => $data_string
+            ]];
 
             $contextid = stream_context_create($context);
             $sock      = fopen($url, 'r', false, $contextid);

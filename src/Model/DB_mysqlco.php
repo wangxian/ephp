@@ -94,7 +94,7 @@ class DB_mysqlco
         }
 
         if ($this->db->errno == 0) {
-            \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT']++;
+            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
         } else {
             \throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, 12045);
         }

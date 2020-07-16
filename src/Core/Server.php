@@ -113,14 +113,23 @@ EOT;
 
     /**
      * 打印访问日志
+     * @param Request $request
      */
-    private function printAccessLog()
+    private function printAccessLog($request)
     {
         // 非STDOUT_LOG模式，不打印
         if (getenv('STDOUT_LOG')) {
+            // 不显示上传的文件内容
+            $post_data = http_build_query(postv());
+            if (!$post_data) {
+                $post_data = '<EMPTY_FORM_POST>';
+            }
+
             echo (new \DateTime())->format('Y-m-d H:i:s.u') . " | \033[32m" . serverv('REMOTE_ADDR') . ":" . serverv('REMOTE_PORT')
-                . " \033[0m | \033[36m" . serverv('REQUEST_METHOD') . ' ' . serverv('REQUEST_URI') . http_build_query(postv()) . "\033[0m\n";
-            echo 'SERVER=' . json_encode(serverv()) . "\n------\n";
+                . " \033[0m | \033[36m" . serverv('REQUEST_METHOD') . ' ' . serverv('REQUEST_URI') . "\033[0m"
+                . ' | ' . $post_data
+                . " | " . number_format((microtime(true) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2) . 'ms';
+            echo "\nSERVER=" . json_encode(serverv()) . "\n------\n";
         }
     }
 
@@ -250,9 +259,16 @@ EOT;
      */
     private function _compatFPM(Request $request)
     {
+        // 保证get/post为数组
+        if (empty($request->get)) {
+            $request->get = [];
+        }
+        if (empty($request->post)) {
+            $request->post = [];
+        }
+
         // 注入全局变量
-        \Swoole\Coroutine::getContext()['__$request']        = $request;
-        \Swoole\Coroutine::getContext()['__$DB_QUERY_COUNT'] = 0;
+        \Swoole\Coroutine::getContext()['__$request'] = $request;
 
         // 兼容php-fpm的$_SERVER，存入context中，使用`serverv()`获取
         $serverValue = [];
@@ -319,7 +335,7 @@ EOT;
         }
 
         // 非调试模式，打印访问日志
-        $this->printAccessLog();
+        $this->printAccessLog($request);
     }
 
     /**
@@ -470,8 +486,6 @@ EOT;
             }
             return;
         }
-
-        var_dump(\Swoole\Coroutine::getContext());
 
         // Get websocket connection Context
         $context = self::$websocketFrameContext[$frame->fd];
