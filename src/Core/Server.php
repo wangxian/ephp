@@ -327,10 +327,10 @@ EOT;
 
             $response->end($h);
         } else {
-            $extname = substr($filename, strrpos($filename, '.') + 1);
-            if (isset($this->contentType[$extname])) {
-                $response->header('Content-Type', $this->contentType[$extname]);
-            }
+            // $extname = substr($filename, strrpos($filename, '.') + 1);
+            // if (isset($this->contentType[$extname])) {
+            //     $response->header('Content-Type', $this->contentType[$extname]);
+            // }
             $response->sendfile($filename);
         }
 
