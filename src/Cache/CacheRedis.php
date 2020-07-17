@@ -1,4 +1,5 @@
 <?php
+
 namespace ePHP\Cache;
 
 use ePHP\Core\Config;
@@ -13,11 +14,11 @@ class CacheRedis
     /**
      * Redis connection
      *
-     * @var object
+     * @var \Redis
      */
     public $connection;
 
-    function __construct($type='redis')
+    function __construct($type = 'redis')
     {
         $config = Config::get('cache_redis');
 
@@ -27,6 +28,7 @@ class CacheRedis
 
         if ($type === 'redis') {
             // C extension - phpredis
+            /** @noinspection PhpFullyQualifiedNameUsageInspection */
             $this->connection = new \Redis();
             $this->connection->connect($config['host'], $config['port'], !empty($config['timeout']) ? $config['timeout'] : 2.5);
 
@@ -45,6 +47,7 @@ class CacheRedis
 
             /** @noinspection PhpUndefinedClassInspection */
             /** @noinspection PhpUndefinedNamespaceInspection */
+            /** @noinspection PhpFullyQualifiedNameUsageInspection */
             $this->connection = new \Predis\Client($config);
         }
     }
@@ -79,7 +82,7 @@ class CacheRedis
      */
     function get($key)
     {
-        $data = $this->connection->get($key);
+        $data     = $this->connection->get($key);
         $dataType = substr($data, 0, 2);
 
         // 如果是array或object需要反序列化

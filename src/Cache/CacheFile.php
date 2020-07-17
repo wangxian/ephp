@@ -1,7 +1,9 @@
 <?php
+
 namespace ePHP\Cache;
 
 use ePHP\Core\Config;
+use ePHP\Exception\ExitException;
 
 class CacheFile
 {
@@ -19,7 +21,7 @@ class CacheFile
         }
 
         $tmp_value = file_get_contents($filename);
-        $expire    = (int) substr($tmp_value, 13, 24);
+        $expire    = (int)substr($tmp_value, 13, 24);
 
         // echo time()."<br />\n";
         // echo $expire."<br />\n";
@@ -39,6 +41,7 @@ class CacheFile
      * @param mixed $value
      * @param int $expire 有效期，0,长期有效, -1: 不缓存，1：缓存
      * @return int
+     * @throws ExitException
      */
     public function set($key, $value, $expire = 0)
     {
@@ -52,6 +55,7 @@ class CacheFile
         $value = '<?php exit;?>' . $expire . serialize($value);
 
         // 检查目录可写否
+        /** @noinspection PhpUndefinedConstantInspection */
         $cachedir = APP_PATH . '/' . Config::get("cache_dir");
         if (!is_writeable($cachedir)) {
             \show_error('ERROR: ' . $cachedir . ' is not writeable!');
@@ -79,6 +83,7 @@ class CacheFile
      */
     public function flush($dir = '')
     {
+        /** @noinspection PhpUndefinedConstantInspection */
         $dir = $cache_dir = APP_PATH . '/' . Config::get('cache_dir');
         \ePHP\Misc\Dir::deleteDir($dir);
         mkdir($dir, 0777);
@@ -90,6 +95,7 @@ class CacheFile
      * @param string $key
      * @access private
      * @return string
+     * @noinspection PhpUndefinedConstantInspection
      */
     private function _filename($key)
     {

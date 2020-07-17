@@ -1,4 +1,5 @@
 <?php
+
 namespace ePHP\Core;
 
 /**
@@ -56,7 +57,7 @@ class Controller
                 if ($key === 'model') {
                     return $this->model = new \ePHP\Model\BaseModel();
                 } else {
-                    $model_name        = '\\App\\Models\\' . ucfirst(substr($key, 6)) . 'Model';
+                    $model_name = '\\App\\Models\\' . ucfirst(substr($key, 6)) . 'Model';
                     return $this->$key = new $model_name;
                 }
                 break;
@@ -87,7 +88,7 @@ class Controller
      */
     protected function isAjax()
     {
-        if (serverv('HTTP_X_REQUESTED_WITH') == "XMLHttpRequest" ) {
+        if (serverv('HTTP_X_REQUESTED_WITH') == "XMLHttpRequest") {
             return true;
         }
         return false;
@@ -106,7 +107,7 @@ class Controller
             \Swoole\Coroutine::getContext()['__$response']->header($key, $value);
         } else {
             if (!headers_sent()) {
-                header($key . ': '. $value);
+                header($key . ': ' . $value);
             }
         }
     }
@@ -124,7 +125,7 @@ class Controller
     protected function redirect($url, $code = 302)
     {
         if (!headers_sent()) {
-            if (SERVER_MODE === 'swoole' ) {
+            if (SERVER_MODE === 'swoole') {
                 \Swoole\Coroutine::getContext()['__$response']->status($code);
             } else if ($code == 301) {
                 header('HTTP/1.1 301 Moved Permanently');
@@ -136,7 +137,7 @@ class Controller
             $this->stopRun();
         } else {
             echo '<html><head><meta charset="UTF-8" /><title></title></head><body>';
-            echo '<script>window.location.href="'. $url .'";</script></body></html>';
+            echo '<script>window.location.href="' . $url . '";</script></body></html>';
             $this->stopRun();
         }
     }

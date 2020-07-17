@@ -1,4 +1,5 @@
 <?php
+
 namespace ePHP\Cache;
 
 use ePHP\Core\Config;
@@ -10,8 +11,9 @@ class CacheMemcached
 
     function __construct()
     {
-        $this->connection = new MemCache;
-        $config = Config::get('cache_memcached');
+        /** @noinspection PhpComposerExtensionStubsInspection */
+        $this->connection = new \MemCache;
+        $config           = Config::get('cache_memcached');
 
         foreach ($config as $v) {
             $this->addServer($v['host'], $v['port'], $v['weight']);
@@ -21,13 +23,14 @@ class CacheMemcached
     /**
      * 写缓存
      *
-     * @param $key 缓存名称
-     * @param $data 缓存内容
-     * @param $expire 缓存有效期，0:长期有效, -1: 不缓存
+     * @param string $key 缓存名称
+     * @param mixed $data 缓存内容
+     * @param int $expire 缓存有效期，0:长期有效, -1: 不缓存
      * @return int
      */
     function set($key, $data, $expire = 0)
     {
+        /** @noinspection PhpComposerExtensionStubsInspection */
         return $this->connection->set($key, $data, MEMCACHE_COMPRESSED, $expire);
     }
 
@@ -69,7 +72,7 @@ class CacheMemcached
     /**
      * 刷新所有的缓存
      *
-     * @return booean
+     * @return bool
      */
     public function flush()
     {

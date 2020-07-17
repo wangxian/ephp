@@ -12,7 +12,7 @@ class Server
      *
      * @var string
      */
-    private $version = '7.2';
+    private $version = '7.3.0';
 
     /**
      * Static file content type
