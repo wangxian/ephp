@@ -47,7 +47,7 @@ class CookieSwoole
      */
     public function get($name)
     {
-        return isset(\Swoole\Coroutine::getContext()['__$request']->cookie[$name]) ? \Swoole\Coroutine::getContext()['__$request']->cookie[$name] : false;
+        return \Swoole\Coroutine::getContext()['__$request']->cookie[$name] ?? false;
     }
 
     /**

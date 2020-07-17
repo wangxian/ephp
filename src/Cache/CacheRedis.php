@@ -43,6 +43,8 @@ class CacheRedis
                 $config['scheme'] = 'tcp';
             }
 
+            /** @noinspection PhpUndefinedClassInspection */
+            /** @noinspection PhpUndefinedNamespaceInspection */
             $this->connection = new \Predis\Client($config);
         }
     }
@@ -50,9 +52,9 @@ class CacheRedis
     /**
      * 写缓存
      *
-     * @param $key 缓存名称
-     * @param $value 缓存内容
-     * @param $expire 缓存有效期，0:长期有效, -1: 不缓存
+     * @param string $key 缓存名称
+     * @param mixed $value 缓存内容
+     * @param int $expire 缓存有效期，0:长期有效, -1: 不缓存
      * @return int
      */
     function set($key, $value, $expire = 0)
@@ -100,9 +102,9 @@ class CacheRedis
     }
 
     /**
-     * 刷新所有的缓存
+     * 危险 - 刷新所有的缓存
      *
-     * @return booean
+     * @return bool
      */
     public function flush()
     {

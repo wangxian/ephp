@@ -31,10 +31,8 @@ class Cache
      */
     public static function init()
     {
-        // !self::$_instance instanceof self
+        // Swoole 不能使用static共享变量
         if (SERVER_MODE === 'swoole') {
-            self::$instance = new self();
-
             // 使用哪种方式的cache
             $cache_driver = Config::get('cache_driver');
 
@@ -45,8 +43,8 @@ class Cache
             }
 
             $cache_driver = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
-            self::$instance->handle = new $cache_driver($type);
-        } else if (!isset(self::$instance)) { // php-fpm
+            return new $cache_driver($type);
+        } else if (!isset(self::$instance)) { // php-fpm 及 buildin
             self::$instance = new self();
 
             // 使用哪种方式的cache
@@ -61,6 +59,7 @@ class Cache
             $cache_driver = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
             self::$instance->handle = new $cache_driver($type);
         }
+
         return self::$instance;
     }
 

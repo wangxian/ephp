@@ -23,7 +23,8 @@
     "ext-mbstring": "*",
     "ext-openssl": "*",
     "ext-json": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-redis": "*"
   },
   "autoload": {
     "files": [
