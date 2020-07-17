@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 namespace ePHP\Model;
 
@@ -17,8 +17,8 @@ class BaseModel
     protected $db_config_name = 'default';
 
     private $field = '*';
-    private $orderby = '';
-    private $groupby = '';
+    private $orderBy = '';
+    private $groupBy = '';
     private $having = '';
     private $limit = '';
     private $where = '';
@@ -61,7 +61,9 @@ class BaseModel
      * 该方法不需要直接调用, 在使用时每个数据库只创建一个链接，以后直接复用
      *
      * @access private
-     * @return $db
+     * @return mixed $db
+     * @noinspection PhpIncludeInspection
+     * @noinspection SpellCheckingInspection
      */
     private function conn()
     {
@@ -95,6 +97,7 @@ class BaseModel
      * 不需要直接调用
      * @access private
      * @return string
+     * @noinspection SpellCheckingInspection
      */
     private function _read_sql()
     {
@@ -104,8 +107,8 @@ class BaseModel
 
             $_join    = $this->join;
             $_where   = $this->where != '' ? ' WHERE ' . $this->where : '';
-            $_orderby = $this->orderby != '' ? ' ORDER BY ' . $this->orderby : '';
-            $_groupby = $this->groupby != '' ? ' GROUP BY ' . $this->groupby : '';
+            $_orderby = $this->orderBy != '' ? ' ORDER BY ' . $this->orderBy : '';
+            $_groupby = $this->groupBy != '' ? ' GROUP BY ' . $this->groupBy : '';
             $_limit   = $this->limit != '' ? ' LIMIT ' . $this->limit : '';
             $_having  = $this->having != '' ? ' HAVING ' . $this->having : '';
 
@@ -156,8 +159,8 @@ class BaseModel
     {
         //$this->table_name = '';
         $this->field   = '*';
-        $this->orderby = '';
-        $this->groupby = '';
+        $this->orderBy = '';
+        $this->groupBy = '';
         $this->having  = '';
         $this->limit   = '';
         $this->where   = '';
@@ -361,10 +364,11 @@ class BaseModel
      *
      * @param string $orderby
      * @return $this
+     * @noinspection SpellCheckingInspection
      */
     public function orderby($orderby)
     {
-        $this->orderby = $orderby;
+        $this->orderBy = $orderby;
         return $this;
     }
 
@@ -373,10 +377,11 @@ class BaseModel
      *
      * @param string $groupby 分组
      * @return $this
+     * @noinspection SpellCheckingInspection
      */
     public function groupby($groupby)
     {
-        $this->groupby = $groupby;
+        $this->groupBy = $groupby;
         return $this;
     }
 
@@ -525,6 +530,8 @@ class BaseModel
      * 返回的数据结构：array('data'=>array(....), 'data_count'=>总数据数)
      *
      * @return array $data
+     * @noinspection SqlNoDataSourceInspection
+     * @noinspection SqlDialectInspection
      */
     public function findPage()
     {
@@ -532,21 +539,21 @@ class BaseModel
         $this->sql = $this->_read_sql();
         if ($this->expire < 0) {
             $_table_name = $this->_get_table_name();
-            $sql_cout    = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
+            $sql_count   = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
 
             $data['data']       = $this->conn()->fetch_arrays($this->sql);
-            $data['data_count'] = $this->db->fetch_object($sql_cout)->countrows;
+            $data['data_count'] = $this->db->fetch_object($sql_count)->countrows;
         } else {
             $cache     = Cache::init();
-            $cachename = 'db/findPage_' . md5($this->sql);
-            if (false == ($data = $cache->get($cachename))) {
+            $cacheName = 'db/findPage_' . md5($this->sql);
+            if (false == ($data = $cache->get($cacheName))) {
                 $_table_name = $this->_get_table_name();
-                $sql_cout    = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
+                $sql_count   = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
 
                 $data['data']       = $this->conn()->fetch_arrays($this->sql);
-                $data['data_count'] = $this->db->fetch_object($sql_cout)->countrows;
+                $data['data_count'] = $this->db->fetch_object($sql_count)->countrows;
 
-                $cache->set($cachename, $data, $this->expire);
+                $cache->set($cacheName, $data, $this->expire);
                 $this->expire = -1;
             }
         }
@@ -584,6 +591,7 @@ class BaseModel
      *
      * @param bool $f
      * @return bool
+     * @noinspection SqlNoDataSourceInspection
      */
     public function delete($f = false)
     {
@@ -682,6 +690,8 @@ class BaseModel
      * @param string $type 类型
      * @param string $update_string 更新字段
      * @return int
+     * @noinspection SqlDialectInspection
+     * @noinspection SqlNoDataSourceInspection
      */
     protected function _insert($type, $update_string = '')
     {
@@ -726,8 +736,6 @@ class BaseModel
 
     /**
      * 事务提交
-     *
-     * @return bool
      */
     public function trans_commit()
     {
@@ -738,8 +746,6 @@ class BaseModel
 
     /**
      * 事务回滚
-     *
-     * @return bool
      */
     public function trans_rollback()
     {

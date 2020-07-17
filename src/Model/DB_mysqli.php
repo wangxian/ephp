@@ -1,11 +1,17 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
 
 class DB_mysqli
 {
-    public $db = false;
+    /**
+     * @var \mysqli
+     */
+    public $db = null;
     protected $config = [];
 
     function __construct($db_config = 'default')
@@ -17,34 +23,32 @@ class DB_mysqli
 
         // Set default value
         $this->config = $config + array(
-            'host'     => '127.0.0.1',
-            'user'     => '',
-            'password' => '',
-            'dbname'   => '',
-            'port'     => 3306,
-            'charset'  => 'utf8',
-            'tb_prefix'=> '',
-            'timeout'  => 3
-        );
+                'host'      => '127.0.0.1',
+                'user'      => '',
+                'password'  => '',
+                'dbname'    => '',
+                'port'      => 3306,
+                'charset'   => 'utf8',
+                'tb_prefix' => '',
+                'timeout'   => 3
+            );
 
         $this->reconnect();
     }
 
     /**
      * Reconnect database
-     *
-     * @return null
      */
     function reconnect()
     {
         // Connect to MySQL
         // $this->db = new \mysqli($this->config['host'], $this->config['user'], $this->config['password'], $this->config['dbname'], $this->config['port']);
         $db = \mysqli_init();
-        if ( !$db->options(MYSQLI_OPT_CONNECT_TIMEOUT, $this->config['timeout']) ) {
+        if (!$db->options(MYSQLI_OPT_CONNECT_TIMEOUT, $this->config['timeout'])) {
             \throw_error('Setting MYSQLI_OPT_CONNECT_TIMEOUT failed', $db->errno);
         }
 
-        if ( !$db->real_connect($this->config['host'], $this->config['user'], $this->config['password'], $this->config['dbname'], $this->config['port']) ) {
+        if (!$db->real_connect($this->config['host'], $this->config['user'], $this->config['password'], $this->config['dbname'], $this->config['port'])) {
             \throw_error('Can not real_connect to MySQL server, message: ' . $db->connect_error);
         }
 
@@ -61,8 +65,9 @@ class DB_mysqli
     /**
      * MySQL query
      *
-     * @param  string $sql
-     * @return mixed
+     * @param string $sql
+     * @return bool|\mysqli_result
+     * @throws \ePHP\Exception\ExitException
      */
     function query($sql)
     {
@@ -71,19 +76,21 @@ class DB_mysqli
         }
 
         if (true == ($rs = $this->db->query($sql))) {
-            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
+            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
             return $rs;
-        } else if($this->db->errno == 2006 || $this->db->errno == 2013) {
+        } else if ($this->db->errno == 2006 || $this->db->errno == 2013) {
             // Catch database pool long running
             // 2013 Lost connection to MySQL server during query
             // 2006 MySQL server has gone away
             $this->reconnect();
 
-            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
+            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
             return $this->db->query($sql);
         } else {
             \throw_error('DB_ERROR: ' . $this->db->error . "\nRAW_SQL: " . $sql, $this->db->errno);
         }
+
+        return true;
     }
 
     /**
@@ -91,6 +98,7 @@ class DB_mysqli
      *
      * @param string $sql
      * @return array
+     * @throws \ePHP\Exception\ExitException
      */
     function fetch_array($sql)
     {
@@ -109,6 +117,7 @@ class DB_mysqli
      *
      * @param string $sql
      * @return array
+     * @throws \ePHP\Exception\ExitException
      */
     function fetch_arrays($sql)
     {
@@ -126,6 +135,7 @@ class DB_mysqli
      *
      * @param string $sql
      * @return object
+     * @throws \ePHP\Exception\ExitException
      */
     function fetch_object($sql)
     {
@@ -140,12 +150,13 @@ class DB_mysqli
      * fetch many rows, return object
      *
      * @param string $sql
-     * @return object
+     * @return array
+     * @throws \ePHP\Exception\ExitException
      */
     function fetch_objects($sql)
     {
         $rs   = $this->query($sql);
-        $data = null;
+        $data = [];
         while (true == ($row = $rs->fetch_object())) {
             $data[] = $row;
         }
@@ -177,6 +188,7 @@ class DB_mysqli
      * 过滤SQL中的不安全字符
      *
      * @param string $str
+     * @return string
      */
     public function escape_string($str)
     {
@@ -205,7 +217,7 @@ class DB_mysqli
     }
 
     /*
-     * Roollback transaction
+     * Rollback transaction
      *
      * @return bool
      */

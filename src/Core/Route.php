@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 namespace ePHP\Core;
 
@@ -132,6 +132,8 @@ class Route
                         if (SERVER_MODE !== 'swoole') {
                             $_GET = $getValue;
                         } else {
+                            /** @noinspection PhpSingleStatementWithBracesInspection */
+                            /** @noinspection PhpFullyQualifiedNameUsageInspection */
                             \Swoole\Coroutine::getContext()['__$request']->get = $getValue;
                         }
                     }

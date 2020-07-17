@@ -24,7 +24,8 @@
     "ext-openssl": "*",
     "ext-json": "*",
     "ext-curl": "*",
-    "ext-redis": "*"
+    "ext-redis": "*",
+    "ext-mysqli": "*"
   },
   "autoload": {
     "files": [
