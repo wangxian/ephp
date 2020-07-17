@@ -83,7 +83,11 @@ class Route
     public function findRoute()
     {
         // Default path is /index/index
-        $path_info = serverv('PATH_INFO', '/index/index');
+        $path_info = serverv('PATH_INFO', '/');
+        if ($path_info == '/') {
+            $path_info = '/index/index';
+        }
+
         $items     = $path_info ? explode('/', ltrim($path_info, '/')) : [];
         $count     = count($items);
 
