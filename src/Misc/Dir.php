@@ -1,4 +1,6 @@
 <?php
+/** @noinspection ALL */
+
 // 目录操作类
 namespace ePHP\Misc;
 
@@ -9,7 +11,7 @@ class Dir
      *
      * 默认获取相对于index.php目录下的目录和文件
      *
-     * @param string  $source_dir 相对于index.php的目录
+     * @param string $source_dir 相对于index.php的目录
      * @param boolean $subdir 递归子目录,true包含，false不包含
      * @return mixed
      */

@@ -1,4 +1,7 @@
-<?php
+<?php /** @noinspection PhpUnusedParameterInspection */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+
+/** @noinspection PhpUnused */
 
 namespace ePHP\Cache;
 
@@ -12,6 +15,7 @@ class CacheFile
      *
      * @param string $key
      * @return mixed
+     * @throws ExitException
      */
     public function get($key)
     {
@@ -56,9 +60,9 @@ class CacheFile
 
         // 检查目录可写否
         /** @noinspection PhpUndefinedConstantInspection */
-        $cachedir = APP_PATH . '/' . Config::get("cache_dir");
-        if (!is_writeable($cachedir)) {
-            \show_error('ERROR: ' . $cachedir . ' is not writeable!');
+        $cacheDir = APP_PATH . '/' . Config::get("cache_dir");
+        if (!is_writeable($cacheDir)) {
+            \show_error('ERROR: ' . $cacheDir . ' is not writeable!');
         }
 
         return file_put_contents($this->_filename($key), $value);
@@ -69,6 +73,7 @@ class CacheFile
      *
      * @param string $key
      * @return bool
+     * @throws ExitException
      */
     public function delete($key)
     {
@@ -80,6 +85,7 @@ class CacheFile
      *
      * @param string $dir 删除指定目录的缓存
      * @return void
+     * @throws ExitException
      */
     public function flush($dir = '')
     {
@@ -93,9 +99,11 @@ class CacheFile
      * 计算缓存名称
      *
      * @param string $key
-     * @access private
      * @return string
+     * @throws ExitException
+     * @access private
      * @noinspection PhpUndefinedConstantInspection
+     * @noinspection PhpUnhandledExceptionInspection
      */
     private function _filename($key)
     {

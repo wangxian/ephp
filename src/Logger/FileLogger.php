@@ -1,6 +1,10 @@
-<?php
+<?php /** @noinspection ALL */
+
+/** @noinspection PhpUndefinedConstantInspection */
 
 namespace ePHP\Logger;
+
+use ePHP\Exception\ExitException;
 
 class FileLogger
 {
@@ -22,6 +26,7 @@ class FileLogger
      * @param string $key
      * @param string $value
      * @return void
+     * @throws ExitException
      */
     public function write($key, $value)
     {

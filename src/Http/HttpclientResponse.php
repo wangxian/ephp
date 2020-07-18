@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection SpellCheckingInspection */
 
 namespace ePHP\Http;
 
@@ -43,7 +43,7 @@ class HttpclientResponse
      *
      * @param string $body
      * @param int $status_code
-     * @param array $response_headers
+     * @param $headers
      * @param string $content_type
      * @param array $curl_info
      */

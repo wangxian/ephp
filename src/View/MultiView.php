@@ -19,9 +19,10 @@ class MultiView extends BaseView
     /**
      * 引用视图 或 视图片段
      * @param string $file 变量名
-     * @param string $layout_block 是否渲染布局模版
+     * @param null $__vars
      * @param boolean $layout_block 使用布局模版否
      * @param boolean $return 返回模版内容 or 直接输出
+     * @return false|string|string[]
      */
     public function _include($file, $__vars = null, $layout_block = false, $return = false)
     {

@@ -1,4 +1,7 @@
-<?php /** @noinspection PhpUndefinedConstantInspection */
+<?php
+/** @noinspection PhpUnused */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection PhpUndefinedConstantInspection */
 
 namespace ePHP\Core;
 
@@ -8,36 +11,35 @@ use \Swoole\Http\Response;
 class Server
 {
     /**
-     * ePHP latest verson
-     *
+     * ePHP latest version
      * @var string
      */
     private $version = '7.3.0';
 
-    /**
-     * Static file content type
-     *
-     * @var array
-     */
-    private $contentType = [
-        'text' => 'text/plain',
-        'html' => 'text/html',
-        'css'  => 'text/css',
-        'js'   => 'text/javascript',
-
-        'png'  => 'image/png',
-        'jpg'  => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'gif'  => 'image/gif',
-        'ico'  => 'image/x-icon',
-
-
-        'ttf'   => 'font/ttf',
-        'eot'   => 'font/eot',
-        'otf'   => 'font/otf',
-        'woff'  => 'font/woff',
-        'woff2' => 'font/woff2'
-    ];
+    // /**
+    //  * Static file content type
+    //  *
+    //  * @var array
+    //  */
+    // private $contentType = [
+    //     'text' => 'text/plain',
+    //     'html' => 'text/html',
+    //     'css'  => 'text/css',
+    //     'js'   => 'text/javascript',
+    //
+    //     'png'  => 'image/png',
+    //     'jpg'  => 'image/jpeg',
+    //     'jpeg' => 'image/jpeg',
+    //     'gif'  => 'image/gif',
+    //     'ico'  => 'image/x-icon',
+    //
+    //
+    //     'ttf'   => 'font/ttf',
+    //     'eot'   => 'font/eot',
+    //     'otf'   => 'font/otf',
+    //     'woff'  => 'font/woff',
+    //     'woff2' => 'font/woff2'
+    // ];
 
     /**
      * Handle of Swoole http server
@@ -113,9 +115,8 @@ EOT;
 
     /**
      * 打印访问日志
-     * @param Request $request
      */
-    private function printAccessLog($request)
+    private function printAccessLog()
     {
         // 非STDOUT_LOG模式，不打印
         if (getenv('STDOUT_LOG')) {
@@ -138,6 +139,7 @@ EOT;
      *
      * @param string $host
      * @param int $port
+     * @noinspection SpellCheckingInspection
      */
     public function devServer(string $host, int $port)
     {
@@ -335,7 +337,7 @@ EOT;
         }
 
         // 非调试模式，打印访问日志
-        $this->printAccessLog($request);
+        $this->printAccessLog();
     }
 
     /**
@@ -371,7 +373,7 @@ EOT;
     }
 
     /**
-     * On wroker started
+     * On worker started
      *
      * @param \Swoole\Server $server
      * @param int $workerId
@@ -389,7 +391,7 @@ EOT;
     }
 
     /**
-     * On wroker stop
+     * On worker stop
      *
      * @param \Swoole\Server $server
      * @param int $workerId

@@ -1,4 +1,6 @@
 <?php
+/** @noinspection ALL */
+
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
@@ -40,7 +42,7 @@ class DB_sqlite3
         }
 
         if (true == ($rs = $this->db->$qt($sql))) {
-            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
+            append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
             return $rs;
         } else {
             \show_error('DB_ERROR: ' . $this->db->lastErrorMsg() . "\nRAW_SQL: " . $sql);
@@ -50,7 +52,6 @@ class DB_sqlite3
 
     /**
      * last insert id
-
      * @return integer $insert_id
      */
     public function insert_id()
@@ -78,7 +79,7 @@ class DB_sqlite3
     {
         $rs   = $this->query($sql);
         $data = $rs->fetchArray(SQLITE3_ASSOC);
-        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
+        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
 
         $rs->finalize();
         return $data;
@@ -97,7 +98,7 @@ class DB_sqlite3
         while (true == ($row = $result->fetchArray(SQLITE3_ASSOC))) {
             $array[] = $row;
         }
-        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
+        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
 
         $result->finalize();
         return $array;
@@ -111,8 +112,8 @@ class DB_sqlite3
      */
     public function fetch_object($sql)
     {
-        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
-        return (object) $this->fetch_array($sql);
+        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
+        return (object)$this->fetch_array($sql);
     }
 
     /**
@@ -126,11 +127,11 @@ class DB_sqlite3
         $arr = $this->fetch_arrays($sql);
         if (!empty($arr)) {
             foreach ($arr as $k => $v) {
-                $arr[$k] = (object) $v;
+                $arr[$k] = (object)$v;
             }
         }
 
-        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0)+1);
+        append_server('__$DB_QUERY_COUNT', serverv('__$DB_QUERY_COUNT', 0) + 1);
         return $arr;
     }
 

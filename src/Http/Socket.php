@@ -1,4 +1,7 @@
-<?php
+<?php /** @noinspection PhpUnusedFieldDefaultValueInspection */
+
+/** @noinspection PhpUnused */
+
 namespace ePHP\Http;
 
  /**
@@ -43,7 +46,7 @@ class Socket
 
     /**
      * 连接
-     * @return object
+     * @return bool
      */
     public function connect()
     {
@@ -69,7 +72,7 @@ class Socket
 
     /**
      * 错误信息
-     * @return string
+     * @return array
      */
     public function error()
     {
@@ -94,8 +97,9 @@ class Socket
     /**
      * 读取数据
      * @param integer $length
+     * @return mixed
      */
-    public function read($length = 1024)
+    public function read(int $length = 1024)
     {
         if (!$this->connected) {
             if (!$this->connect()) {

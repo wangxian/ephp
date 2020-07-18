@@ -1,4 +1,5 @@
 <?php
+/** @noinspection ALL */
 // debug调试类
 namespace ePHP\Misc;
 

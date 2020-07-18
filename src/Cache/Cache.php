@@ -1,12 +1,16 @@
-<?php
+<?php /** @noinspection SpellCheckingInspection */
+
+/** @noinspection PhpUnused */
+
 namespace ePHP\Cache;
 
 use ePHP\Core\Config;
+use ePHP\Exception\ExitException;
 
 class Cache
 {
     /**
-     * @var \ePHP\Cache\Cache
+     * @var Cache
      */
     private static $instance;
 
@@ -28,6 +32,7 @@ class Cache
      * 初始化, 获取缓存示例，$cache = Cache::init();
      *
      * @return mixed
+     * @throws ExitException
      */
     public static function init()
     {

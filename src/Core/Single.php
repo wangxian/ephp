@@ -4,7 +4,7 @@ namespace ePHP\Core;
 trait Single
 {
     /**
-     * @var \ePHP\Core\Server
+     * @var Single
      */
     private static $instance;
 

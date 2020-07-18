@@ -1,6 +1,8 @@
-<?php
+<?php /** @noinspection PhpUnused */
 
 namespace ePHP\Http;
+
+use ePHP\Hash\Encrypt;
 
 class Cookie
 {
@@ -64,7 +66,7 @@ class Cookie
     public function setSecret($name, $value, $expire = 604800, $path = '/', $domain = '')
     {
         /** @noinspection PhpUndefinedConstantInspection */
-        $value = \ePHP\Hash\Encrypt::encryptG($value, md5(serverv('HTTP_HOST') . APP_PATH . SERVER_MODE));
+        $value = Encrypt::encryptG($value, md5(serverv('HTTP_HOST') . APP_PATH . SERVER_MODE));
         $this->set($name, $value, $expire, $path, $domain);
     }
 
@@ -92,7 +94,7 @@ class Cookie
             return false;
         } else {
             /** @noinspection PhpUndefinedConstantInspection */
-            return \ePHP\Hash\Encrypt::decryptG($value, md5(serverv('HTTP_HOST') . APP_PATH . SERVER_MODE));
+            return Encrypt::decryptG($value, md5(serverv('HTTP_HOST') . APP_PATH . SERVER_MODE));
         }
     }
 
@@ -106,10 +108,10 @@ class Cookie
     public function delete($name, $path = '/', $domain = '')
     {
         if (empty($domain)) {
-            setcookie($name, null, time() - 3600, '/');
+            setcookie($name, null, time() - 3600, $path);
         } else {
             $domain = '.' . serverv('HTTP_HOST');
-            setcookie($name, null, time() - 3600, '/', $domain);
+            setcookie($name, null, time() - 3600, $path, $domain);
         }
 
         unset($_COOKIE[$name]);

@@ -1,4 +1,8 @@
-<?php
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection SpellCheckingInspection */
+
+/** @noinspection PhpUnused */
+
 namespace ePHP\Http;
 
 /**
@@ -10,6 +14,7 @@ class HttpclientSwoole extends Httpclient
 {
     /**
      * Create the cURL resource.
+     * @noinspection PhpMissingParentConstructorInspection
      */
     public function __construct()
     {
@@ -40,9 +45,9 @@ class HttpclientSwoole extends Httpclient
         $is_ssl = isset($paths['scheme']) && $paths['scheme'] == 'https';
         $port = isset($paths['port']) ? $paths['port'] : ($is_ssl ? 443 : 80);
 
-        $ip = \co::gethostbyname($host);
+        $ip = \Swoole\Coroutine::gethostbyname($host);
         if ( !$ip ) {
-            \throw_error('co::gethostbyname("'. $host .'") host is empty', 19220);
+            \throw_error('Coroutine::gethostbyname("'. $host .'") host is empty', 19220);
         }
 
         $cli = new \Swoole\Coroutine\Http\Client($ip, $port, $is_ssl);

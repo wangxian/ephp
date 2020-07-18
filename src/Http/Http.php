@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpUnused */
 
 namespace ePHP\Http;
 
@@ -328,10 +329,10 @@ class Http
                 'content' => $data_string
             ]];
 
-            $contextid = stream_context_create($context);
-            $sock      = fopen($url, 'r', false, $contextid);
+            $context_id = stream_context_create($context);
+            $sock      = fopen($url, 'r', false, $context_id);
+            $result    = '';
             if ($sock) {
-                $result = '';
                 while (!feof($sock)) {
                     $result .= fgets($sock, 4096);
                 }

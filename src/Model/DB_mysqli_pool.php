@@ -1,13 +1,16 @@
-<?php
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+
 // Swoole Coroutine MySQL
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
-use ePHP\Model\DBPool;
 
 class DB_mysqli_pool extends DB_mysqli
 {
-    public $db = false;
+    /**
+     * @var \mysqli
+     */
+    public $db;
 
     /**
      * Default db config
@@ -23,6 +26,12 @@ class DB_mysqli_pool extends DB_mysqli
      */
     protected $config = [];
 
+    /**
+     * @noinspection PhpMissingParentConstructorInspection
+     * @noinspection PhpUnhandledExceptionInspection
+     * @param string $db_config
+     * @throws \ePHP\Exception\ExitException
+     */
     function __construct($db_config = 'default')
     {
         $this->db_config = $db_config;
@@ -80,6 +89,7 @@ class DB_mysqli_pool extends DB_mysqli
      *
      * @param string $sql
      * @return object
+     * @throws \ePHP\Exception\ExitException
      */
     public function query($sql)
     {
@@ -133,6 +143,7 @@ class DB_mysqli_pool extends DB_mysqli
         // echo ',cap='. (DBPool::init($this->db_config)->cap);
         // var_dump(DBPool::init($this->db_config)->queue);
 
+        /** @noinspection PhpUndefinedVariableInspection */
         return $rs;
     }
 
@@ -140,12 +151,12 @@ class DB_mysqli_pool extends DB_mysqli
      * 过滤SQL中的不安全字符
      *
      * @param string $str
+     * @return string
      */
     public function escape_string($str)
     {
         // Prepare one MySQL client connect
         $isFromPool = $this->prepareDB();
-
         $str = $this->db->real_escape_string($str);
 
         if ($isFromPool) {

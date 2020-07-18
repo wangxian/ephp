@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace ePHP\Cache;
 
@@ -6,9 +6,13 @@ use ePHP\Core\Config;
 
 class CacheMemcached
 {
-    // 原始链接驱动链接
+    /**
+     * 原始链接驱动链接
+     * @var \MemCache
+     */
     public $connection;
 
+    /** @noinspection PhpUnhandledExceptionInspection */
     function __construct()
     {
         /** @noinspection PhpComposerExtensionStubsInspection */

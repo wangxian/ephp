@@ -1,4 +1,6 @@
 <?php
+/** @noinspection ALL */
+
 namespace ePHP\Model;
 
 use ePHP\Core\Config;

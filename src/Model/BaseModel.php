@@ -1,9 +1,12 @@
-<?php /** @noinspection PhpUnused */
+<?php
+/** @noinspection PhpDocMissingThrowsInspection */
+/** @noinspection PhpUnused */
 
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
 use \ePHP\Cache\Cache;
+use ePHP\Exception\ExitException;
 
 class BaseModel
 {
@@ -64,6 +67,7 @@ class BaseModel
      * @return mixed $db
      * @noinspection PhpIncludeInspection
      * @noinspection SpellCheckingInspection
+     * @noinspection PhpUnhandledExceptionInspection
      */
     private function conn()
     {
@@ -128,6 +132,7 @@ class BaseModel
      *
      * @access private
      * @return string
+     * @noinspection PhpUnhandledExceptionInspection
      */
     private function _get_table_name()
     {
@@ -142,7 +147,7 @@ class BaseModel
                     $this->table_name = $tb_prefix . $this->table_name;
                 }
             } else {
-                throw_error('Tablename cannot automatically infer.');
+                throw_error('Table name can not automatically infer.');
             }
         }
 
@@ -506,6 +511,7 @@ class BaseModel
      *
      * @param string $type 查询类型,fetch_array fetch_arrays...
      * @return mixed
+     * @noinspection PhpUnhandledExceptionInspection
      */
     protected function _find($type)
     {
@@ -532,6 +538,7 @@ class BaseModel
      * @return array $data
      * @noinspection SqlNoDataSourceInspection
      * @noinspection SqlDialectInspection
+     * @throws ExitException
      */
     public function findPage()
     {

@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection ALL */
+
 namespace ePHP\Model;
 
 class DBPool
@@ -39,7 +40,8 @@ class DBPool
     /**
      * Dynamically handle calls to the class.
      *
-     * @return \ePHP\Model\Pool
+     * @param $name
+     * @return DBPool
      */
     public static function init($name)
     {

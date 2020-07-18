@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace ePHP\Misc;
 
 /**
@@ -485,7 +486,12 @@ class Pinyin
         );
     }
 
-    // 编码转换
+    /**
+     * @param $from
+     * @param $to
+     * @param $fContents
+     * @return bool|false|string
+     */
     private function iconvStr($from, $to, $fContents)
     {
         if (is_string($fContents)) {
@@ -497,6 +503,8 @@ class Pinyin
                 return $fContents;
             }
         }
+
+        return false;
     }
 
     public function __destruct()

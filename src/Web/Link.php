@@ -1,19 +1,24 @@
 <?php
- /**
- +------------------------------------------------------------------------------
+/** @noinspection PhpUnusedPrivateFieldInspection */
+/** @noinspection PhpUnusedFieldDefaultValueInspection */
+/** @noinspection PhpUnused */
+/** @noinspection HtmlUnknownAttribute */
+
+/**
+ * +------------------------------------------------------------------------------
  * 分页导航 通用类 暂时提供了5中通用的分页方法；
  * 用法：$link = new Link('当第几页', '总数据量', '分页的url', '每页显示的数据数', '每次显示的页数');
  * 类初始化后：$link->show(3);
  * by 木頭
  * 2008.12.22
- +------------------------------------------------------------------------------
+ * +------------------------------------------------------------------------------
  * @version 2.5
  * @author WangXian
  * @email wo#wangxian.me
  * @package  libraries
  * @creation_date 2008.12.22
  * @last_modified 2011-06-05
- +------------------------------------------------------------------------------
+ * +------------------------------------------------------------------------------
  */
 
 class Link
@@ -36,12 +41,20 @@ class Link
     // 总页数
     private $totalpage;
 
+    /**
+     * Link constructor.
+     * @param $cpage
+     * @param $totaldata
+     * @param $url
+     * @param int $pagenum
+     * @param int $opage
+     */
     public function __construct($cpage, $totaldata, $url, $pagenum = 10, $opage = 9)
     {
-        $this->cpage = $cpage;
+        $this->cpage     = $cpage;
         $this->totaldata = $totaldata;
-        $this->url = $url;
-        $this->totalpage = $totaldata ? ceil( $totaldata / $pagenum ) : 1;
+        $this->url       = $url;
+        $this->totalpage = $totaldata ? ceil($totaldata / $pagenum) : 1;
 
         $this->opage = $opage;
     }
@@ -54,7 +67,8 @@ class Link
      * -3 : 滑动滚动
      * -4 : wap2.0
      * -5 : wap1.2
-     * @param integer $style 可选：1,2,3,4,5
+     * @param int $style 可选：1,2,3,4,5
+     * @return string
      */
     public function show($style)
     {
@@ -80,19 +94,20 @@ class Link
                 return $this->f5();
                 break;
             default:
-                $this->f1();
+                return $this->f1();
         }
     }
 
     private function url($tpage)
     {
-        return $this->url.'?page='.$tpage;
+        return $this->url . '?page=' . $tpage;
     }
 
     /**
      * 普通的上一页，下一页方式
      *
-     * @return void
+     * @return string
+     * @noinspection PhpUnusedLocalVariableInspection
      */
     private function f1()
     {
@@ -108,14 +123,14 @@ class Link
             $nextpage = $this->cpage + 1;
             $_linkstr .= "<span class=\"disabled\">首页</span>" . " \n";
             $_linkstr .= "<span class=\"disabled\">上一页</span> \n";
-            $_linkstr .= "<a href=\"" . $this->url ( $nextpage ) . "\">下一页</a> \n";
-            $_linkstr .= "<a href=\"" . $this->url ( $this->totalpage ) . "\">尾页</a> \n";
+            $_linkstr .= "<a href=\"" . $this->url($nextpage) . "\">下一页</a> \n";
+            $_linkstr .= "<a href=\"" . $this->url($this->totalpage) . "\">尾页</a> \n";
         } elseif ($this->cpage >= $this->totalpage) {
             // ＝尾页
             $prepage = $this->cpage - 1;
 
-            $_linkstr .= "<a href=\"" . $this->url ( 1 ) . "\">首页</a>\n";
-            $_linkstr .= "<a href=\"" . $this->url ( $prepage ) . "\">上一页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url(1) . "\">首页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url($prepage) . "\">上一页</a>\n";
             $_linkstr .= "\n<span class=\"disabled\">下一页</span>\n";
             $_linkstr .= "<span class=\"disabled\">尾页</span>" . "\n";
         } else {
@@ -123,10 +138,10 @@ class Link
             $prepage  = $this->cpage - 1;
             $nextpage = $this->cpage + 1;
 
-            $_linkstr .= "<a href=\"" . $this->url ( 1 ) . "\">首页</a>\n";
-            $_linkstr .= "<a href=\"" . $this->url ( $prepage ) . "\">上一页</a>\n";
-            $_linkstr .= "\n<a href=\"" . $this->url ( $nextpage ) . "\">下一页</a>\n";
-            $_linkstr .= "<a href=\"" . $this->url ( $this->totalpage ) . "\">尾页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url(1) . "\">首页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url($prepage) . "\">上一页</a>\n";
+            $_linkstr .= "\n<a href=\"" . $this->url($nextpage) . "\">下一页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url($this->totalpage) . "\">尾页</a>\n";
         }
         $_linkstr .= "</p>\n"; //end div
         return $_linkstr;
@@ -137,18 +152,18 @@ class Link
      */
     private function f2()
     {
-        $p1 = ceil ( ($this->cpage - $this->opage) / $this->opage );
+        $p1 = ceil(($this->cpage - $this->opage) / $this->opage);
 
         // 计算开始页 结束页
         $beginpage = $p1 * ($this->opage) + 1;
-        $endpage = ($p1 + 1) * ($this->opage);
+        $endpage   = ($p1 + 1) * ($this->opage);
         if ($endpage > $this->totalpage) {
             // 最后一页 大于总页数
             $endpage = $this->totalpage;
         }
 
         // 前后滚10页
-        $preopage = ($beginpage - $this->opage > 0) ? $beginpage - $this->opage : ''; //上一个N页码
+        $preopage  = ($beginpage - $this->opage > 0) ? $beginpage - $this->opage : '';                //上一个N页码
         $nextopage = ($beginpage + $this->opage < $this->totalpage) ? $beginpage + $this->opage : ''; //下一个N页码
 
 
@@ -159,7 +174,7 @@ class Link
 
         // 前滚10页码
         if ($preopage) {
-            $_linkstr .= "<a href=\"" . $this->url ( $preopage ) . "\">上{$this->opage}页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url($preopage) . "\">上{$this->opage}页</a>\n";
         } else {
             $_linkstr .= "<span class=\"disabled\">上{$this->opage}页</span>\n";
         }
@@ -191,12 +206,12 @@ class Link
     private function f3()
     {
         // 计算开始页 结束页
-        if ($this->cpage > ceil ( ($this->opage) / 2 )) {
-            $beginpage = $this->cpage - floor( ($this->opage) / 2 );
-            $endpage = $this->cpage + floor( ($this->opage) / 2 );
+        if ($this->cpage > ceil(($this->opage) / 2)) {
+            $beginpage = $this->cpage - floor(($this->opage) / 2);
+            $endpage   = $this->cpage + floor(($this->opage) / 2);
         } else {
             $beginpage = 1;
-            $endpage = $this->opage;
+            $endpage   = $this->opage;
         }
 
         // 限制末页
@@ -212,7 +227,7 @@ class Link
         // 首页
         if ($this->cpage > 1) {
             $_linkstr .= "<a href=\"{$this->url(1)}\">首页</a> \n";
-            $_linkstr .= "<a href=\"" . $this->url ( $this->cpage - 1 ) . "\">上一页</a> \n";
+            $_linkstr .= "<a href=\"" . $this->url($this->cpage - 1) . "\">上一页</a> \n";
         } else {
             $_linkstr .= "<span class=\"disabled\">首页</span>" . " \n";
             $_linkstr .= "<span class=\"disabled\">上一页</span>" . " \n";
@@ -232,8 +247,8 @@ class Link
             $_linkstr .= "<span class=\"disabled\">下一页</span>" . " \n";
             $_linkstr .= "<span class=\"disabled\">尾页</span>" . " \n";
         } else {
-            $_linkstr .= "<a href=\"" . $this->url ( $this->cpage + 1 ) . "\">下一页</a> \n";
-            $_linkstr .= "<a href=\"" . $this->url ( $this->totalpage ) . "\">尾页</a> \n";
+            $_linkstr .= "<a href=\"" . $this->url($this->cpage + 1) . "\">下一页</a> \n";
+            $_linkstr .= "<a href=\"" . $this->url($this->totalpage) . "\">尾页</a> \n";
         }
 
         // end div
@@ -249,22 +264,22 @@ class Link
         if ($this->cpage > $this->totalpage) {
             $this->cpage = 1;
         }
-        $out = '<form method="post" action="'. $this->url( $this->cpage ) .'">';
+        $out = '<form method="post" action="' . $this->url($this->cpage) . '">';
         $out .= '<p class="links">';
 
         // 上一页
         if ($this->cpage > 1) {
-            $out .= '<a href="'. $this->url($this->cpage - 1) .'">上页</a>&nbsp;';
+            $out .= '<a href="' . $this->url($this->cpage - 1) . '">上页</a>&nbsp;';
         }
 
         // 下一页
         if ($this->cpage < $this->totalpage) {
-            $out .= '<a href="'. $this->url($this->cpage + 1).'">下页</a>&nbsp;'."\n";
+            $out .= '<a href="' . $this->url($this->cpage + 1) . '">下页</a>&nbsp;' . "\n";
         }
 
-        $out .= '&nbsp;&nbsp;<input type="text" name="page" size="2" value="'. $this->cpage .'" />';
+        $out .= '&nbsp;&nbsp;<input type="text" name="page" size="2" value="' . $this->cpage . '" />';
         $out .= '<input type="submit" name="pagego" value="跳转" />';
-        $out .= '&nbsp;&nbsp;'. $this->cpage .'/'. $this->totalpage .'页'."\n";
+        $out .= '&nbsp;&nbsp;' . $this->cpage . '/' . $this->totalpage . '页' . "\n";
 
         $out .= '</p>';
         $out .= '</form>';
@@ -274,6 +289,7 @@ class Link
 
     /**
      * wap1.2分页
+     * @noinspection PhpUnusedLocalVariableInspection
      */
     private function f5()
     {
@@ -283,33 +299,33 @@ class Link
         if ($this->cpage == $this->totalpage || $this->totalpage == 0) {
             $_linkstr .= "<span class=\"disabled\">下一页</span>" . " \n";
         } else {
-            $_linkstr .= "<a href=\"" . $this->url ( $this->cpage + 1 ) . "\">下一页</a> \n";
+            $_linkstr .= "<a href=\"" . $this->url($this->cpage + 1) . "\">下一页</a> \n";
         }
 
-        $_linkstr .=' / ';
+        $_linkstr .= ' / ';
 
         // 首页
         if ($this->cpage > 1) {
-            $_linkstr .= "<a href=\"" . $this->url ( $this->cpage - 1 ) . "\">上一页</a>\n";
+            $_linkstr .= "<a href=\"" . $this->url($this->cpage - 1) . "\">上一页</a>\n";
         } else {
             $_linkstr .= "<span class=\"disabled\">上一页</span>" . "\n";
         }
 
-        $_linkstr .='<br />';
+        $_linkstr .= '<br />';
 
         // 数字分页
-        if ($this->totalpage<7) {
-            for ($i=1; $i<$this->totalpage+1; $i++) {
+        if ($this->totalpage < 7) {
+            for ($i = 1; $i < $this->totalpage + 1; $i++) {
                 if ($this->cpage == $i) {
-                    $_linkstr .=  "<span class=\"current\">$i</span>\n";
+                    $_linkstr .= "<span class=\"current\">$i</span>\n";
                 } else {
                     $_linkstr .= "<a href=\"{$this->url($i)}\">{$i}</a> \n";
                 }
             }
-        } elseif ($this->cpage < 4 && $this->totalpage>7) {
-            for ($i=1; $i<5; $i++) {
+        } elseif ($this->cpage < 4 && $this->totalpage > 7) {
+            for ($i = 1; $i < 5; $i++) {
                 if ($this->cpage == $i) {
-                    $_linkstr .=  "<span class=\"current\">$i</span>\n";
+                    $_linkstr .= "<span class=\"current\">$i</span>\n";
                 } else {
                     $_linkstr .= "<a href=\"{$this->url($i)}\">{$i}</a>\n";
                 }
@@ -317,10 +333,10 @@ class Link
             $_linkstr .= " ... ";
             $_linkstr .= "<a href=\"{$this->url($this->totalpage)}\">{$this->totalpage}</a>\n";
         } elseif ($this->cpage >= 4 && $this->totalpage > $this->cpage + 4) {
-            $beginpage = $this->cpage - ceil ( ($this->opage) / 2 );
-            for ($i=$this->cpage - 2; $i<=$this->cpage+1; $i++) {
+            $beginpage = $this->cpage - ceil(($this->opage) / 2);
+            for ($i = $this->cpage - 2; $i <= $this->cpage + 1; $i++) {
                 if ($this->cpage == $i) {
-                    $_linkstr .=  "<span class=\"current\">$i</span>\n";
+                    $_linkstr .= "<span class=\"current\">$i</span>\n";
                 } else {
                     $_linkstr .= "<a href=\"{$this->url($i)}\">{$i}</a>\n";
                 }
@@ -328,20 +344,20 @@ class Link
             $_linkstr .= " ... ";
             $_linkstr .= "<a href=\"{$this->url($this->totalpage)}\">{$this->totalpage}</a>\n";
         } elseif ($this->totalpage <= $this->cpage + 4) {
-            $beginpage = $this->cpage - ceil ( ($this->opage) / 2 );
-            for ($i=$this->totalpage-7; $i<=$this->totalpage; $i++) {
+            $beginpage = $this->cpage - ceil(($this->opage) / 2);
+            for ($i = $this->totalpage - 7; $i <= $this->totalpage; $i++) {
                 if ($this->cpage == $i) {
-                    $_linkstr .=  "<span class=\"current\">$i</span>\n";
+                    $_linkstr .= "<span class=\"current\">$i</span>\n";
                 } else {
                     $_linkstr .= "<a href=\"{$this->url($i)}\">{$i}</a> \n";
                 }
             }
         }
 
-        $_linkstr.='
+        $_linkstr .= '
 			到<input name="goPageNo" format="*N" size="2" value="" maxlength="3" emptyok="true"/>页
 			<anchor>
-			<go href="'. $this->url('') .'" method="post" sendreferer="true">
+			<go href="' . $this->url('') . '" method="post" sendreferer="true">
 				<postfield name="page" value="$goPageNo"/>
 			</go>跳转
 			</anchor>

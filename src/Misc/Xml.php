@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace ePHP\Misc;
 
 /**
@@ -12,17 +13,19 @@ class Xml
      *
      * @param mixed $data
      * @param string $encoding
+     * @return string
      */
     public static function toXml($data, $encoding = 'UTF-8')
     {
         header('Content-Type: text/xml');
         $xml = '<?xml version="1.0" encoding="' . $encoding . "\"?>\n";
-        return $xml .= self::_to_xml_body($data);
+        return $xml . self::_to_xml_body($data);
     }
 
     /**
      * @param mixed $data
      * @param string $child_label
+     * @return string
      * @ignore
      */
     private static function _to_xml_body($data, $child_label = '')
@@ -61,6 +64,7 @@ class Xml
      *
      * @param string xml内容
      * @param boolean $file xml文件路径
+     * @return array
      */
     public static function toArray($xml, $file = false)
     {
@@ -71,9 +75,11 @@ class Xml
     /**
      * SimpleXMLElement to array
      *
+     * @param $data
+     * @return array
      * @ignore
      */
-    private static function _toArray($data, $recursion = false)
+    private static function _toArray($data)
     {
         $tmp  = array();
         $data = (array) $data;
@@ -82,7 +88,7 @@ class Xml
             if (isset($v[0]) && is_string($v[0])) {
                 $tmp[$k] = $v[0];
             } else {
-                $tmp[$k] = self::_toArray($v, true);
+                $tmp[$k] = self::_toArray($v);
             }
         }
         return $tmp;

@@ -1,4 +1,7 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpUnusedPrivateMethodInspection */
+
 namespace ePHP\Misc;
 
 /**
@@ -27,10 +30,9 @@ namespace ePHP\Misc;
  * dd($this->validate->error());
  * </code>
  */
-
 class Validate
 {
-    private $_error   = array();
+    private $_error = array();
     private $_message = array(
         'email'            => 'invalid email',
         'required'         => 'is empty',
@@ -136,7 +138,7 @@ class Validate
      */
     private function url($url)
     {
-        return preg_match('/^((https?|ftp|news):\/\/)?([a-z]([a-z0-9\-]*\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel)|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-z][a-z0-9_]*)?$/i', $url) ? true : false;
+        return preg_match('/^((https?|ftp|news):\/\/)?([a-z]([a-z0-9\-]*\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel)|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))(\/[a-z0-9_\-.~]+)*(\/([a-z0-9_\-.]*)(\?[a-z0-9+_\-.%=&amp;]*)?)?(#[a-z][a-z0-9_]*)?$/i', $url) ? true : false;
     }
 
     /**
@@ -188,6 +190,7 @@ class Validate
      *
      * @param mixed $value
      * @return boolean
+     * @noinspection PhpComposerExtensionStubsInspection
      */
     private function digit($value)
     {
@@ -243,9 +246,9 @@ class Validate
                 continue;
             }
 
-            #循环验证
+            // 循环验证
             foreach ($rule as $rule_type => $rule_value) {
-                //密码验证
+                // 密码验证
                 if ($rule_type == 'password_confirm') {
                     if ($data[$key] != $data[$rule_value]) {
                         $this->_error[$key] = $this->_msg($message, $rule_type);
@@ -273,7 +276,7 @@ class Validate
      * Check value
      *
      * @param mixed $value
-     * @param array $rule_type
+     * @param string $rule_type
      * @param mixed $rule_value 规则的值
      * @return mixed string as error, true for OK
      */
@@ -306,8 +309,8 @@ class Validate
     /**
      * Set error message
      *
-     * @param array $rule
-     * @param string $name
+     * @param $message
+     * @param $rule_type
      * @return string
      */
     private function _msg($message, $rule_type)
@@ -323,7 +326,7 @@ class Validate
 
     /**
      * Get error message
-     * @return string
+     * @return array
      */
     public function error()
     {

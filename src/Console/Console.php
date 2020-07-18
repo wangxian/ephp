@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
+/** @noinspection PhpDocMissingThrowsInspection */
 
 namespace ePHP\Console;
 
@@ -60,9 +62,10 @@ class Console
     /**
      * Write message
      *
-     * @param  int $level
-     * @param  string $message
+     * @param int $level
+     * @param string $message
      * @return void
+     * @noinspection PhpUnhandledExceptionInspection
      */
     private function _log($level, $message)
     {

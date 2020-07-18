@@ -25,7 +25,10 @@
     "ext-json": "*",
     "ext-curl": "*",
     "ext-redis": "*",
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+    "ext-gd": "*",
+    "ext-iconv": "*",
+    "ext-simplexml": "*"
   },
   "autoload": {
     "files": [

@@ -1,4 +1,7 @@
 <?php
+/** @noinspection ALL */
+
+// 废弃了，官方建议使用MySQLi hook的方式
 // Swoole Coroutine MySQL
 namespace ePHP\Model;
 

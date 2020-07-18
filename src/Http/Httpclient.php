@@ -1,4 +1,8 @@
-<?php
+<?php /** @noinspection SpellCheckingInspection */
+/** @noinspection PhpUnused */
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+
 namespace ePHP\Http;
 
 /**
@@ -56,10 +60,11 @@ class Httpclient
      * Make a HTTP GET request.
      *
      * @param string $url
-     * @param mixed  $params
-     * @param array  $options
+     * @param mixed $params
+     * @param array $options
      *
      * @return HttpclientResponse
+     * @throws \Exception
      */
     public function get($url, $params = array(), $options = array())
     {
@@ -70,10 +75,11 @@ class Httpclient
      * Make a HTTP POST request.
      *
      * @param string $url
-     * @param mixed  $params
-     * @param array  $options
+     * @param mixed $params
+     * @param array $options
      *
      * @return HttpclientResponse
+     * @throws \Exception
      */
     public function post($url, $params = array(), $options = array())
     {
@@ -84,10 +90,11 @@ class Httpclient
      * Make a HTTP PUT request.
      *
      * @param string $url
-     * @param mixed  $params
-     * @param array  $options
+     * @param mixed $params
+     * @param array $options
      *
      * @return HttpclientResponse
+     * @throws \Exception
      */
     public function put($url, $params = array(), $options = array())
     {
@@ -98,10 +105,11 @@ class Httpclient
      * Make a HTTP PATCH request.
      *
      * @param string $url
-     * @param mixed  $params
-     * @param array  $options
+     * @param mixed $params
+     * @param array $options
      *
      * @return HttpclientResponse
+     * @throws \Exception
      */
     public function patch($url, $params = array(), $options = array())
     {
@@ -112,10 +120,11 @@ class Httpclient
      * Make a HTTP DELETE request.
      *
      * @param string $url
-     * @param mixed  $params
-     * @param array  $options
+     * @param mixed $params
+     * @param array $options
      *
      * @return HttpclientResponse
+     * @throws \Exception
      */
     public function delete($url, $params = array(), $options = array())
     {
@@ -127,10 +136,12 @@ class Httpclient
      *
      * @param string $url
      * @param string $method
-     * @param mixed  $params
-     * @param array  $options
+     * @param mixed $params
+     * @param array $options
      *
      * @return HttpclientResponse
+     * @throws \Exception
+     * @noinspection SpellCheckingInspection
      */
     protected function request($url, $method = self::GET, $params = array(), $options = array())
     {
@@ -155,7 +166,7 @@ class Httpclient
         // 使用证书
         if (isset($options['sslcert_path']) && isset($options['sslkey_path'])) {
             if (!file_exists($options['sslcert_path']) || !file_exists($options['sslkey_path'])) {
-                throw new \Exception('Certfile is not correct');
+                throw new \Exception('Cert file is not correct');
             }
 
             // 设置证书
@@ -264,6 +275,7 @@ class Httpclient
      * Perform the Curl request.
      *
      * @return array
+     * @throws \Exception
      */
     protected function doCurl()
     {

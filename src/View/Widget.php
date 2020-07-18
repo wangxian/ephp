@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedConstantInspection */
+
 /**
 +------------------------------------------------------------------------------
  * 挂件类
@@ -21,6 +23,11 @@ class Widget
     private $tVar = array();
 
     // abstract public function run();
+    /**
+     * @var Widget
+     */
+    private $view;
+
     public function __construct()
     {
         // 不改变控制器中的使用习惯
@@ -29,7 +36,8 @@ class Widget
 
     /**
      * @param string $name widget name
-     * @param array $data default ''
+     * @param string $data default ''
+     * @noinspection PhpIncludeInspection
      */
     public static function show($name, $data = '')
     {
@@ -66,12 +74,13 @@ class Widget
         }
 
         // 释放assign的变量
+        /** @noinspection PhpIncludeInspection */
         include $filename;
     }
 
-    protected function layout($file = '', $expire = -1)
+    protected function layout($file = '')
     {
-        $this->render($file, $expire);
+        $this->render($file);
     }
 
     protected function assign($name, $value = '')

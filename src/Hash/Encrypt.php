@@ -1,5 +1,8 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace ePHP\Hash;
+
+use ePHP\Misc\Func;
 
 class Encrypt
 {
@@ -19,7 +22,7 @@ class Encrypt
         $key = md5($secret . "30f7384ac1");
 
         $ciphertext_raw = openssl_encrypt($str, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
-        return \ePHP\Misc\Func::safe_b64encode($ciphertext_raw);
+        return Func::safe_b64encode($ciphertext_raw);
     }
 
     /**
@@ -37,8 +40,8 @@ class Encrypt
 
         $key = md5($secret . "30f7384ac1");
 
-        $ciphertext_raw = \ePHP\Misc\Func::safe_b64decode($str);
-        return openssl_decrypt($ciphertext_raw, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
+        $cipher_text_raw = Func::safe_b64decode($str);
+        return openssl_decrypt($cipher_text_raw, 'AES-128-ECB', $key, OPENSSL_RAW_DATA);
     }
 
     /**
@@ -58,7 +61,7 @@ class Encrypt
     {
         // ENCODE
         $key_length    = strlen($key);
-        $string        = $operation == 'DECODE' ? \ePHP\Misc\Func::safe_b64decode($string) : substr(md5($string . $key), 0, 8) . $string;
+        $string        = $operation == 'DECODE' ? Func::safe_b64decode($string) : substr(md5($string . $key), 0, 8) . $string;
         $string_length = strlen($string);
         $rndkey        = $box = array();
         $result        = '';
@@ -92,7 +95,7 @@ class Encrypt
                 return '';
             }
         } else {
-            return \ePHP\Misc\Func::safe_b64encode($result);
+            return Func::safe_b64encode($result);
         }
     }
 

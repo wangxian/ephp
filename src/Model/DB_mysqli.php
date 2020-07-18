@@ -1,5 +1,5 @@
-<?php /** @noinspection PhpUnused */
-
+<?php
+/** @noinspection PhpUnused */
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 namespace ePHP\Model;
@@ -14,6 +14,7 @@ class DB_mysqli
     public $db = null;
     protected $config = [];
 
+    /** @noinspection PhpUnhandledExceptionInspection */
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;

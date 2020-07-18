@@ -2,8 +2,6 @@
 
 namespace ePHP\Exception;
 
-use ePHP\Core\Config;
-
 class ExitException extends CommonException
 {
     public function __construct()

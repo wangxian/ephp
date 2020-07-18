@@ -1,6 +1,8 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace ePHP\Core;
+
+use ePHP\Exception\ExitException;
 
 /**
  * 系统配置类
@@ -28,9 +30,10 @@ class Config
      * 其他的app自定义配置，可以使用get进行载入，如果已经载入过一次
      * 则不在载入，相当于缓存配置。
      *
-     * @param  string $key
-     * @param  string $config_name 配置项名称，如mian
+     * @param string $key
+     * @param string $config_name 配置项名称，如mian
      * @return mixed
+     * @throws ExitException
      */
     public static function get($key, $config_name = 'main')
     {

@@ -1,5 +1,8 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace ePHP\Http;
+
+use ePHP\Misc\Func;
 
 /**
  * 图片缩略图、验证码
@@ -31,23 +34,22 @@ class Image
     /**
      * 得到图片的信息
      *
-     * @param $imgfile 文件文件名
+     * @param string $img_file 文件文件名
      * @return mixed
      */
-    public static function getInfo($imgfile)
+    public static function getInfo($img_file)
     {
-        $imageInfo = getimagesize($imgfile);
+        $imageInfo = getimagesize($img_file);
         if ($imageInfo !== false) {
             $imageType = strtolower(substr(image_type_to_extension($imageInfo[2]), 1));
-            $imageSize = filesize($imgfile);
-            $info      = array(
+            $imageSize = filesize($img_file);
+            return array(
                 "width"  => $imageInfo[0],
                 "height" => $imageInfo[1],
                 "type"   => $imageType,
                 "size"   => $imageSize,
                 "mime"   => $imageInfo['mime'],
             );
-            return $info;
         } else {
             return false;
         }
@@ -58,32 +60,34 @@ class Image
      *
      * 缩略图会根据源图的比例进行缩略的，生成的缩略图格式是JPG
      *
-     * @param string $srcfile 源文件名
-     * @param string $dstfile 生成缩略图的文件名
+     * @param string $src_file 源文件名
+     * @param string $dist_file 生成缩略图的文件名
      * @param string $thumbWidth 缩略图最大宽度
      * @param string $thumbHeight 缩略图最大高度
+     * @return bool
      */
-    public static function thumbImg($srcfile, $dstfile, $thumbWidth, $thumbHeight)
+    public static function thumbImg($src_file, $dist_file, $thumbWidth, $thumbHeight)
     {
-        $imageinfo = getimagesize($srcfile);
-        if (empty($imageinfo)) {
+        $image_info = getimagesize($src_file);
+        if (empty($image_info)) {
             throw_error('只支持gif,jpg,png的图片');
         }
 
-        // dd($imageinfo);
+        // dd($image_info);
 
-        if ($imageinfo[2] == 1) {
-            $im = imagecreatefromgif($srcfile);
-        } elseif ($imageinfo[2] == 2) {
-            $im = imagecreatefromjpeg($srcfile);
-        } elseif ($imageinfo[2] == 3) {
-            $im = imagecreatefrompng($srcfile);
+        $im = null;
+        if ($image_info[2] == 1) {
+            $im = imagecreatefromgif($src_file);
+        } elseif ($image_info[2] == 2) {
+            $im = imagecreatefromjpeg($src_file);
+        } elseif ($image_info[2] == 3) {
+            $im = imagecreatefrompng($src_file);
         } else {
             throw_error('只支持gif,jpg,png的图片');
         }
 
-        $w = $imageinfo[0];
-        $h = $imageinfo[1];
+        $w = $image_info[0];
+        $h = $image_info[1];
 
         if ($thumbWidth / $thumbHeight > $w / $h) {
             $nh = $thumbHeight;
@@ -96,10 +100,10 @@ class Image
 
         $ni = imagecreatetruecolor($nw, $nh);
         imagecopyresampled($ni, $im, 0, 0, 0, 0, $nw, $nh, $w, $h);
-        imagejpeg($ni, $dstfile);
+        imagejpeg($ni, $dist_file);
         imagedestroy($im);
 
-        return file_exists($dstfile);
+        return file_exists($dist_file);
     }
 
     /**
@@ -111,11 +115,10 @@ class Image
      * @param int $mode 0大小写字母，1数字，2大写字母，3小写字母,5大小写+数字
      * @param string $type 图片类型
      * @param bool $hasborder 图片边框有否
-     * @return null
      */
     public static function captcha($length = 4, $mode = 3, $type = 'png', $hasborder = true)
     {
-        $randval                   = \ePHP\Misc\Func::randString($length, $mode);
+        $randval                   = Func::randString($length, $mode);
         $_SESSION['imgVerifyCode'] = md5(strtolower($randval));
 
         $width  = 50;
@@ -151,7 +154,8 @@ class Image
         }
 
         for ($i = 0; $i < 25; $i++) {
-            $fontcolor = imagecolorallocate($im, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
+            // $fontcolor = imagecolorallocate($im, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
+            imagecolorallocate($im, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
             imagesetpixel($im, mt_rand(0, $width), mt_rand(0, $height), $pointColor);
         }
 
@@ -166,7 +170,7 @@ class Image
     /**
      * 检测输入的验证码是否正确
      *
-     * @param $verifyCode 用户输入的验证码
+     * @param string $verifyCode 用户输入的验证码
      * @return bool
      */
     public static function checkCaptcha($verifyCode)

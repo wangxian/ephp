@@ -1,4 +1,8 @@
-<?php /** @noinspection PhpUndefinedConstantInspection */
+<?php
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection PhpUnused */
+
+/** @noinspection PhpUndefinedConstantInspection */
 
 namespace ePHP\Http;
 
@@ -77,10 +81,10 @@ class CookieSwoole
     public function delete($name, $path = '/', $domain = '')
     {
         if (empty($domain)) {
-            \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, '/');
+            \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, $path);
         } else {
             $domain = '.' . serverv('HTTP_HOST');
-            \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, '/', $domain);
+            \Swoole\Coroutine::getContext()['__$response']->cookie($name, null, time() - 3600, $path, $domain);
         }
     }
 

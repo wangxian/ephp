@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
 namespace ePHP\Exception;
 
@@ -11,6 +13,7 @@ class CommonException extends \Exception
      * @param string $message 错误消息
      * @param integer $code 错误码
      * @param mixed $previous
+     * @noinspection SpellCheckingInspection
      */
     public function __construct($message, $code = 0, $previous = null)
     {

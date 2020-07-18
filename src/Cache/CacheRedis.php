@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+
+/** @noinspection PhpUnused */
 
 namespace ePHP\Cache;
 
@@ -18,6 +20,7 @@ class CacheRedis
      */
     public $connection;
 
+    /** @noinspection PhpUnhandledExceptionInspection */
     function __construct($type = 'redis')
     {
         $config = Config::get('cache_redis');

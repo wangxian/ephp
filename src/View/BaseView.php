@@ -1,8 +1,10 @@
 <?php
+/** @noinspection ALL */
 
 namespace ePHP\View;
 
 use ePHP\Cache\Cache;
+use ePHP\Exception\ExitException;
 
 /**
  * 基础视图
@@ -44,7 +46,7 @@ class BaseView
      *
      * @param string $file 视图名称，默认 `控制器/视图.ptpl`
      * @param int $expire 视图有效期(单位秒), 默认-1。当$expire>0缓存，=0长期缓存，<0不缓存
-     * @package bool $layout_block 是否使用布局模版, 默认不使用
+     * @param bool $layout_block
      */
     public function render($file = '', $expire = -1, $layout_block = false)
     {

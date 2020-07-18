@@ -1,18 +1,18 @@
-<?php
- /**
- +------------------------------------------------------------------------------
+<?php /** @noinspection PhpUnused */
+
+/**
+ * +------------------------------------------------------------------------------
  * Html辅助类
  * html生成，生存表单元素等；
- +------------------------------------------------------------------------------
+ * +------------------------------------------------------------------------------
  * @version 3.0
  * @author WangXian
  * @email wo#wangxian.me
  * @package  libraries
  * @creation_date 2010-10-17
  * @last_modified 2010-12-25 19:02:12
- +------------------------------------------------------------------------------
+ * +------------------------------------------------------------------------------
  */
-
 class Html
 {
     /**
@@ -20,10 +20,11 @@ class Html
      * 判断str1 str1是否相同，相同返回selected 否则为空。
      * @param string $str1
      * @param string $str2
+     * @return string
      */
     public static function selected($str1, $str2)
     {
-        return $str1 == $str2 ? 'selected="selected"':'';
+        return $str1 == $str2 ? 'selected="selected"' : '';
     }
 
     /**
@@ -31,22 +32,11 @@ class Html
      * 判断str1 str1是否相同，相同返回selected 否则为空。
      * @param string $str1
      * @param string $str2
+     * @return string
      */
     public static function checked($str1, $str2)
     {
-        return $str1 == $str2 ? 'checked="checked"':'';
-    }
-
-    /**
-     * 生成a链接，只能生成本站内的地址
-     * @param string $uri '控制器/action'
-     * @param string $text '链接文字'
-     * @return string
-     */
-    public static function a($uri, $text = '')
-    {
-        $text = ($text == '') ? $uri : $text;
-        return '<a href="'. U($uri) .'" title="">'. $text .'</a>';
+        return $str1 == $str2 ? 'checked="checked"' : '';
     }
 
     /**
@@ -57,7 +47,7 @@ class Html
      */
     public static function img($pic, $alt = '')
     {
-        return '<img src="'. $pic .'" alt="'. $alt .'" />';
+        return '<img src="' . $pic . '" alt="' . $alt . '" />';
     }
 
     /**
@@ -83,7 +73,7 @@ class Html
     /**
      * 生成html外链资源link
      * 链接资源、css、js、ico
-     * @param $source 列举资源类型
+     * @param string $source 列举资源类型
      * @return string
      */
     public static function link_tag($source)
@@ -92,10 +82,11 @@ class Html
         if ($ext == '.css') {
             return "<link href=\"{$source}\" rel=\"stylesheet\" type=\"text/css\" />";
         } elseif ($ext == '.js') {
-            return '<script type="text/javascript" src="'. $source .'"></script>';
+            return '<script type="text/javascript" src="' . $source . '"></script>';
         } elseif ($ext == '.ico') {
-            return '<link href="'. $source .'" rel="shortcut icon" type="image/ico" />';
+            return '<link href="' . $source . '" rel="shortcut icon" type="image/ico" />';
         }
+        return '';
     }
 
     /**
@@ -106,15 +97,15 @@ class Html
      */
     public static function ul($data, $attributes = array())
     {
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             return '';
         }
-        $attributes = $attributes + array('id'=>'', 'class'=>'');
+        $attributes = $attributes + array('id' => '', 'class' => '');
 
-        $str="<ul id=\"". $attributes['id'] ."\" class=\"". $attributes['class'] ."\">\n";
+        $str = "<ul id=\"" . $attributes['id'] . "\" class=\"" . $attributes['class'] . "\">\n";
         foreach ($data as $k => $v) {
             $str .= "\t<li>";
-            $str .= is_array($v) ? $k.self::ul($v) : $v;
+            $str .= is_array($v) ? $k . self::ul($v) : $v;
             $str .= "</li>\n";
         }
         $str .= "</ul>\n";
@@ -129,15 +120,15 @@ class Html
      */
     public static function ol($data, $attributes = array())
     {
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             return '';
         }
-        $attributes = $attributes + array('id'=>'', 'class'=>'');
+        $attributes = $attributes + array('id' => '', 'class' => '');
 
-        $str="<ol id=\"". $attributes['id'] ."\" class=\"". $attributes['class'] ."\">\n";
+        $str = "<ol id=\"" . $attributes['id'] . "\" class=\"" . $attributes['class'] . "\">\n";
         foreach ($data as $k => $v) {
             $str .= "\t<li>";
-            $str .= is_array($v) ? $k.self::ol($v) : $v;
+            $str .= is_array($v) ? $k . self::ol($v) : $v;
             $str .= "</li>\n";
         }
         $str .= "</ol>\n";
@@ -156,13 +147,13 @@ class Html
         // 必须是二维数组
         if (is_string($data)) {
             return $data;
-        } elseif (is_array($data) && ! is_array(reset($data))) {
+        } elseif (is_array($data) && !is_array(reset($data))) {
             return implode(' ', $data);
         }
 
-        $attributes = $attributes + array('id'=>'', 'class'=>'');
+        $attributes = $attributes + array('id' => '', 'class' => '');
 
-        $str="<table id=\"". $attributes['id'] ."\" class=\"". $attributes['class'] ."\">\n";
+        $str = "<table id=\"" . $attributes['id'] . "\" class=\"" . $attributes['class'] . "\">\n";
 
         //table th
         if (!empty($title)) {
@@ -195,15 +186,16 @@ class Html
      * -
      * @param mixed $name hidden名称，如果想批量设置，此为数组
      * @param string $value
+     * @return string
      */
     public static function form_hidden($name, $value = '')
     {
         if (is_string($name)) {
-            return '<input type="hidden" id="'. $name .'" name="'. $name .'" value="'. $value .'" />'."\n";
+            return '<input type="hidden" id="' . $name . '" name="' . $name . '" value="' . $value . '" />' . "\n";
         } elseif (is_array($name)) {
             $hidden = '';
             foreach ($name as $k => $v) {
-                $hidden .= '<input type="hidden" id="'. $k .'" name="'. $k .'" value="'. $v .'" />'."\n";
+                $hidden .= '<input type="hidden" id="' . $k . '" name="' . $k . '" value="' . $v . '" />' . "\n";
             }
             return $hidden;
         } else {
@@ -222,7 +214,7 @@ class Html
      */
     public static function form_select($name = '', $options = array(), $selected = array(), $extra = '')
     {
-        if (! is_array($selected)) {
+        if (!is_array($selected)) {
             $selected = array($selected);
         }
 
@@ -235,30 +227,30 @@ class Html
         }
 
         if ($extra != '') {
-            $extra = ' '.$extra;
+            $extra = ' ' . $extra;
         }
 
         $multiple = (count($selected) > 1 && strpos($extra, 'multiple') === false) ? ' multiple="multiple"' : '';
 
-        $form = '<select name="'.$name.'" id="'.$name.'"'. $extra.$multiple .">\n";
+        $form = '<select name="' . $name . '" id="' . $name . '"' . $extra . $multiple . ">\n";
 
         foreach ($options as $key => $val) {
-            $key = (string) $key;
+            $key = (string)$key;
 
             if (is_array($val)) {
-                $form .= '<optgroup label="'.$key.'">'."\n";
+                $form .= '<optgroup label="' . $key . '">' . "\n";
 
                 foreach ($val as $optgroup_key => $optgroup_val) {
                     $sel = (in_array($optgroup_key, $selected)) ? ' selected="selected"' : '';
 
-                    $form .= '<option value="'.$optgroup_key.'"'.$sel.'>'.(string) $optgroup_val."</option>\n";
+                    $form .= '<option value="' . $optgroup_key . '" ' . $sel . '>' . (string)$optgroup_val . "</option>\n";
                 }
 
-                $form .= '</optgroup>'."\n";
+                $form .= '</optgroup>' . "\n";
             } else {
                 $sel = (in_array($key, $selected)) ? ' selected="selected"' : '';
 
-                $form .= '<option value="'.$key.'"'.$sel.'>'.(string) $val."</option>\n";
+                $form .= '<option value="' . $key . '" ' . $sel . '>' . (string)$val . "</option>\n";
             }
         }
 
@@ -271,13 +263,13 @@ class Html
      * 生成checkbox
      * @param mixed $data
      * @param mixed $value
-     * @param string $checked
+     * @param bool $checked
      * @param string $extra
      * @return string
      */
     public static function form_checkbox($data = '', $value = '', $checked = false, $extra = '')
     {
-        $defaults = array('type' => 'checkbox', 'name' => (( ! is_array($data)) ? $data : ''), 'value' => $value);
+        $defaults = array('type' => 'checkbox', 'name' => ((!is_array($data)) ? $data : ''), 'value' => $value);
 
         if (is_array($data) && array_key_exists('checked', $data)) {
             $checked = $data['checked'];
@@ -295,20 +287,20 @@ class Html
             unset($defaults['checked']);
         }
 
-        return "<input ".self::_parse_form_attributes($data, $defaults).$extra." />\n";
+        return "<input " . self::_parse_form_attributes($data, $defaults) . $extra . " />\n";
     }
 
     /**
      * 生成radio
      * @param mixed $data
      * @param mixed $value
-     * @param string $checked
+     * @param bool $checked
      * @param string $extra
      * @return string
      */
     public static function form_radio($data = '', $value = '', $checked = false, $extra = '')
     {
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             $data = array('name' => $data);
         }
 
@@ -318,10 +310,10 @@ class Html
 
     /**
      * Parse the form attributes
-     * @ignore
      * @param mixed $attributes
      * @param mixed $default
      * @return string
+     * @ignore
      */
     private static function _parse_form_attributes($attributes, $default)
     {

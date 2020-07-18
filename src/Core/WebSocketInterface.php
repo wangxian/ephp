@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpUnused */
+
 namespace ePHP\Core;
 
 use Swoole\Http\Request;

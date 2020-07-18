@@ -1,22 +1,25 @@
 <?php
+/** @noinspection ALL */
+
 /**
  * This feature is temporarily unavailable
  */
+
 namespace ePHP\Model;
 
 use ePHP\Core\Config;
 
 class ModelMongodb
 {
-    protected $table_name   = '';
-    protected $sql          = array();
+    protected $table_name = '';
+    protected $sql = array();
 
-    protected $field        = array();
-    protected $limit        = '';
-    protected $skip         = '';
-    protected $orderby      = array();
-    protected $where        = array();
-    protected $data             = array();
+    protected $field = array();
+    protected $limit = '';
+    protected $skip = '';
+    protected $orderby = array();
+    protected $where = array();
+    protected $data = array();
 
     public $db_config_name = 'default';
 
@@ -31,20 +34,20 @@ class ModelMongodb
      */
     protected function _clear_var()
     {
-        $this->field    = array();
-        $this->limit    = '';
-        $this->skip     = '';
-        $this->where    = array();
-        $this->orderby  = array();
-        $this->data         = array();
+        $this->field   = array();
+        $this->limit   = '';
+        $this->skip    = '';
+        $this->where   = array();
+        $this->orderby = array();
+        $this->data    = array();
     }
 
     protected function conn()
     {
-        if (! isset(self::$_db_handle[$this->db_config_name])) {
+        if (!isset(self::$_db_handle[$this->db_config_name])) {
             $db_config = 'dbconfig.' . $db_config;
-            if (false == ( $iconfig = C($this->db_config_name, 'db') )) {
-                show_error('数据库配制文件db.config.php中 '. $this->db_config_name .'  未设置。');
+            if (false == ($iconfig = C($this->db_config_name, 'db'))) {
+                show_error('数据库配制文件db.config.php中 ' . $this->db_config_name . '  未设置。');
             }
 
             $DSN = 'mongodb://'; // exp: mongodb://192.168.1.222
@@ -52,7 +55,7 @@ class ModelMongodb
                 $DSN .= $iconfig['user'];
             }
             if ($iconfig['password']) {
-                $DSN .= ':'.$iconfig['password'];
+                $DSN .= ':' . $iconfig['password'];
             }
 
             if ($DSN != 'mongodb://') {
@@ -63,10 +66,10 @@ class ModelMongodb
             }
 
             if (!empty($iconfig['port'])) {
-                $DSN .= ':'.$iconfig['port'];
+                $DSN .= ':' . $iconfig['port'];
             }
 
-            $mongoDB = new Mongo($DSN);
+            $mongoDB                                 = new Mongo($DSN);
             self::$_db_handle[$this->db_config_name] = $this->db = $mongoDB->selectDB($iconfig['dbname']);
         } else {
             $this->db = self::$_db_handle[$this->db_config_name];
@@ -76,7 +79,7 @@ class ModelMongodb
 
     /**
      * 查询的表名
-     * @param  string $table_name 表名
+     * @param string $table_name 表名
      * @return string $this
      */
     public function table($table_name)
@@ -86,7 +89,7 @@ class ModelMongodb
     }
 
     /**
-     * model::table()方法的别名，查询的表名
+     * Alias table() method
      * @param string $table_name
      * @return $this
      */
@@ -118,7 +121,7 @@ class ModelMongodb
 
     /**
      * 要查询的字段
-     * @param  string $field 要查询的字段列表
+     * @param string $field 要查询的字段列表
      * @return object $this
      */
     public function select($field)
@@ -146,7 +149,7 @@ class ModelMongodb
     public function limit($skip, $limit)
     {
         $this->limit = $limit;
-        $this->skip = $skip;
+        $this->skip  = $skip;
         return $this;
     }
 
@@ -174,7 +177,7 @@ class ModelMongodb
 
     /**
      * where条件
-     * @param  array $where
+     * @param array $where
      * @return object $this
      */
     public function where($where, $noquote = array())
@@ -185,7 +188,7 @@ class ModelMongodb
 
     /**
      * 对查询结果排序
-     * @param  array $orderby
+     * @param array $orderby
      * @return object $this
      */
     public function orderby($orderby)
@@ -204,8 +207,8 @@ class ModelMongodb
      */
     public function group($keys, $initial, $reduce, $options = array())
     {
-        $ret = $this->conn()->selectCollection($this->table_name)->group($keys, $initial, $reduce, $options);
-        $this->sql = array('table'=> $this->table_name, 'keys'=>$keys, 'reduce'=> $reduce, 'options'=> $options);
+        $ret       = $this->conn()->selectCollection($this->table_name)->group($keys, $initial, $reduce, $options);
+        $this->sql = array('table' => $this->table_name, 'keys' => $keys, 'reduce' => $reduce, 'options' => $options);
         $this->_clear_var();
         return $ret;
     }
@@ -226,12 +229,12 @@ class ModelMongodb
      */
     public function find()
     {
-        $ret = $this->conn()->selectCollection($this->table_name)->findOne($this->where, $this->field);
+        $ret       = $this->conn()->selectCollection($this->table_name)->findOne($this->where, $this->field);
         $this->sql = array(
-                     'table'=> $this->table_name,
-                     'query'=>$this->where,
-                     'field'=> $this->field
-                   );
+            'table' => $this->table_name,
+            'query' => $this->where,
+            'field' => $this->field
+        );
         $this->_clear_var();
         return $ret;
     }
@@ -251,12 +254,12 @@ class ModelMongodb
         }
 
         $this->sql = array(
-                     'table'=> $this->table_name,
-                     'query'=>$this->where,
-                     'field'=> $this->field,
-                     'limit'=> $this->limit,
-                     'skip'=> $this->skip,
-                   );
+            'table' => $this->table_name,
+            'query' => $this->where,
+            'field' => $this->field,
+            'limit' => $this->limit,
+            'skip'  => $this->skip,
+        );
         $this->_clear_var();
         return $ret;
     }
@@ -285,7 +288,7 @@ class ModelMongodb
      */
     public function findPage()
     {
-        $data['data'] = $this->findAll();
+        $data['data']       = $this->findAll();
         $data['data_count'] = $this->conn()->selectCollection($this->table_name)->count();
 
         return $data;
@@ -298,8 +301,8 @@ class ModelMongodb
      */
     public function count()
     {
-        $ret = $this->conn()->selectCollection($this->table_name)->count($this->where);
-        $this->sql = array('table'=> $this->table_name,'where'=>$this->where);
+        $ret       = $this->conn()->selectCollection($this->table_name)->count($this->where);
+        $this->sql = array('table' => $this->table_name, 'where' => $this->where);
 
         $this->_clear_var();
         return $ret;
@@ -311,8 +314,8 @@ class ModelMongodb
      */
     public function delete()
     {
-        $ret = $this->conn()->selectCollection($this->table_name)->remove($this->where);
-        $this->sql = array('table'=> $this->table_name,'where'=>$this->where);
+        $ret       = $this->conn()->selectCollection($this->table_name)->remove($this->where);
+        $this->sql = array('table' => $this->table_name, 'where' => $this->where);
 
         $this->_clear_var();
         return $ret;
@@ -325,8 +328,8 @@ class ModelMongodb
      */
     public function update($options = array())
     {
-        $ret = $this->conn()->selectCollection($this->table_name)->update($this->where, $this->data, $options);
-        $this->sql = array('table'=> $this->table_name,'where'=>$this->where, 'update_data'=> $this->data);
+        $ret       = $this->conn()->selectCollection($this->table_name)->update($this->where, $this->data, $options);
+        $this->sql = array('table' => $this->table_name, 'where' => $this->where, 'update_data' => $this->data);
 
         $this->_clear_var();
         return $ret;
@@ -338,9 +341,9 @@ class ModelMongodb
      */
     public function insert()
     {
-        $data = $this->data;
-        $ret = $this->conn()->selectCollection($this->table_name)->insert($data);
-        $this->sql = array('table'=> $this->table_name,'insert_data'=> $this->data);
+        $data      = $this->data;
+        $ret       = $this->conn()->selectCollection($this->table_name)->insert($data);
+        $this->sql = array('table' => $this->table_name, 'insert_data' => $this->data);
 
         $this->_clear_var();
         if ($ret) {

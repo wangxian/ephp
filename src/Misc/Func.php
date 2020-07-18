@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace ePHP\Misc;
 
 /**
@@ -21,7 +22,6 @@ namespace ePHP\Misc;
  * echo Func::remove_xss() //过滤xss攻击
  * </code>
  */
-
 class Func
 {
     /**
@@ -73,7 +73,7 @@ class Func
      */
     public static function randNum($min = null, $max = null)
     {
-        mt_srand((double) microtime() * 1000000);
+        mt_srand((double)microtime() * 1000000);
         if ($min === null || $max === null) {
             return mt_rand();
         } else {
@@ -84,14 +84,15 @@ class Func
     /**
      * 产生随机字串，可用来自动生成密码 默认长度6位 字母和数字混合
      *
-     * @param string $len 长度
-     * @param string $type 0大小写字母，1数字，2大写字母，3小写字母，4中文,5大小写数字
+     * @param int $len 长度
+     * @param int $type 0大小写字母，1数字，2大写字母，3小写字母，4中文,5大小写数字
      * @param string $addChars 额外字符
      * @return string
      */
     public static function randString($len = 6, $type = 3, $addChars = '')
     {
-        $str = '';
+        $str   = '';
+        $chars = '';
         switch ($type) {
             case 0:
                 $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' . $addChars;
@@ -111,10 +112,10 @@ class Func
             case 5:
                 $chars = 'ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789' . $addChars;
                 break;
-                // default :
-                // 默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
-                //                $chars='ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'.$addChars;
-                //                break;
+            // default :
+            // 默认去掉了容易混淆的字符oOLl和数字01，要添加请使用addChars参数
+            //                $chars='ABCDEFGHIJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'.$addChars;
+            //                break;
         }
 
         if ($len > 10) {
@@ -141,7 +142,7 @@ class Func
      */
     public static function md5Rand()
     {
-        srand((double) microtime() * 1000000);
+        srand((double)microtime() * 1000000);
         return md5(uniqid(time() . rand()));
     }
 
@@ -152,7 +153,7 @@ class Func
      * @param string $start 开始位置
      * @param string $length 截取长度
      * @param string $charset 编码格式
-     * @param string $suffix 截断显示字符,是否显示 '...'
+     * @param bool $suffix 截断显示字符,是否显示 '...'
      * @return string
      */
     public static function msubstr($str, $start, $length, $charset = "UTF-8", $suffix = false)
@@ -181,8 +182,9 @@ class Func
      *
      * @param mixed $size
      * @param integer $dec 保留几位小数
+     * @return string
      */
-    public static function byte_format($size, $dec = 2)
+    public static function byte_format($size, int $dec = 2)
     {
         $a   = array("B", "KB", "MB", "GB", "TB", "PB");
         $pos = 0;
@@ -197,8 +199,9 @@ class Func
      * 检查字符串是否是UTF8编码
      *
      * @param string $string
+     * @return false|int
      */
-    public static function is_utf8($string)
+    public static function is_utf8(string $string)
     {
         return preg_match('%^(?:
              [\x09\x0A\x0D\x20-\x7E]            # ASCII
@@ -215,9 +218,10 @@ class Func
     /**
      * 代码加亮
      *
-     * @param string  $str 要高亮显示的字符串 或者 文件名
+     * @param string $str 要高亮显示的字符串 或者 文件名
      * @param boolean $show 是否输出
      * @return string
+     * @noinspection RegExpRedundantEscape
      */
     public static function highlight_code($str, $show = false)
     {
@@ -230,7 +234,7 @@ class Func
         $str = str_replace(array('&lt;', '&gt;'), array('<', '>'), $str);
         $str = str_replace(array('&lt;?php', '?&gt;', '\\'), array('phptagopen', 'phptagclose', 'backslashtmp'), $str);
 
-        $str = '<?php //tempstart' . "\n" . $str . '//tempend ?>'; // <?
+        $str = '<?php //tempstart' . "\n" . $str . '//tempend ?>';                                                                                                                                                                                                             // <?
 
         // All the magic happens here, baby!
         $str = highlight_string($str, true);
@@ -246,8 +250,8 @@ class Func
         $str = preg_replace("#//tempend.+#is", "</span>\n</code>", $str);
 
         // Replace our markers back to PHP tags.
-        $str    = str_replace(array('phptagopen', 'phptagclose', 'backslashtmp'), array('&lt;?php', '?&gt;', '\\'), $str); //<?
-        $line   = explode("<br />", rtrim(ltrim($str, '<code>'), '</code>'));
+        $str    = str_replace(array('phptagopen', 'phptagclose', 'backslashtmp'), array('&lt;?php', '?&gt;', '\\'), $str);                                                                                                                                                        //<?
+        $line = explode("<br />", rtrim(ltrim($str, '<code>'), '</code>'));
         $result = '<div class="code"><ol>';
         foreach ($line as $key => $val) {
             $result .= '<li>' . $val . '</li>';
@@ -258,6 +262,7 @@ class Func
 
         if ($show !== false) {
             echo $result;
+            return null;
         } else {
             return $result;
         }
@@ -267,9 +272,12 @@ class Func
      * 输出安全的html
      *
      * @param string $text
-     * @param string $tags,不允许的html标签。
+     * @param string $tags ,不允许的html标签。
+     * @return string|string[]
+     * @noinspection RegExpRedundantEscape
+     * @noinspection RegExpSingleCharAlternation
      */
-    public static function h($text, $tags = null)
+    public static function h(string $text, string $tags = null)
     {
         $text = trim($text);
         $text = preg_replace('/<!--?.*-->/', '', $text); //完全过滤注释
@@ -306,7 +314,7 @@ class Func
         // 允许的HTML标签
         $text = preg_replace('/<(' . $tags . ')( [^><\[\]]*)>/i', '[\1\2]', $text);
         //过滤多余html
-        $text = preg_replace('/<\/?(html|head|meta|link|base|basefont|body|bgsound|title|style|script|form|iframe|frame|frameset|applet|id|ilayer|layer|name|script|style|xml)[^><]*>/i', '', $text);
+        $text = preg_replace('/<\/?(html|head|meta|link|base|basefont|body|bgsound|title|form|iframe|frame|frameset|applet|id|ilayer|layer|name|script|style|xml)[^><]*>/i', '', $text);
 
         // 过滤合法的html标签
         while (preg_match('/<([a-z]+)[^><\[\]]*>[^><]*<\/\1>/i', $text, $mat)) {
@@ -338,44 +346,6 @@ class Func
         return $text;
     }
 
-    // ubb转换
-    public static function ubb($Text)
-    {
-        $Text = trim($Text);
-        // $Text=htmlspecialchars($Text);
-        $Text = preg_replace('/\\t/is', '  ', $Text);
-        $Text = preg_replace('/\[h1\](.+?)\[\/h1\]/is', "<h1>\\1</h1>", $Text);
-        $Text = preg_replace('/\[h2\](.+?)\[\/h2\]/is', "<h2>\\1</h2>", $Text);
-        $Text = preg_replace('/\[h3\](.+?)\[\/h3\]/is', "<h3>\\1</h3>", $Text);
-        $Text = preg_replace('/\[h4\](.+?)\[\/h4\]/is', "<h4>\\1</h4>", $Text);
-        $Text = preg_replace('/\[h5\](.+?)\[\/h5\]/is', "<h5>\\1</h5>", $Text);
-        $Text = preg_replace('/\[h6\](.+?)\[\/h6\]/is', "<h6>\\1</h6>", $Text);
-        $Text = preg_replace('/\[separator\]/is', "", $Text);
-        $Text = preg_replace('/\[center\](.+?)\[\/center\]/is', "<center>\\1</center>", $Text);
-        $Text = preg_replace('/\[url=http:\/\/([^\[]*)\](.+?)\[\/url\]/is', "<a href=\"http://\\1\" target=_blank>\\2</a>", $Text);
-        $Text = preg_replace('/\[url=([^\[]*)\](.+?)\[\/url\]/is', "<a href=\"http://\\1\" target=_blank>\\2</a>", $Text);
-        $Text = preg_replace('/\[url\]http:\/\/([^\[]*)\[\/url\]/is', "<a href=\"http://\\1\" target=_blank>\\1</a>", $Text);
-        $Text = preg_replace('/\[url\]([^\[]*)\[\/url\]/is', "<a href=\"\\1\" target=_blank>\\1</a>", $Text);
-        $Text = preg_replace('/\[img\](.+?)\[\/img\]/is', "<img src=\\1>", $Text);
-        $Text = preg_replace('/\[color=(.+?)\](.+?)\[\/color\]/is', "<font color=\\1>\\2</font>", $Text);
-        $Text = preg_replace('/\[size=(.+?)\](.+?)\[\/size\]/is', "<font size=\\1>\\2</font>", $Text);
-        $Text = preg_replace('/\[sup\](.+?)\[\/sup\]/is', "<sup>\\1</sup>", $Text);
-        $Text = preg_replace('/\[sub\](.+?)\[\/sub\]/is', "<sub>\\1</sub>", $Text);
-        $Text = preg_replace('/\[pre\](.+?)\[\/pre\]/is', "<pre>\\1</pre>", $Text);
-        $Text = preg_replace('/\[email\](.+?)\[\/email\]/is', "<a href='mailto:\\1'>\\1</a>", $Text);
-        $Text = preg_replace('/\[colorTxt\](.+?)\[\/colorTxt\]/eis', "color_txt('\\1')", $Text);
-        $Text = preg_replace('/\[emot\](.+?)\[\/emot\]/eis', "emot('\\1')", $Text);
-        $Text = preg_replace('/\[i\](.+?)\[\/i\]/is', "<i>\\1</i>", $Text);
-        $Text = preg_replace('/\[u\](.+?)\[\/u\]/is', "<u>\\1</u>", $Text);
-        $Text = preg_replace('/\[b\](.+?)\[\/b\]/is', "<b>\\1</b>", $Text);
-        $Text = preg_replace('/\[quote\](.+?)\[\/quote\]/is', " <div class='quote'><h5>引用:</h5><blockquote>\\1</blockquote></div>", $Text);
-        $Text = preg_replace('/\[code\](.+?)\[\/code\]/eis', "highlight_code('\\1')", $Text);
-        $Text = preg_replace('/\[php\](.+?)\[\/php\]/eis', "highlight_code('\\1')", $Text);
-        $Text = preg_replace('/\[sig\](.+?)\[\/sig\]/is', "<div class='sign'>\\1</div>", $Text);
-        $Text = preg_replace('/\\n/is', '<br/>', $Text);
-        return $Text;
-    }
-
     /**
      * 过滤xss数据
      *
@@ -384,7 +354,7 @@ class Func
      */
     public static function remove_xss($val)
     {
-        $val = preg_replace('/([\x00-\x08,\x0b-\x0c,\x0e-\x19])/', '', $val);
+        $val = preg_replace('/([\x00-\x08,\x0b-\x0c\x0e-\x19])/', '', $val);
 
         $search = 'abcdefghijklmnopqrstuvwxyz';
         $search .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -392,7 +362,7 @@ class Func
         $search .= '~`";:?+/={}[]-_|\'\\';
         for ($i = 0; $i < strlen($search); $i++) {
             $val = preg_replace('/(&#[xX]0{0,8}' . dechex(ord($search[$i])) . ';?)/i', $search[$i], $val); // with a ;
-            $val = preg_replace('/(&#0{0,8}' . ord($search[$i]) . ';?)/', $search[$i], $val); // with a ;
+            $val = preg_replace('/(&#0{0,8}' . ord($search[$i]) . ';?)/', $search[$i], $val);              // with a ;
         }
 
         // now the only remaining whitespace attacks are \t, \n, and \r
@@ -415,9 +385,9 @@ class Func
                     }
                     $pattern .= $ra[$i][$j];
                 }
-                $pattern .= '/i';
+                $pattern     .= '/i';
                 $replacement = substr($ra[$i], 0, 2) . '<x>' . substr($ra[$i], 2); // add in <> to nerf the tag
-                $val         = preg_replace($pattern, $replacement, $val); // filter out the hex tags
+                $val         = preg_replace($pattern, $replacement, $val);         // filter out the hex tags
                 if ($val_before == $val) {
                     // no replacements were made, so exit the loop
                     $found = false;
@@ -433,11 +403,12 @@ class Func
      *
      * @param string $str :字符或字符串(子串)
      * @param string $string :字符串(母串)
+     * @return bool
      */
-    public static function strExists($str, $string)
+    public static function strExists(string $str, string $string)
     {
-        $string = (string) $string;
-        $str    = (string) $str;
+        $string = (string)$string;
+        $str    = (string)$str;
         return strstr($string, $str) === false ? false : true;
     }
 
@@ -447,8 +418,9 @@ class Func
      * 一般将 <textarea> 标记中输入的内容从数据库中读出来后在网页中显示
      *
      * @param string $text
+     * @return string
      */
-    public static function toHtml($text)
+    public static function toHtml(string $text)
     {
         $text = htmlspecialchars($text);
         $text = nl2br(str_replace(' ', '&nbsp;', $text));
@@ -461,6 +433,7 @@ class Func
      * 替换掉+ / = 字符，这样不用urldecode了
      *
      * @param $string
+     * @return string
      */
     public static function safe_b64encode($string)
     {
@@ -473,6 +446,7 @@ class Func
      * 安全的base64_encode
      *
      * @param $string
+     * @return string
      */
     public static function safe_b64decode($string)
     {
