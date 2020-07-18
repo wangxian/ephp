@@ -33,7 +33,6 @@ class Config
      * @param string $key
      * @param string $config_name 配置项名称，如mian
      * @return mixed
-     * @throws ExitException
      */
     public static function get($key, $config_name = 'main')
     {

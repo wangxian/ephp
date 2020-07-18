@@ -26,7 +26,6 @@ class FileLogger
      * @param string $key
      * @param string $value
      * @return void
-     * @throws ExitException
      */
     public function write($key, $value)
     {

@@ -1,6 +1,5 @@
-<?php /** @noinspection SpellCheckingInspection */
-
-/** @noinspection PhpUnused */
+<?php
+/** @noinspection ALL */
 
 namespace ePHP\Cache;
 
@@ -31,8 +30,7 @@ class Cache
     /**
      * 初始化, 获取缓存示例，$cache = Cache::init();
      *
-     * @return mixed
-     * @throws ExitException
+     * @return Cache
      */
     public static function init()
     {
@@ -61,7 +59,7 @@ class Cache
                 $cache_driver = 'redis';
             }
 
-            $cache_driver = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
+            $cache_driver           = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
             self::$instance->handle = new $cache_driver($type);
         }
 

@@ -1,4 +1,5 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php /** @noinspection PhpUnused */
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 // Swoole Coroutine MySQL
 namespace ePHP\Model;
@@ -28,9 +29,7 @@ class DB_mysqli_pool extends DB_mysqli
 
     /**
      * @noinspection PhpMissingParentConstructorInspection
-     * @noinspection PhpUnhandledExceptionInspection
      * @param string $db_config
-     * @throws \ePHP\Exception\ExitException
      */
     function __construct($db_config = 'default')
     {
@@ -89,7 +88,6 @@ class DB_mysqli_pool extends DB_mysqli
      *
      * @param string $sql
      * @return object
-     * @throws \ePHP\Exception\ExitException
      */
     public function query($sql)
     {

@@ -1,7 +1,4 @@
-<?php /** @noinspection PhpUnusedParameterInspection */
-/** @noinspection PhpFullyQualifiedNameUsageInspection */
-
-/** @noinspection PhpUnused */
+<?php /** @noinspection ALL */
 
 namespace ePHP\Cache;
 
@@ -15,7 +12,6 @@ class CacheFile
      *
      * @param string $key
      * @return mixed
-     * @throws ExitException
      */
     public function get($key)
     {
@@ -45,7 +41,6 @@ class CacheFile
      * @param mixed $value
      * @param int $expire 有效期，0,长期有效, -1: 不缓存，1：缓存
      * @return int
-     * @throws ExitException
      */
     public function set($key, $value, $expire = 0)
     {
@@ -73,7 +68,6 @@ class CacheFile
      *
      * @param string $key
      * @return bool
-     * @throws ExitException
      */
     public function delete($key)
     {
@@ -85,7 +79,6 @@ class CacheFile
      *
      * @param string $dir 删除指定目录的缓存
      * @return void
-     * @throws ExitException
      */
     public function flush($dir = '')
     {
@@ -100,10 +93,8 @@ class CacheFile
      *
      * @param string $key
      * @return string
-     * @throws ExitException
      * @access private
      * @noinspection PhpUndefinedConstantInspection
-     * @noinspection PhpUnhandledExceptionInspection
      */
     private function _filename($key)
     {

@@ -74,7 +74,6 @@ class Controller
      * Stop run Application
      *
      * @return void
-     * @throws \ePHP\Exception\ExitException
      */
     protected function stopRun()
     {
@@ -119,7 +118,6 @@ class Controller
      * @param string $url
      * @param int $code 301 or 302
      * @return void
-     * @throws \ePHP\Exception\ExitException
      * @noinspection HtmlRequiredLangAttribute
      */
     protected function redirect($url, $code = 302)

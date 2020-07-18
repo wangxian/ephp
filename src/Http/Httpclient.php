@@ -1,6 +1,6 @@
-<?php /** @noinspection SpellCheckingInspection */
+<?php
+/** @noinspection SpellCheckingInspection */
 /** @noinspection PhpUnused */
-
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 namespace ePHP\Http;

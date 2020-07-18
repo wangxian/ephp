@@ -10,8 +10,6 @@ use ePHP\Exception\ExitException;
  * 默认使用console.info打印信息
  *
  * @return void
- * @noinspection BadExpressionStatementJS
- * @noinspection JSUnnecessarySemicolon
  */
 function cc()
 {
@@ -31,7 +29,6 @@ function cc()
  * console.log and die
  *
  * @return void
- * @throws ExitException
  */
 function ccc()
 {
@@ -65,7 +62,6 @@ function dd()
  * dump variable and die
  *
  * @return void
- * @throws ExitException
  */
 function ddd()
 {
@@ -116,7 +112,6 @@ function error_handler($errno, $errstr, $errfile, $errline)
  * @ignore
  * @param \Swoole\Http\Response $swooleResponse
  * @return void
- * @throws ExitException
  */
 function shutdown_handler($swooleResponse = null)
 {
@@ -146,6 +141,11 @@ function shutdown_handler($swooleResponse = null)
     }
 }
 
+
+/**
+ * 打印系统耗时到浏览器控制台
+ * @param bool $verbose 是否打印数据库查询次数
+ */
 function run_info($verbose = false)
 {
     cc('当前系统运行耗时:', number_format((microtime(1) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2, '.', ''), 'ms');
@@ -160,7 +160,6 @@ function run_info($verbose = false)
  * @param string $key 日志名称，自动加上{2010-09-22.log}的作为文件名
  * @param string $value
  * @return void
- * @throws ExitException
  */
 function wlog($key, $value)
 {
@@ -177,9 +176,6 @@ function wlog($key, $value)
  * 显示404页面
  *
  * @return void
- * @throws ExitException
- * @noinspection PhpIncludeInspection
- * @noinspection PhpUndefinedConstantInspection
  */
 function show_404()
 {
@@ -203,8 +199,6 @@ function show_404()
  * @param string $message 要显示的消息内容
  * @param string $url 可选，要跳转的URL，如果省略则使用referer，跳转到上一个界面
  * @param int $wait 可选，自动跳转等待时间，默认6s
- * @return void
- * @throws ExitException
  */
 function show_success($message, $url = '', $wait = 6)
 {
@@ -235,7 +229,6 @@ function show_success($message, $url = '', $wait = 6)
  * @param string $url 可选，要跳转的URL，如果省略则使用referer，跳转到上一个界面
  * @param int $wait 可选，自动跳转等待时间，默认6s
  * @return void
- * @throws ExitException
  */
 function show_error($message, $url = '', $wait = 6)
 {
@@ -263,7 +256,6 @@ function show_error($message, $url = '', $wait = 6)
  * @param string $url 要跳转的url
  * @param int $wait 可选，跳转等待时间，默认0s
  * @param string $message 可选，提示信息
- * @throws ExitException
  */
 function R($url, $wait = 0, $message = '')
 {

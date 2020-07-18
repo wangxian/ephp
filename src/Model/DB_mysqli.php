@@ -14,7 +14,6 @@ class DB_mysqli
     public $db = null;
     protected $config = [];
 
-    /** @noinspection PhpUnhandledExceptionInspection */
     function __construct($db_config = 'default')
     {
         $db_config = 'dbconfig.' . $db_config;
@@ -68,7 +67,6 @@ class DB_mysqli
      *
      * @param string $sql
      * @return bool|\mysqli_result
-     * @throws \ePHP\Exception\ExitException
      */
     function query($sql)
     {
@@ -99,7 +97,6 @@ class DB_mysqli
      *
      * @param string $sql
      * @return array
-     * @throws \ePHP\Exception\ExitException
      */
     function fetch_array($sql)
     {
@@ -118,7 +115,6 @@ class DB_mysqli
      *
      * @param string $sql
      * @return array
-     * @throws \ePHP\Exception\ExitException
      */
     function fetch_arrays($sql)
     {
@@ -136,7 +132,6 @@ class DB_mysqli
      *
      * @param string $sql
      * @return object
-     * @throws \ePHP\Exception\ExitException
      */
     function fetch_object($sql)
     {
@@ -152,7 +147,6 @@ class DB_mysqli
      *
      * @param string $sql
      * @return array
-     * @throws \ePHP\Exception\ExitException
      */
     function fetch_objects($sql)
     {
