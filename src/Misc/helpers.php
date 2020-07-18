@@ -1,6 +1,7 @@
-<?php /** @noinspection SpellCheckingInspection */
+<?php /** @noinspection ALL */
 
 use ePHP\Core\Config;
+use ePHP\Exception\ExitException;
 
 /**
  * 使用浏览器console打印，调试方法
@@ -30,12 +31,12 @@ function cc()
  * console.log and die
  *
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function ccc()
 {
     call_user_func_array('cc', func_get_args());
-    throw new \ePHP\Exception\ExitException();
+    throw new ExitException();
 }
 
 /**
@@ -64,12 +65,12 @@ function dd()
  * dump variable and die
  *
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function ddd()
 {
     call_user_func_array('dd', func_get_args());
-    throw new \ePHP\Exception\ExitException();
+    throw new ExitException();
 }
 
 /**
@@ -115,7 +116,7 @@ function error_handler($errno, $errstr, $errfile, $errline)
  * @ignore
  * @param \Swoole\Http\Response $swooleResponse
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function shutdown_handler($swooleResponse = null)
 {
@@ -159,7 +160,7 @@ function run_info($verbose = false)
  * @param string $key 日志名称，自动加上{2010-09-22.log}的作为文件名
  * @param string $value
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function wlog($key, $value)
 {
@@ -176,7 +177,7 @@ function wlog($key, $value)
  * 显示404页面
  *
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  * @noinspection PhpIncludeInspection
  * @noinspection PhpUndefinedConstantInspection
  */
@@ -190,7 +191,7 @@ function show_404()
         include APP_PATH . '/views/' . $tpl;
     }
 
-    throw new \ePHP\Exception\ExitException();
+    throw new ExitException();
 }
 
 /**
@@ -203,7 +204,7 @@ function show_404()
  * @param string $url 可选，要跳转的URL，如果省略则使用referer，跳转到上一个界面
  * @param int $wait 可选，自动跳转等待时间，默认6s
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function show_success($message, $url = '', $wait = 6)
 {
@@ -221,7 +222,7 @@ function show_success($message, $url = '', $wait = 6)
         include APP_PATH . '/views/' . $tpl;
     }
 
-    throw new \ePHP\Exception\ExitException();
+    throw new ExitException();
 }
 
 /**
@@ -234,7 +235,7 @@ function show_success($message, $url = '', $wait = 6)
  * @param string $url 可选，要跳转的URL，如果省略则使用referer，跳转到上一个界面
  * @param int $wait 可选，自动跳转等待时间，默认6s
  * @return void
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function show_error($message, $url = '', $wait = 6)
 {
@@ -253,7 +254,7 @@ function show_error($message, $url = '', $wait = 6)
         include APP_PATH . '/views/' . $tpl;
     }
 
-    throw new \ePHP\Exception\ExitException();
+    throw new ExitException();
 }
 
 /**
@@ -262,7 +263,7 @@ function show_error($message, $url = '', $wait = 6)
  * @param string $url 要跳转的url
  * @param int $wait 可选，跳转等待时间，默认0s
  * @param string $message 可选，提示信息
- * @throws \ePHP\Exception\ExitException
+ * @throws ExitException
  */
 function R($url, $wait = 0, $message = '')
 {
@@ -276,12 +277,12 @@ function R($url, $wait = 0, $message = '')
         // redirect
         header("Content-Type:text/html; charset=UTF-8");
         header("Location: {$url}");
-        throw new \ePHP\Exception\ExitException();
+        throw new ExitException();
     } else {
         // html refresh
         // header("refresh:{$wait};url={$url}"); // 直接发送header头。
         include __DIR__ . '/../Template/302.html';
-        throw new \ePHP\Exception\ExitException();
+        throw new ExitException();
     }
 }
 
