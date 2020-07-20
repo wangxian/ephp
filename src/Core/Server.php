@@ -352,8 +352,8 @@ EOT;
     {
         // STDOUT_LOG 开启才显示日志
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " | ...... http \e[45mmaster\e[0m process start[master_pid={$server->master_pid}] ...... \n";
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " | ...... http \e[46mmanager\e[0m process start[manager_pid={$server->manager_pid}] ......\e[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m ...... http \e[45mmaster\e[0m process start[master_pid={$server->master_pid}] ...... \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m ...... http \e[46mmanager\e[0m process start[manager_pid={$server->manager_pid}] ......\e[0m \n";
         }
 
         // Add event Listener
@@ -368,7 +368,7 @@ EOT;
      */
     public function onShutdown(\Swoole\Server $server)
     {
-        echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[31m http server shutdown ......\e[0m \n";
+        echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[31m http server shutdown ......\e[0m \n";
 
         // Add event Listener
         $this->trigger_user_event('onShutdown', $server);
@@ -385,7 +385,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " | ...... http \e[43mworker\e[0m process start[id={$workerId} pid={$server->worker_pid}] ...... \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m ...... http \e[43mworker\e[0m process start[id={$workerId} pid={$server->worker_pid}] ...... \n";
         }
 
         // Add event Listener
@@ -403,7 +403,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[35m ...... http worker process stop[id={$workerId} pid={$server->worker_pid}] ......\e[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[35m ...... http worker process stop[id={$workerId} pid={$server->worker_pid}] ......\e[0m \n";
         }
 
         // Add event Listener
