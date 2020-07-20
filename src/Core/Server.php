@@ -115,8 +115,9 @@ EOT;
 
     /**
      * 打印访问日志
+     * @param Request $request
      */
-    private function printAccessLog()
+    private function printAccessLog(Request $request)
     {
         // 非STDOUT_LOG模式，不打印
         if (getenv('STDOUT_LOG')) {
@@ -126,9 +127,9 @@ EOT;
                 $post_data = '-';
             }
 
-            echo  "\e[1m[ACCESS_LOG] \e[0m | \e[35m" . (new \DateTime())->format('Y-m-d H:i:s.u') . "\e[0m | \e[33m" . serverv('REMOTE_ADDR') . "\e[0m"
+            echo  "\e[1m[ACCESS_LOG] \e[0m | \e[35m" . (new \DateTime())->format('Y-m-d H:i:s.u') . "\e[0m | \e[1;33m" . serverv('REMOTE_ADDR') . "\e[0m"
                 . " | \e[1;46m " . serverv('REQUEST_METHOD') . " \e[0m \e[4;30m" . serverv('REQUEST_URI') . "\e[0m"
-                . ' | ' . $post_data
+                . ' | ' . $post_data . " |\e[1;30m fd=" . $request->fd . "\e[0m"
                 . " | \e[1;36m" . number_format((microtime(true) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2) . "ms\e[0m\n";
 
             // echo "\tSERVER=" . json_encode(serverv()) . "\n";
@@ -338,7 +339,7 @@ EOT;
         }
 
         // 非调试模式，打印访问日志
-        $this->printAccessLog();
+        $this->printAccessLog($request);
     }
 
     /**
@@ -421,7 +422,7 @@ EOT;
      */
     public function onWorkerError(\Swoole\Server $server, int $workerId, int $worker_pid, int $exit_code, int $signal)
     {
-        echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[31m http worker process error[id={$workerId} pid={$worker_pid}] ......\e[0m \n";
+        echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m http worker process error[id={$workerId} pid={$worker_pid}] ......\e[0m \n";
 
         // Add event Listener
         $this->trigger_user_event('onWorkerError', $server, $workerId, $worker_pid, $exit_code, $signal);
@@ -467,7 +468,7 @@ EOT;
             ];
 
             if (getenv('STDOUT_LOG')) {
-                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[34m [websocket][onopen]fd{$request->fd}, pid=" . getmypid() . ", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\e[0m\n";
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m\e[34m [websocket][onOpen]fd{$request->fd}, pid=" . getmypid() . ", uri={$request->server['request_uri']}, WebSocket has been CONNECTED...\e[0m\n";
                 echo '>>> pid=' . getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext))
                     . ', connections=' . count(self::$websocketFrameContext) . "\n";
                 echo '>>> GET=' . json_encode(getv(), JSON_UNESCAPED_UNICODE) . "\n------\n";
@@ -492,7 +493,7 @@ EOT;
         // print_r(self::$websocketFrameContext);
         if (empty(self::$websocketFrameContext[$frame->fd]) || !$server->isEstablished($frame->fd)) {
             if (getenv('STDOUT_LOG')) {
-                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[31m [ERROR][onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\e[0m \n";
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\e[0m \n";
             }
 
             $server->disconnect($frame->fd);
@@ -511,7 +512,7 @@ EOT;
         $controller_class                                     = $context['controller_class'];
 
         if (getenv('STDOUT_LOG') && $frame->data != '{"action":"ping"}') {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\e[0m\n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m\e[36m [INFO][onmessage]fd{$frame->fd}, data={$frame->data}, opcode:{$frame->opcode}, fin:{$frame->finish}\e[0m\n";
             echo '>>> pid=' . getmypid() . ', fds=' . implode(',', array_keys(self::$websocketFrameContext)) . "\n";
             echo '>>> GET=' . json_encode($context['get']) . "\n------\n";
         }
@@ -541,10 +542,11 @@ EOT;
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactorId)
     {
+        // http发生onClose时，不进行websocketFrameContext的清理
         if (empty(self::$websocketFrameContext[$fd])) {
-            if (getenv('STDOUT_LOG')) {
-                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[31m [ERROR][onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
-            }
+            // if (getenv('STDOUT_LOG')) {
+            //     echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
+            // }
             return;
         }
 
@@ -552,7 +554,7 @@ EOT;
         $context = self::$websocketFrameContext[$fd];
 
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\e[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;43m INFO \e[0m\e[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\e[0m \n";
             echo 'GET=' . json_encode($context['get']) . "\n------\n";
         }
 
@@ -567,9 +569,10 @@ EOT;
         // Clear websocket cache
         unset(self::$websocketFrameContext[$fd]);
 
+        // Call xxxController::onClose()
         call_user_func([new $controller_class(), 'onClose'], $server, $fd);
 
-        // Add event Listener
+        // Call \App\Boot::onclose
         $this->trigger_user_event('onClose', $server, $fd, $reactorId);
     }
 }
