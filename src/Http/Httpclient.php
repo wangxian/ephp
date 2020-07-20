@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection SpellCheckingInspection */
 /** @noinspection PhpUnused */
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
@@ -64,7 +66,6 @@ class Httpclient
      * @param array $options
      *
      * @return HttpclientResponse
-     * @throws \Exception
      */
     public function get($url, $params = array(), $options = array())
     {
@@ -79,7 +80,6 @@ class Httpclient
      * @param array $options
      *
      * @return HttpclientResponse
-     * @throws \Exception
      */
     public function post($url, $params = array(), $options = array())
     {
@@ -94,7 +94,6 @@ class Httpclient
      * @param array $options
      *
      * @return HttpclientResponse
-     * @throws \Exception
      */
     public function put($url, $params = array(), $options = array())
     {
@@ -109,7 +108,6 @@ class Httpclient
      * @param array $options
      *
      * @return HttpclientResponse
-     * @throws \Exception
      */
     public function patch($url, $params = array(), $options = array())
     {
@@ -124,7 +122,6 @@ class Httpclient
      * @param array $options
      *
      * @return HttpclientResponse
-     * @throws \Exception
      */
     public function delete($url, $params = array(), $options = array())
     {
@@ -140,7 +137,6 @@ class Httpclient
      * @param array $options
      *
      * @return HttpclientResponse
-     * @throws \Exception
      * @noinspection SpellCheckingInspection
      */
     protected function request($url, $method = self::GET, $params = array(), $options = array())
@@ -275,7 +271,6 @@ class Httpclient
      * Perform the Curl request.
      *
      * @return array
-     * @throws \Exception
      */
     protected function doCurl()
     {
