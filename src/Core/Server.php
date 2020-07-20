@@ -211,15 +211,11 @@ EOT;
             $boot = new \App\Boot();
 
             if (method_exists($boot, $event)) {
+                // Args
                 $args = func_get_args();
                 array_shift($args);
-                call_user_func_array([$boot, $event], $args);
-            }
 
-            // Listen Background task listener
-            if ($event == 'onBoot') {
-                $this->server->on('task', [$boot, 'onTask']);
-                $this->server->on('finish', [$boot, 'onFinish']);
+                call_user_func_array([$boot, $event], $args);
             }
         }
     }
@@ -248,8 +244,9 @@ EOT;
         $this->server->on('close', [$this, 'onConnect']);
         $this->server->on('close', [$this, 'onClose']);
 
-        // Trigger onBoot event
-        $this->trigger_user_event('onBoot', $this->server);
+        // Trigger tasks event
+        $this->server->on('task', [$this, 'onTask']);
+        $this->server->on('finish', [$this, 'onFinish']);
 
         // Start a new http server
         $this->server->start();
@@ -426,6 +423,38 @@ EOT;
 
         // Add event Listener
         $this->trigger_user_event('onWorkerError', $server, $workerId, $worker_pid, $exit_code, $signal);
+    }
+
+    /**
+     * 在 task 进程内被调用。worker 进程可以使用 task 函数向 task_worker 进程投递新的任务。
+     * 当前的 Task 进程在调用 onTask 回调函数时会将进程状态切换为忙碌，这时将不再接收新的 Task，
+     * 当 onTask 函数返回时会将进程状态切换为空闲然后继续接收新的 Task。
+     *
+     * v4.2.12 起如果开启了 task_enable_coroutine 第二个参数是 \Swoole\Server\Task
+     *
+     * https://wiki.swoole.com/#/server/events?id=ontask
+     *
+     * @param \Swoole\Server $server
+     * @param \Swoole\Server\Task $task
+     */
+    public function onTask(\Swoole\Server $server, \Swoole\Server\Task $task)
+    {
+        // Add event Listener
+        $this->trigger_user_event('onTask', $server, $task);
+    }
+
+    /**
+     * 此回调函数在 worker 进程被调用，当 worker 进程投递的任务在 task 进程中完成时，
+     * task 进程会通过 Swoole\Server->finish() 方法将任务处理的结果发送给 worker 进程。
+     *
+     * @param \Swoole\Server $server
+     * @param int $task_id
+     * @param string $data
+     */
+    public function onFinish(\Swoole\Server $server, int $task_id, string $data)
+    {
+        // Add event Listener
+        $this->trigger_user_event('onFinish', $server, $task_id, $data);
     }
 
     /**
