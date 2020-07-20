@@ -102,13 +102,7 @@ class Controller
      */
     protected function setHeader($key, $value)
     {
-        if (SERVER_MODE === 'swoole') {
-            \Swoole\Coroutine::getContext()['__$response']->header($key, $value);
-        } else {
-            if (!headers_sent()) {
-                header($key . ': ' . $value);
-            }
-        }
+        \set_header($key, $value);
     }
 
     /**

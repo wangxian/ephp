@@ -494,3 +494,21 @@ function append_server($key, $value) {
         \Swoole\Coroutine::getContext()['__$_SERVER'][$key] = $value;
     }
 }
+
+/**
+ * Set response header
+ *
+ * @param string $key
+ * @param string $value
+ * @return void
+ */
+function set_header($key, $value)
+{
+    if (SERVER_MODE === 'swoole') {
+        \Swoole\Coroutine::getContext()['__$response']->header($key, $value);
+    } else {
+        if (!headers_sent()) {
+            header($key . ': ' . $value);
+        }
+    }
+}
