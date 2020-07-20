@@ -194,12 +194,12 @@ EOT;
     }
 
     /**
-     * Trigger event
+     * Trigger user event Of \App\Boot
      *
      * @param string $event
      * @return void
      */
-    private function trigger_event(string $event)
+    private function trigger_user_event(string $event)
     {
         // Automatically instantiate this class
         if (class_exists("\App\Boot")) {
@@ -247,7 +247,7 @@ EOT;
         $this->server->on('close', [$this, 'onClose']);
 
         // Trigger onBoot event
-        $this->trigger_event('onBoot', $this->server);
+        $this->trigger_user_event('onBoot', $this->server);
 
         // Start a new http server
         $this->server->start();
@@ -355,7 +355,7 @@ EOT;
         }
 
         // Add event Listener
-        $this->trigger_event('onStart', $server);
+        $this->trigger_user_event('onStart', $server);
     }
 
     /**
@@ -369,7 +369,7 @@ EOT;
         echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m http server shutdown ......\033[0m \n";
 
         // Add event Listener
-        $this->trigger_event('onShutdown', $server);
+        $this->trigger_user_event('onShutdown', $server);
     }
 
     /**
@@ -387,7 +387,7 @@ EOT;
         }
 
         // Add event Listener
-        $this->trigger_event('onWorkerStart', $server, $workerId);
+        $this->trigger_user_event('onWorkerStart', $server, $workerId);
     }
 
     /**
@@ -405,7 +405,7 @@ EOT;
         }
 
         // Add event Listener
-        $this->trigger_event('onWorkerStop', $server, $workerId);
+        $this->trigger_user_event('onWorkerStop', $server, $workerId);
     }
 
     /**
@@ -423,7 +423,7 @@ EOT;
         echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\033[31m http worker process error[id={$workerId} pid={$worker_pid}] ......\033[0m \n";
 
         // Add event Listener
-        $this->trigger_event('onWorkerError', $server, $workerId, $worker_pid, $exit_code, $signal);
+        $this->trigger_user_event('onWorkerError', $server, $workerId, $worker_pid, $exit_code, $signal);
     }
 
     /**
@@ -528,7 +528,7 @@ EOT;
     public function onConnect(\Swoole\Server $server, int $fd, int $reactorId)
     {
         // Add event Listener
-        $this->trigger_event('onConnect', $server, $fd, $reactorId);
+        $this->trigger_user_event('onConnect', $server, $fd, $reactorId);
     }
 
     /**
@@ -569,6 +569,6 @@ EOT;
         call_user_func([new $controller_class(), 'onClose'], $server, $fd);
 
         // Add event Listener
-        $this->trigger_event('onClose', $server, $fd, $reactorId);
+        $this->trigger_user_event('onClose', $server, $fd, $reactorId);
     }
 }
