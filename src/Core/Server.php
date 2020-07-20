@@ -382,7 +382,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m ...... http \e[43mworker\e[0m process start[id={$workerId} pid={$server->worker_pid}] ...... \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[33m...... ". ($server->taskworker?'TASK':'HTTP') ." worker process start[id={$workerId} pid={$server->worker_pid}] ...... \e[0m\n";
         }
 
         // Add event Listener
@@ -400,7 +400,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[35m ...... http worker process stop[id={$workerId} pid={$server->worker_pid}] ......\e[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[35m...... ". ($server->taskworker?'TASK':'HTTP') ." worker process stop[id={$workerId} pid={$server->worker_pid}] ......\n";
         }
 
         // Add event Listener
