@@ -261,13 +261,18 @@ function redirect_to($url, $wait = 0, $message = '')
 {
     // header("HTTP/1.1 301 Moved Permanently");
     if ($wait === 0) {
-        set_header("Content-Type", "text/html; charset=UTF-8");
-        set_header("Location", $url);
+        if (SERVER_MODE != 'swoole') {
+            set_header("Content-Type", "text/html; charset=UTF-8");
+            set_header("Location", $url);
+        } else {
+            \Swoole\Coroutine::getContext()['__$response']->redirect($url, 302);
+        }
+
         throw new ExitException();
     } else {
         if (empty($message)) {
             /** @noinspection PhpUnusedLocalVariableInspection */
-            $message = "系统将在{$wait}秒之后自动跳转到{$url}！";
+            $message = "系统将在{$wait}秒之后自动跳转到 {$url}";
         }
 
         // html refresh
