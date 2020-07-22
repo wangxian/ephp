@@ -228,7 +228,6 @@ function show_success($message, $url = '', $wait = 6)
  * @param string $message 要显示的消息内容
  * @param string $url 可选，要跳转的URL，如果省略则使用referer，跳转到上一个界面
  * @param int $wait 可选，自动跳转等待时间，默认6s
- * @return void
  */
 function show_error($message, $url = '', $wait = 6)
 {
@@ -256,6 +255,7 @@ function show_error($message, $url = '', $wait = 6)
  * @param string $url 要跳转的url
  * @param int $wait 可选，跳转等待时间，默认0s
  * @param string $message 可选，提示信息
+ * @noinspection PhpUnhandledExceptionInspection
  */
 function redirect_to($url, $wait = 0, $message = '')
 {
@@ -282,7 +282,7 @@ function redirect_to($url, $wait = 0, $message = '')
  * @param $url
  * @param int $wait
  * @param string $message
- * @throws ExitException
+ * @noinspection PhpUnhandledExceptionInspection
  */
 function R($url, $wait = 0, $message = '')
 {
