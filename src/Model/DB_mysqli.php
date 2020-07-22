@@ -57,7 +57,7 @@ class DB_mysqli
         }
 
         // Set charset
-        $db->set_charset(isset($this->config['charset']));
+        $db->set_charset($this->config['charset']);
 
         $this->db = $db;
     }
