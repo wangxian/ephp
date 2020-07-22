@@ -109,9 +109,9 @@ function error_handler($errno, $errstr, $errfile, $errline)
 /**
  * 捕获Swoole异常退出错误
  *
- * @ignore
  * @param \Swoole\Http\Response $swooleResponse
  * @return void
+ * @ignore
  */
 function shutdown_handler($swooleResponse = null)
 {
@@ -257,25 +257,36 @@ function show_error($message, $url = '', $wait = 6)
  * @param int $wait 可选，跳转等待时间，默认0s
  * @param string $message 可选，提示信息
  */
-function R($url, $wait = 0, $message = '')
+function redirect_to($url, $wait = 0, $message = '')
 {
     // header("HTTP/1.1 301 Moved Permanently");
-    if (empty($message)) {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $message = "系统将在{$wait}秒之后自动跳转到{$url}！";
-    }
-
-    if (!headers_sent() && (0 === $wait)) {
-        // redirect
-        header("Content-Type:text/html; charset=UTF-8");
-        header("Location: {$url}");
+    if ($wait === 0) {
+        set_header("Content-Type", "text/html; charset=UTF-8");
+        set_header("Location", $url);
         throw new ExitException();
     } else {
+        if (empty($message)) {
+            /** @noinspection PhpUnusedLocalVariableInspection */
+            $message = "系统将在{$wait}秒之后自动跳转到{$url}！";
+        }
+
         // html refresh
-        // header("refresh:{$wait};url={$url}"); // 直接发送header头。
         include __DIR__ . '/../Template/302.html';
         throw new ExitException();
     }
+}
+
+/**
+ * Alias redirect_to
+ *
+ * @param $url
+ * @param int $wait
+ * @param string $message
+ * @throws ExitException
+ */
+function R($url, $wait = 0, $message = '')
+{
+    redirect_to($url, $wait, $message);
 }
 
 /**
@@ -457,13 +468,14 @@ function env($key, $default = '')
  * @param $key
  * @param $value
  */
-function append_get($key, $value) {
+function append_get($key, $value)
+{
     if (SERVER_MODE != 'swoole') {
-        $_GET[$key] = $value;
+        $_GET[$key]     = $value;
         $_REQUEST[$key] = $value;
     } else {
         \Swoole\Coroutine::getContext()['__$request']->get[$key] = $value;
-        \Swoole\Coroutine::getContext()['__$_REQUEST'][$key] = $value;
+        \Swoole\Coroutine::getContext()['__$_REQUEST'][$key]     = $value;
     }
 }
 
@@ -472,13 +484,14 @@ function append_get($key, $value) {
  * @param $key
  * @param $value
  */
-function append_post($key, $value) {
+function append_post($key, $value)
+{
     if (SERVER_MODE != 'swoole') {
-        $_POST[$key] = $value;
+        $_POST[$key]    = $value;
         $_REQUEST[$key] = $value;
     } else {
         \Swoole\Coroutine::getContext()['__$request']->post[$key] = $value;
-        \Swoole\Coroutine::getContext()['__$_REQUEST'][$key] = $value;
+        \Swoole\Coroutine::getContext()['__$_REQUEST'][$key]      = $value;
     }
 }
 
@@ -487,7 +500,8 @@ function append_post($key, $value) {
  * @param $key
  * @param $value
  */
-function append_server($key, $value) {
+function append_server($key, $value)
+{
     if (SERVER_MODE != 'swoole') {
         $_SERVER[$key] = $value;
     } else {
