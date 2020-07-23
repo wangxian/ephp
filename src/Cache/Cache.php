@@ -46,7 +46,19 @@ class Cache
             }
 
             $cache_driver = '\\ePHP\Cache\\' . ($cache_driver ? 'Cache' . ucfirst($cache_driver) : 'CacheFile');
-            return new $cache_driver($type);
+
+            // 使用上下文，避免重复实例化
+            if (isset(\Swoole\Coroutine::getContext()['__$instance_cache'])) {
+                return \Swoole\Coroutine::getContext()['__$instance_cache'];
+            } else {
+                $self = new self();
+                $self->handle = new $cache_driver($type);
+
+                // 记录到context中
+                \Swoole\Coroutine::getContext()['__$instance_cache'] = $self;
+
+                return $self;
+            }
         } else if (!isset(self::$instance)) { // php-fpm 及 buildin
             self::$instance = new self();
 
