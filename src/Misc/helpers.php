@@ -328,8 +328,8 @@ function getp($pos, $default = '', $callback = 'trim')
     static $url_part = [];
     if (empty($url_part) || SERVER_MODE === 'swoole') {
         // only first time
-        $pos = strpos(serverv('PATH_INFO'), '?');
-        $url = $pos ? substr(serverv('PATH_INFO'), 1, $pos) : substr(serverv('PATH_INFO'), 1);
+        $pos_trim = strpos(serverv('PATH_INFO'), '?');
+        $url = $pos_trim ? substr(serverv('PATH_INFO'), 1, $pos_trim) : substr(serverv('PATH_INFO'), 1);
         if (!empty($url)) {
             $url_part = explode('/', $url);
         } else {
