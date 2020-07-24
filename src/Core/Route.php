@@ -84,7 +84,7 @@ class Route
     {
         // Default path is /index/index
         $path_info = serverv('PATH_INFO', '/');
-        if ($path_info == '/') {
+        if ($path_info == '' || $path_info == '/') {
             $path_info = '/index/index';
         }
 
