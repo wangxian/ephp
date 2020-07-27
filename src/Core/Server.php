@@ -130,7 +130,7 @@ EOT;
             echo  "\e[1m[ACCESS_LOG] \e[0m | \e[35m" . (new \DateTime())->format('Y-m-d H:i:s.u') . "\e[0m | \e[1;33m" . serverv('REMOTE_ADDR') . "\e[0m"
                 . " | \e[1;46m " . serverv('REQUEST_METHOD') . " \e[0m \e[4;30m" . serverv('REQUEST_URI') . "\e[0m"
                 . ' | ' . $post_data . " |\e[1;30m fd=" . $request->fd . "\e[0m"
-                . " | \e[1;36m" . number_format((microtime(true) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2) . "ms\e[0m\n";
+                . " | \e[1;36m" . number_format((microtime(true) - serverv('REQUEST_TIME_FLOAT', 0)) * 1000, 2) . "ms\e[0m\n";
 
             // echo "\tSERVER=" . json_encode(serverv()) . "\n";
         }

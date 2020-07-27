@@ -148,7 +148,7 @@ function shutdown_handler($swooleResponse = null)
  */
 function run_info($verbose = false)
 {
-    cc('当前系统运行耗时:', number_format((microtime(1) - serverv('REQUEST_TIME_FLOAT')) * 1000, 2, '.', ''), 'ms');
+    cc('当前系统运行耗时:', number_format((microtime(1) - serverv('REQUEST_TIME_FLOAT', 0)) * 1000, 2, '.', ''), 'ms');
     if ($verbose) {
         cc('数据库查询次数:', serverv('__$DB_QUERY_COUNT', 0));
     }
