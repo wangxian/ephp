@@ -248,6 +248,9 @@ EOT;
         $this->server->on('task', [$this, 'onTask']);
         $this->server->on('finish', [$this, 'onFinish']);
 
+        // Add event Listener before boot
+        $this->trigger_user_event("onBoot", $this->server);
+
         // Start a new http server
         $this->server->start();
     }
