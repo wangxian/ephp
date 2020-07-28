@@ -491,7 +491,7 @@ EOT;
             \Swoole\Coroutine::getContext()['controller_class'] = $controller_class;
             // Save websocket connection Context
             self::$websocketFrameContext[$request->fd] = [
-                'get'              => $this->get ?? [],
+                'get'              => $request->get ?? [],
                 'cookie'           => $request->cookie ?? [],
                 'controller_class' => $controller_class
             ];
