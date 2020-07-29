@@ -69,7 +69,9 @@ class BaseModel
      */
     private function conn()
     {
-        if (SERVER_MODE == 'swoole') {
+        // Swoole 不能使用static共享变量，否则协程切换会有问题
+        // 同时不能使用 SERVER_MODE 去检查，在cli模式下无法进行路由调度，故使用函数检测的方式
+        if (function_exists('go')) {
             // swoole模式下，static property是全局变量，协程切换时会出现问题，这里使用成员变量处理
             // 当swoole协程context结束时，自动回收内存
             if (isset($this->_swoole_db_handle[$this->db_config_name])) {

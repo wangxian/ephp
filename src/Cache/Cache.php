@@ -34,8 +34,9 @@ class Cache
      */
     public static function init()
     {
-        // Swoole 不能使用static共享变量
-        if (SERVER_MODE == 'swoole') {
+        // Swoole 不能使用static共享变量，否则协程切换会有问题
+        // 同时不能使用 SERVER_MODE 去检查，在cli模式下无法进行路由调度，故使用函数检测的方式
+        if (function_exists('go')) {
             // 使用哪种方式的cache
             $cache_driver = Config::get('cache_driver');
 
