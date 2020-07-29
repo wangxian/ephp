@@ -129,7 +129,7 @@ class Route
                 if ($f) {
                     if (count($url_args) > 0) {
                         $getValue = array_merge(getv(), $url_args);
-                        if (SERVER_MODE !== 'swoole') {
+                        if (SERVER_MODE != 'swoole') {
                             $_GET = $getValue;
                         } else {
                             /** @noinspection PhpSingleStatementWithBracesInspection */

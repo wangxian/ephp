@@ -49,7 +49,7 @@ class Controller
                 return $this->session = new \ePHP\Http\Session($session_name);
                 break;
             case 'cookie':
-                return $this->cookie = SERVER_MODE !== 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole();
+                return $this->cookie = SERVER_MODE != 'swoole' ? new \ePHP\Http\Cookie() : new \ePHP\Http\CookieSwoole();
                 break;
             case 'server':
                 return Server::init()->server;
@@ -117,7 +117,7 @@ class Controller
     protected function redirect($url, $code = 302)
     {
         if (!headers_sent()) {
-            if (SERVER_MODE === 'swoole') {
+            if (SERVER_MODE == 'swoole') {
                 \Swoole\Coroutine::getContext()['__$response']->status($code);
             } else if ($code == 301) {
                 header('HTTP/1.1 301 Moved Permanently');
@@ -141,7 +141,7 @@ class Controller
      */
     protected function rawContent()
     {
-        if (SERVER_MODE !== 'swoole') {
+        if (SERVER_MODE != 'swoole') {
             return file_get_contents('php://input');
         } else {
             return \Swoole\Coroutine::getContext()['__$request']->rawContent();

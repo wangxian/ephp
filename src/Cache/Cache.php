@@ -35,7 +35,7 @@ class Cache
     public static function init()
     {
         // Swoole 不能使用static共享变量
-        if (SERVER_MODE === 'swoole') {
+        if (SERVER_MODE == 'swoole') {
             // 使用哪种方式的cache
             $cache_driver = Config::get('cache_driver');
 

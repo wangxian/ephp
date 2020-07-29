@@ -131,7 +131,7 @@ function shutdown_handler($swooleResponse = null)
                 wlog('ExceptionLog', $str);
 
                 $str = '<pre>' . $str . '</pre>';
-                if (SERVER_MODE !== 'swoole') {
+                if (SERVER_MODE != 'swoole') {
                     echo $str;
                 } else {
                     $swooleResponse->end($str);
@@ -326,7 +326,7 @@ function getv($key = '', $default = '', $callback = 'trim')
 function getp($pos, $default = '', $callback = 'trim')
 {
     static $url_part = [];
-    if (empty($url_part) || SERVER_MODE === 'swoole') {
+    if (empty($url_part) || SERVER_MODE == 'swoole') {
         // only first time
         $pos_trim = strpos(serverv('PATH_INFO'), '?');
         $url = $pos_trim ? substr(serverv('PATH_INFO'), 1, $pos_trim) : substr(serverv('PATH_INFO'), 1);
@@ -523,7 +523,7 @@ function append_server($key, $value)
  */
 function set_header($key, $value)
 {
-    if (SERVER_MODE === 'swoole') {
+    if (SERVER_MODE == 'swoole') {
         \Swoole\Coroutine::getContext()['__$response']->header($key, $value);
     } else {
         if (!headers_sent()) {

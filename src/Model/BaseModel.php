@@ -69,7 +69,7 @@ class BaseModel
      */
     private function conn()
     {
-        if (SERVER_MODE === 'swoole') {
+        if (SERVER_MODE == 'swoole') {
             // swoole模式下，static property是全局变量，协程切换时会出现问题，这里使用成员变量处理
             // 当swoole协程context结束时，自动回收内存
             if (isset($this->_swoole_db_handle[$this->db_config_name])) {

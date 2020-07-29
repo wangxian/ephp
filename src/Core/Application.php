@@ -31,7 +31,7 @@ class Application
 
         // 注册中止时执行的函数
         // Swoole模式下必须在onRequest中单独调用，使用context无法得到response对象
-        if (SERVER_MODE !== 'swoole') {
+        if (SERVER_MODE != 'swoole') {
             register_shutdown_function("shutdown_handler");
         }
 
@@ -67,7 +67,7 @@ class Application
                 }
             }
 
-            if (SERVER_MODE !== 'swoole') {
+            if (SERVER_MODE != 'swoole') {
                 call_user_func([new $controller_name(), $action_name]);
             } else {
                 try {

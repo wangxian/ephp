@@ -85,7 +85,7 @@ class Server
     private function printServerFinger()
     {
         $version       = $this->version;
-        $software      = SERVER_MODE === 'swoole' ? 'Swoole Server' : 'PHP Development Server';
+        $software      = SERVER_MODE == 'swoole' ? 'Swoole Server' : 'PHP Development Server';
         $document_root = APP_PATH . '/public';
 
         echo <<<EOT
