@@ -241,7 +241,7 @@ EOT;
             $this->server->on('message', [$this, 'onMessage']);
         }
 
-        $this->server->on('close', [$this, 'onConnect']);
+        $this->server->on('connect', [$this, 'onConnect']);
         $this->server->on('close', [$this, 'onClose']);
 
         // Trigger tasks event
