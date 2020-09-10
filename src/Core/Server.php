@@ -14,7 +14,7 @@ class Server
      * ePHP latest version
      * @var string
      */
-    private $version = '7.3.0';
+    private $version = '7.3.11';
 
     // /**
     //  * Static file content type
@@ -524,9 +524,9 @@ EOT;
         // $server->push($frame->fd, "this is server");
         // print_r(self::$websocketFrameContext);
         if (empty(self::$websocketFrameContext[$frame->fd]) || !$server->isEstablished($frame->fd)) {
-            if (getenv('STDOUT_LOG')) {
-                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\e[0m \n";
-            }
+            // if (getenv('STDOUT_LOG')) {
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onmessage]fd{$frame->fd}, WebSocket has been stoped before frame sending data\e[0m \n";
+            // }
 
             $server->disconnect($frame->fd);
             return;
@@ -577,7 +577,7 @@ EOT;
         // http发生onClose时，不进行websocketFrameContext的清理
         if (empty(self::$websocketFrameContext[$fd])) {
             // if (getenv('STDOUT_LOG')) {
-            //     echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
             // }
             return;
         }
