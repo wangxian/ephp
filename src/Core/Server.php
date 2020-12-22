@@ -574,37 +574,41 @@ EOT;
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactorId)
     {
-        // http发生onClose时，不进行websocketFrameContext的清理
-        if (empty(self::$websocketFrameContext[$fd])) {
-            // if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
-            // }
-            return;
-        }
+        $self = $this;
+        // FIXED: 这里有一个swoole BUG, 浏览器刷新时，onClose 消息早于 onOpen 事件收到，导致清理关联数据失败
+        \Swoole\Timer::after(1000, function () use (&$self, &$server, $fd, $reactorId) {
+            // http发生onClose时，不进行websocketFrameContext的清理
+            if (empty(self::$websocketFrameContext[$fd])) {
+                // if (getenv('STDOUT_LOG')) {
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
+                // }
+                return;
+            }
 
-        // Get websocket connection Context
-        $context = self::$websocketFrameContext[$fd];
+            // Get websocket connection Context
+            $context = self::$websocketFrameContext[$fd];
 
-        if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;43m INFO \e[0m\e[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\e[0m \n";
-            echo 'GET=' . json_encode($context['get']) . "\n------\n";
-        }
+            if (getenv('STDOUT_LOG')) {
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;43m INFO \e[0m\e[33m [WARNING][onClose]fd{$fd}, WebSocket fd normal quit\e[0m \n";
+                echo 'GET=' . json_encode($context['get']) . "\n------\n";
+            }
 
-        // Restore context data
-        if (empty(\Swoole\Coroutine::getContext()['__$request'])) {
-            \Swoole\Coroutine::getContext()['__$request'] = new \Stdclass();
-        }
-        \Swoole\Coroutine::getContext()['__$request']->get    = $context['get'];
-        \Swoole\Coroutine::getContext()['__$request']->cookie = $context['cookie'];
-        $controller_class                                     = $context['controller_class'];
+            // Restore context data
+            if (empty(\Swoole\Coroutine::getContext()['__$request'])) {
+                \Swoole\Coroutine::getContext()['__$request'] = new \Stdclass();
+            }
+            \Swoole\Coroutine::getContext()['__$request']->get    = $context['get'];
+            \Swoole\Coroutine::getContext()['__$request']->cookie = $context['cookie'];
+            $controller_class                                     = $context['controller_class'];
 
-        // Clear websocket cache
-        unset(self::$websocketFrameContext[$fd]);
+            // Clear websocket cache
+            unset(self::$websocketFrameContext[$fd]);
 
-        // Call xxxController::onClose()
-        call_user_func([new $controller_class(), 'onClose'], $server, $fd);
+            // Call xxxController::onClose()
+            call_user_func([new $controller_class(), 'onClose'], $server, $fd);
 
-        // Call \App\Boot::onclose
-        $this->trigger_user_event('onClose', $server, $fd, $reactorId);
+            // Call \App\Boot::onclose
+            $self->trigger_user_event('onClose', $server, $fd, $reactorId);
+        });
     }
 }
