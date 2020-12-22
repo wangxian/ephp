@@ -187,7 +187,12 @@ EOT;
             $this->server = new \Swoole\WebSocket\Server($this->config['host'], $this->config['port'], SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
         }
 
-        $this->server->set($this->config);
+        // 注销 swoole server 不需要的配置，否则报错
+        $_config = $this->config;
+        unset($_config['enable_websocket']);
+        unset($_config['host']);
+        unset($_config['port']);
+        $this->server->set($_config);
 
         // Show welcome finger
         $this->printServerFinger();
