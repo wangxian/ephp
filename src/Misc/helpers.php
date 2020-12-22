@@ -134,7 +134,7 @@ function shutdown_handler($swooleResponse = null)
                 if (SERVER_MODE != 'swoole') {
                     echo $str;
                 } else {
-                    $swooleResponse->end($str);
+                    try { $swooleResponse->end($str); } catch (Exception $e) {}
                 }
                 break;
         }
