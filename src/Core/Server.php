@@ -127,7 +127,7 @@ EOT;
                 $post_data = '-';
             }
 
-            echo  "\e[1m[ACCESS_LOG] \e[0m | \e[35m" . (new \DateTime())->format('Y-m-d H:i:s.u') . "\e[0m | \e[1;33m" . serverv('REMOTE_ADDR') . "\e[0m"
+            echo "\e[1m[ACCESS_LOG] \e[0m | \e[35m" . (new \DateTime())->format('Y-m-d H:i:s.u') . "\e[0m | \e[1;33m" . serverv('REMOTE_ADDR') . "\e[0m"
                 . " | \e[1;46m " . serverv('REQUEST_METHOD') . " \e[0m \e[4;30m" . serverv('REQUEST_URI') . "\e[0m"
                 . ' | ' . $post_data . " |\e[1;30m fd=" . $request->fd . "\e[0m"
                 . " | \e[1;36m" . number_format((microtime(true) - serverv('REQUEST_TIME_FLOAT', 0)) * 1000, 2) . "ms\e[0m\n";
@@ -391,7 +391,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[33m...... ". ($server->taskworker?'TASK':'HTTP') ." worker process start[id={$workerId} pid={$server->worker_pid}] ...... \e[0m\n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[33m...... " . ($server->taskworker ? 'TASK' : 'HTTP') . " worker process start[id={$workerId} pid={$server->worker_pid}] ...... \e[0m\n";
         }
 
         // Add event Listener
@@ -409,7 +409,7 @@ EOT;
     {
         // STDOUT_LOG模式，不打印 worker stop 输出
         if (getenv('STDOUT_LOG')) {
-            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[35m...... ". ($server->taskworker?'TASK':'HTTP') ." worker process stop[id={$workerId} pid={$server->worker_pid}] ......\n";
+            echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[30;46m INFO \e[0m \e[35m...... " . ($server->taskworker ? 'TASK' : 'HTTP') . " worker process stop[id={$workerId} pid={$server->worker_pid}] ......\n";
         }
 
         // Add event Listener
@@ -580,17 +580,17 @@ EOT;
      */
     public function onClose(\Swoole\Server $server, int $fd, int $reactorId)
     {
+        // http发生onClose时，不进行websocketFrameContext的清理
+        if (empty(self::$websocketFrameContext[$fd])) {
+            if (getenv('STDOUT_LOG')) {
+                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
+            }
+            return;
+        }
+
         $self = $this;
         // FIXED: 这里有一个swoole BUG, 浏览器刷新时，onClose 消息早于 onOpen 事件收到，导致清理关联数据失败
         \Swoole\Timer::after(1000, function () use (&$self, &$server, $fd, $reactorId) {
-            // http发生onClose时，不进行websocketFrameContext的清理
-            if (empty(self::$websocketFrameContext[$fd])) {
-                // if (getenv('STDOUT_LOG')) {
-                echo (new \DateTime())->format('Y-m-d H:i:s.u') . " |\e[37;41m ERROR \e[0m\e[31m [onClose]fd{$fd}, WebSocket fd has been stoped already, skip ...\e[0m \n";
-                // }
-                return;
-            }
-
             // Get websocket connection Context
             $context = self::$websocketFrameContext[$fd];
 
