@@ -273,7 +273,11 @@ class BaseModel
     {
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                $data[$k] = "'" . $this->escape_string($v) . "'";
+                if (is_null($v))  {
+                    $data[$k] = null;
+                } else {
+                    $data[$k] = "'" . $this->escape_string($v) . "'";
+                }
             }
 
             $this->data += $data;
@@ -318,7 +322,11 @@ class BaseModel
         if (is_array($where)) {
             $tmp = array();
             foreach ($where as $k => $v) {
-                $tmp[] = !is_string($v) ? $k . "=" . $v : $k . "='" . $this->escape_string($v) . "'";
+                if (is_null($v)) {
+                    $tmp[] = $k . " is null";
+                } else {
+                    $tmp[] = !is_string($v) ? $k . "=" . $v : $k . "='" . $this->escape_string($v) . "'";
+                }
             }
             $where = implode(' AND ', $tmp);
         } elseif (is_string($where) && !empty($replacement)) {
