@@ -274,7 +274,7 @@ class BaseModel
         if (is_array($data)) {
             foreach ($data as $k => $v) {
                 if (is_null($v))  {
-                    $data[$k] = null;
+                    $data[$k] = 'null';
                 } else {
                     $data[$k] = "'" . $this->escape_string($v) . "'";
                 }
@@ -323,7 +323,11 @@ class BaseModel
             $tmp = array();
             foreach ($where as $k => $v) {
                 if (is_null($v)) {
-                    $tmp[] = $k . " is null";
+                    if (substr($k, -1) == '!') {
+                        $tmp[] = trim(substr($k, 0, -1)) . " is not null";
+                    } else {
+                        $tmp[] = $k . " is null";
+                    }
                 } else {
                     $tmp[] = !is_string($v) ? $k . "=" . $v : $k . "='" . $this->escape_string($v) . "'";
                 }
