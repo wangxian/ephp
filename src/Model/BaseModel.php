@@ -171,7 +171,6 @@ class BaseModel
         $this->limit   = '';
         $this->where   = '';
         $this->join    = '';
-        $this->expire  = -1;
     }
 
     /**
