@@ -110,7 +110,6 @@ class Cookie
         if (empty($domain)) {
             setcookie($name, null, time() - 3600, $path);
         } else {
-            $domain = '.' . serverv('HTTP_HOST');
             setcookie($name, null, time() - 3600, $path, $domain);
         }
 
