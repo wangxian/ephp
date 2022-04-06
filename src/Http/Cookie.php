@@ -108,9 +108,9 @@ class Cookie
     public function delete($name, $path = '/', $domain = '')
     {
         if (empty($domain)) {
-            setcookie($name, null, time() - 3600, $path);
+            setcookie($name, '', time() - 3600, $path);
         } else {
-            setcookie($name, null, time() - 3600, $path, $domain);
+            setcookie($name, '', time() - 3600, $path, $domain);
         }
 
         unset($_COOKIE[$name]);
