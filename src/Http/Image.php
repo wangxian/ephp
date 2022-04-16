@@ -96,6 +96,8 @@ class Image
             $nw = $thumbWidth;
             $nh = ($h * $thumbWidth) / $w;
         }
+        $nw = intval($nw);
+        $nh = intval($nh);
         // echo "w: $nw , h: $nh";exit;
 
         $ni = imagecreatetruecolor($nw, $nh);
