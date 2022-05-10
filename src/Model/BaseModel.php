@@ -567,6 +567,7 @@ class BaseModel
                 $_table_name = $this->_get_table_name();
                 $sql_count   = 'SELECT count(*) AS countrows FROM ' . $_table_name . $this->join . $_where;
 
+                $data = [];
                 $data['data']       = $this->conn()->fetch_arrays($this->sql);
                 $data['data_count'] = $this->db->fetch_object($sql_count)->countrows;
 
