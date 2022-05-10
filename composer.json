@@ -24,7 +24,6 @@
     "ext-openssl": "*",
     "ext-json": "*",
     "ext-curl": "*",
-    "ext-redis": "*",
     "ext-mysqli": "*",
     "ext-gd": "*",
     "ext-iconv": "*",
