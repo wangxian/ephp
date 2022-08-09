@@ -338,9 +338,40 @@ EOT;
             $response->end($h);
         } else {
             // $extname = substr($filename, strrpos($filename, '.') + 1);
+            // 发现系统已经自动发送 MIME header了，所以注释了以下代码
             // if (isset($this->contentType[$extname])) {
             //     $response->header('Content-Type', $this->contentType[$extname]);
             // }
+
+            // 静态资源的默认有效期，默认值3d
+            $maxAge = Config::get("static_files_max_age");
+            $maxAge = $maxAge !== false ? $maxAge : 86400*3;
+
+            // 客户端最后修改时间
+            $clientModifiedSince = $request->header['if-modified-since'] ?? null;
+
+            // 文件最后修时间
+            $fileStat = stat($filename);
+            $lastModifiedTimeGMT = gmdate("D, d M Y H:i:s", $fileStat['mtime']) . " GMT";
+
+            // 设置最后的修改时间
+            $response->header("Cache-Control", "max-age=" . $maxAge);
+            $response->header("Last-Modified", $lastModifiedTimeGMT);
+
+            // 支持客户端 ETag 模式
+            $clientIfNoneMatch = $request->header['if-none-match'] ?? null;
+            $etag = '"'. $fileStat['mtime'] . '-' . $fileStat['size'] .'"';
+            $response->header("ETag",  $etag);
+
+            // File 304 NOT modified
+            // 文件未过期 或 文件 hash 值未发送变化（文件未修改 hash 值 不变）
+            if ( ($clientIfNoneMatch != null && $clientIfNoneMatch == $etag)
+                || ($clientModifiedSince != null && $clientModifiedSince == $lastModifiedTimeGMT) ) {
+                $response->status(304);
+                $response->end();
+                return;
+            }
+
             $response->sendfile($filename);
         }
 
