@@ -205,7 +205,7 @@ class Httpclient
         // Check for custom headers
         if (isset($options['headers']) && count($options['headers'])) {
             foreach ($options['headers'] as $value) {
-                if ($value == $is_sent_ua) {
+                if (strpos($value, 'user-agent') !== false) {
                     $is_sent_ua = true;
                 }
             }
