@@ -201,8 +201,14 @@ class Httpclient
             }
         }
 
+        $is_sent_ua = false;
         // Check for custom headers
         if (isset($options['headers']) && count($options['headers'])) {
+            foreach ($options['headers'] as $value) {
+                if ($value == $is_sent_ua) {
+                    $is_sent_ua = true;
+                }
+            }
             curl_setopt($this->curl, CURLOPT_HTTPHEADER, $options['headers']);
         }
 
@@ -214,6 +220,19 @@ class Httpclient
         // Check for basic auth
         if (isset($options['auth']['type']) && 'basic' === $options['auth']['type']) {
             curl_setopt($this->curl, CURLOPT_USERPWD, $options['auth']['username'].':'.$options['auth']['password']);
+        }
+
+        // follow url redirect 301/302
+        // 注意：服务器端一般都需要访问携带ua，否则不能访问，从修改支持 follow 起，httpclient 默认都会发送ua
+        if (!empty($options['follow'])) {
+            curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
+            // 最大跳转次数
+            curl_setopt($this->curl, CURLOPT_MAXREDIRS, 3);
+        }
+
+        // always send user agent header
+        if (!$is_sent_ua) {
+            curl_setopt($this->curl, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) ephp-httpclient");
         }
 
         $response = $this->doCurl();
