@@ -146,7 +146,7 @@ class Httpclient
                 $url .= (stripos($url, '?') ? '&' : '?').http_build_query($params);
                 $params = '';
             } elseif (($method === self::POST || $method === self::PUT || $method === self::PATCH)
-                && (empty($options['files']) && empty($options['json']) )
+                && ( empty($options['files']) && empty($options['json']) && empty($options['formdata']) )
                 && !is_string($params)
             ) {
                 $params = http_build_query($params);
