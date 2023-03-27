@@ -143,7 +143,10 @@ class Httpclient
     {
         if (is_array($params)) {
             if ($method === self::GET || $method === self::DELETE) {
-                $url .= (stripos($url, '?') ? '&' : '?').http_build_query($params);
+                if (!empty($params)) {
+                    $url .= (stripos($url, '?') ? '&' : '?').http_build_query($params);
+                }
+                
                 $params = '';
             } elseif (($method === self::POST || $method === self::PUT || $method === self::PATCH)
                 && ( empty($options['files']) && empty($options['json']) && empty($options['formdata']) )
