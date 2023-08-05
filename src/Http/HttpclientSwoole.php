@@ -45,12 +45,12 @@ class HttpclientSwoole extends Httpclient
         $is_ssl = isset($paths['scheme']) && $paths['scheme'] == 'https';
         $port = isset($paths['port']) ? $paths['port'] : ($is_ssl ? 443 : 80);
 
-        $ip = \Swoole\Coroutine::gethostbyname($host);
-        if ( !$ip ) {
-            \throw_error('Coroutine::gethostbyname("'. $host .'") host is empty', 19220);
-        }
+        // $ip = \Swoole\Coroutine::gethostbyname($host);
+        // if ( !$ip ) {
+        //     \throw_error('Coroutine::gethostbyname("'. $host .'") host is empty', 19220);
+        // }
 
-        $cli = new \Swoole\Coroutine\Http\Client($ip, $port, $is_ssl);
+        $cli = new \Swoole\Coroutine\Http\Client($host, $port, $is_ssl);
 
         // 兼容httpclient的header头
         $headers = ['Host' => $host];
